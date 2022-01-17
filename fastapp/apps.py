@@ -14,14 +14,12 @@ from fastai.learner import Learner, load_learner
 from fastai.data.core import DataLoaders
 from fastai.callback.schedule import fit_one_cycle
 from fastai.distributed import distrib_ctx
-from fastai.callback.core import Callback
 from fastai.callback.tracker import SaveModelCallback
 from fastai.callback.wandb import WandbCallback
 from fastai.callback.progress import CSVLogger
 
 import click
 import typer
-from typer.models import OptionInfo, ArgumentInfo
 from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.utils import get_params_from_function
 
@@ -32,13 +30,8 @@ from rich.console import Console
 install()
 console = Console()
 
-
-class WandbCallbackTime(Callback):
-    def __init__(self, wandb_callback):
-        self.wandb_callback = wandb_callback
-
-    def after_epoch(self):
-        wandb.log({'time': time.time() - self.recorder.start_epoch}, step=self.wandb_callback._wandb_step)
+from .params import Param
+from .callbacks import WandbCallbackTime
 
 
 def run_callback(callback, params):
@@ -46,44 +39,6 @@ def run_callback(callback, params):
     allowed_param_names = [p.name for p in allowed_params]
     kwargs = {key:value for key,value in params.items() if key in allowed_param_names}
     return callback(**kwargs)
-
-
-class Param(OptionInfo):
-        
-    def __init__(self, tune=False, tune_min=None, tune_max=None, log=False, distribution=None, annotation=None, **kwargs):
-        super().__init__(**kwargs)
-        self.tune = tune
-        self.log = log
-        self.tune_min = tune_min if tune_min is not None else self.min
-        self.tune_max = tune_max if tune_max is not None else self.max
-        self.annotation = annotation
-
-    def config(self):
-        if self.annotation in [int, float]:
-            assert self.tune_min is not None
-            assert self.tune_max is not None
-
-            distribution = "log_uniform" if self.log else "uniform"
-            if self.annotation == int:
-                distribution = f"q_{distribution}"
-            if self.log:
-                return dict(
-                    distribution=distribution,
-                    min=math.log(self.tune_min),
-                    max=math.log(self.tune_max),
-                )            
-
-            return dict(
-                distribution=distribution,
-                min=self.tune_min,
-                max=self.tune_max,
-            )
-        
-        # TODO add categorical
-
-        pdb.set_trace()
-        raise NotImplementedError
-
 
 
 def version_callback(value: bool):
