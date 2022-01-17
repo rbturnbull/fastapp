@@ -7,7 +7,7 @@ import wandb
 
 from torch import nn
 from fastcore.meta import delegates
-from fastai.learner import Learner, load_learner
+from fastai.learner import Learner, load_learner, cnn_learner
 from fastai.data.core import DataLoaders
 from fastai.callback.schedule import fit_one_cycle
 from fastai.distributed import distrib_ctx
@@ -196,10 +196,14 @@ class FastApp:
     def model(self) -> nn.Module:
         raise NotImplementedError
 
+    def build_learner_func(self):
+        return Learner
+
     def learner(
         self,
         dataloaders,
         output_dir: Path,
+        fp16:bool = Param(default=True, help="Whether or not the floating-point precision of learner should be set to 16 bit."),
         **params,
     ) -> Learner:
         """
@@ -212,9 +216,10 @@ class FastApp:
         model = run_callback(self.model, params)
 
         console.print("Building learner", style="bold")
-        learner = Learner(dataloaders, model, loss_func=self.loss_func(), metrics=self.metrics(), path=output_dir)
+        build_learner_func = self.build_learner_func()
+        learner = build_learner_func(dataloaders, model, loss_func=self.loss_func(), metrics=self.metrics(), path=output_dir)
 
-        if params.get('fp16'):
+        if fp16:
             console.print("Setting floating-point precision of learner to 16 bit", style="red")
             learner = learner.to_fp16()
 
@@ -346,3 +351,28 @@ class FastApp:
         wandb.agent(id, function=agent_train, count=runs, project=name)
 
         return id
+
+
+
+class VisionApp(FastApp):
+
+    def default_model_name(self):
+        return "resnet18"
+
+    def model(
+        self,
+        model_name:str = Param(default="", help="The name of a model architecture in torchvision.models (https://pytorch.org/vision/stable/models.html)."),
+        pretrained:bool = Param(default=True, help="Whether or not to use the pretrained weights.")
+    ):
+        import torchvision.models as models
+
+        if not model_name:
+            model_name = self.default_model_name()
+
+        if not hasattr(models, model_name):
+            raise ValueError(f"Model '{model_name}' not recognized.")
+        
+        return getattr( models, model_name )(pretrained=pretrained)
+
+    def build_learner_func(self):
+        return cnn_learner

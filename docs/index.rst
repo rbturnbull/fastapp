@@ -10,7 +10,11 @@ Welcome to fastapp's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
+   generation
+   apps
+   cli
+   tuning
+   testing
 
 Indices and tables
 ==================
