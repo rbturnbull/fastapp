@@ -1,0 +1,3 @@
+[submodule "fastapp/cookiecutter"]
+	path = fastapp/cookiecutter
+	url = https://github.com/rbturnbull/fastapp-cookiecutter
