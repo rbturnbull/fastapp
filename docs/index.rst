@@ -12,9 +12,13 @@ Welcome to fastapp's documentation!
 
    generation
    apps
-   cli
+   parameters
+   training
    tuning
    testing
+   examples
+
+fastapp is a tool for jumpstarting the creation of deep learning projects with fastai and allows for easy command-line interfaces and hyper-parameter tuning.
 
 Indices and tables
 ==================

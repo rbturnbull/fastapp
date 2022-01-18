@@ -1,5 +1,10 @@
 =======================
-Hyperparameter Tuning
+Examples
 =======================
 
-Information to come.
+
+Iris
+=======================
+
+.. literalinclude :: ../fastapp/examples/iris.py
+   :language: python

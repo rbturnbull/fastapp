@@ -7,7 +7,8 @@ import wandb
 
 from torch import nn
 from fastcore.meta import delegates
-from fastai.learner import Learner, load_learner, cnn_learner
+from fastai.learner import Learner, load_learner
+from fastai.vision.learner import cnn_learner
 from fastai.data.core import DataLoaders
 from fastai.callback.schedule import fit_one_cycle
 from fastai.distributed import distrib_ctx

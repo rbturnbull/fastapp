@@ -1,5 +1,5 @@
 =======================
-Hyperparameter Tuning
+Parameters
 =======================
 
 Information to come.
