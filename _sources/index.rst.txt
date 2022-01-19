@@ -10,8 +10,8 @@ Welcome to fastapp's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   quickstart
    generation
-   apps
    parameters
    training
    tuning
