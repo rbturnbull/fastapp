@@ -23,26 +23,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install
-    - name: Create config file for aurin
-      run: |
-        bash make_test_config.sh
-      env:
-        USERNAME: ${{ secrets.AURINUSERNAME }}
-        PASSWORD: ${{ secrets.AURINPASSWORD }}
     - name: Coverage
       run: |
         poetry run coverage run -m pytest
         poetry run coverage html
         echo "COVERAGE=$(poetry run coverage report --precision 2 | grep TOTAL | tr -s ' ' | cut -f 4 -d " ")" >> $GITHUB_ENV
-    - name: Create Badge
-      uses: schneegans/dynamic-badges-action@v1.1.0
-      with:
-        auth: ${{ secrets.GIST_SECRET }}
-        gistID: 49262550cc8b0fb671d46df58de213d4
-        filename: coverage-badge.json
-        label: coverage
-        message: ${{ env.COVERAGE }}
-        color: green
+    # - name: Create Badge
+    #   uses: schneegans/dynamic-badges-action@v1.1.0
+    #   with:
+    #     auth: ${{ secrets.GIST_SECRET }}
+    #     gistID: 
+    #     filename: coverage-badge.json
+    #     label: coverage
+    #     message: ${{ env.COVERAGE }}
+    #     color: green
 
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@4.1.5
