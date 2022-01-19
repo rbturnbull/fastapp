@@ -1,3 +1,6 @@
 docshtml
 paper.pdf
 fastapp/*.ipynb
+wandb/*
+outputs/*
+fastapp/outputs/*

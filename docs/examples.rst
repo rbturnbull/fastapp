@@ -2,6 +2,11 @@
 Examples
 =======================
 
+Logistic Regression
+=======================
+
+.. literalinclude :: ../fastapp/examples/logistic_regression.py
+   :language: python
 
 Iris
 =======================
