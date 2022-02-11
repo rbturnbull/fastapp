@@ -1,6 +1,8 @@
+from fastapp.apps import WandbLoggingMixin
 import numpy as np
 from torch import nn
 from fastai.tabular.data import TabularDataLoaders
+from fastai.tabular.all import tabular_learner
 from sklearn.datasets import load_iris
 
 import fastapp as fa
@@ -27,8 +29,12 @@ class IrisApp(fa.FastApp):
         self,
         hidden_size:int = fa.Param(128, tune_min=8, tune_max=1028, log=True, help="The number of hidden layers."),
     ):
-        return nn.Sequential(
-            nn.Linear(in_features=len(self.data['feature_names']), out_features=hidden_size),
-            nn.ReLU(),
-            nn.Linear(in_features=hidden_size, out_features=len(self.data['target_names'])),
-        )
+        return None
+
+    def build_learner_func(self):
+        return tabular_learner
+
+class IrisWandbApp(fa.apps.WandbLoggingMixin, IrisApp):
+    
+    def __init__(self):
+        super().__init__()
