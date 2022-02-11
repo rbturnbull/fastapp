@@ -254,9 +254,7 @@ class FastApp:
         monitor = self.monitor()
         if monitor:
             callbacks.append(SaveModelCallback(monitor=monitor))
-        if wandb.run:
-            wandb_callback = WandbCallback(log_preds=False)
-            callbacks.extend([wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)])
+        callbacks = self.logging_callbacks(callbacks)
         return callbacks
 
     def show_batch(self, **kwargs):
@@ -270,22 +268,10 @@ class FastApp:
         lr_max:float = Param(default=1e-4, help="The max learning rate."),
         distributed:bool = Param(default=False, help="If the learner is distributed."),
         wandb:bool = Param(default=False, help="If training should use Weights & Biases."),
-        wandb_name:str = Param(default="", help="The name for this run in Weights & Biases. If no name is given then the name of the output directory is used."),
+        run_name:str = Param(default="", help="The name for this run in Weights & Biases. If no name is given then the name of the output directory is used."),
         **kwargs,
     ) -> Learner:
-        if wandb:
-            import wandb
-            if not wandb_name:
-                wandb_name = Path(output_dir).name
-            wandb.init(
-                project=self.wandb_project_name(), 
-                name=wandb_name,
-                reinit=True,
-                config=dict(
-                    lr_max=lr_max,
-                    **kwargs,
-                )
-            )
+        
 
         dataloaders = run_callback(self.dataloaders, kwargs)
 
@@ -297,7 +283,7 @@ class FastApp:
         learner.export()
         return learner
 
-    def wandb_project_name(self):
+    def project_name(self):
         return self.__class__.__name__
 
     def tune(
@@ -310,8 +296,83 @@ class FastApp:
         **kwargs,
     ):
         if not name:
-            name = f"{self.wandb_project_name()}-tuning"
+            name = f"{self.project_name()}-tuning"
 
+        if not id:
+
+            parameters_config = dict()
+            tuning_params = self.tuning_params()
+            for key, value in tuning_params.items():
+                if key in kwargs and kwargs[key] is None:
+                    parameters_config[key] = value.config()
+            
+            sweep_config = {
+                "name" : name,
+                "method" : method,
+                "parameters" : parameters_config,
+            }
+            if self.monitor():
+                sweep_config['metric'] = dict(name=self.monitor(), goal=self.goal())
+
+            if min_iter:
+                sweep_config['early_terminate'] = dict(type="hyperband", min_iter=min_iter)
+
+            console.print("Configuration for hyper-parameter tuning:", style="bold red")
+            pprint(sweep_config)
+
+    def init_run(self, run_name, output_dir, **kwargs):
+        if not run_name:
+            run_name = Path(output_dir).name
+        print(f'from {self.project_name}')
+        print(f'running {run_name}')
+        print(f'with these parameters: \n {kwargs}')
+    
+    def log(self, param):
+        print(param)
+    
+    def logging_callbacks(self, callbacks):
+        return callbacks
+    
+    
+
+
+class WandbLoggingMixin(object):
+
+    def init_run(self, run_name, output_dir, **kwargs):
+        
+        
+        if not run_name:
+            run_name = Path(output_dir).name
+        wandb.init(
+            project=self.project_name(), 
+            name=run_name,
+            reinit=True,
+            config=dict(
+                **kwargs,
+            )
+        )
+
+    def log(self, param):
+        wandb.log(param)
+
+    def logging_callbacks(self, callbacks):
+        wandb_callback = WandbCallback(log_preds=False)
+        callbacks.extend([wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)])
+        return callbacks
+
+    
+    def tune(
+        self,
+        id: str=None,
+        name: str=None,
+        method: str="random", # Should be enum
+        runs: int=1,
+        min_iter: int=None,
+        **kwargs,
+    ):
+        if not name:
+            name = f"{self.project_name()}-tuning"
+        self.init_run(run_name=name)
         if not id:
 
             parameters_config = dict()
@@ -352,8 +413,6 @@ class FastApp:
         wandb.agent(id, function=agent_train, count=runs, project=name)
 
         return id
-
-
 
 class VisionApp(FastApp):
 
