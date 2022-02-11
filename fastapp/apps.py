@@ -218,7 +218,12 @@ class FastApp:
 
         console.print("Building learner", style="bold")
         build_learner_func = self.build_learner_func()
-        learner = build_learner_func(dataloaders, model, loss_func=self.loss_func(), metrics=self.metrics(), path=output_dir)
+        if model is not None:
+            learner = build_learner_func(dataloaders, model, loss_func=self.loss_func(), metrics=self.metrics(), path=output_dir)
+
+        else:
+            learner = build_learner_func(dataloaders, model, loss_func=self.loss_func(), metrics=self.metrics(), path=output_dir)
+
 
         if fp16:
             console.print("Setting floating-point precision of learner to 16 bit", style="red")
@@ -267,11 +272,15 @@ class FastApp:
         epochs:int = Param(default=20, help="The number of epochs."),
         lr_max:float = Param(default=1e-4, help="The max learning rate."),
         distributed:bool = Param(default=False, help="If the learner is distributed."),
-        wandb:bool = Param(default=False, help="If training should use Weights & Biases."),
+        # wandb:bool = Param(default=False, help="If training should use Weights & Biases."),
         run_name:str = Param(default="", help="The name for this run in Weights & Biases. If no name is given then the name of the output directory is used."),
         **kwargs,
     ) -> Learner:
         
+        kwargs_plus_lr  = kwargs.copy()
+        kwargs_plus_lr['lr_max'] = lr_max
+        
+        self.init_run(run_name=run_name, output_dir=output_dir, **kwargs_plus_lr)
 
         dataloaders = run_callback(self.dataloaders, kwargs)
 
@@ -280,7 +289,7 @@ class FastApp:
         with learner.distrib_ctx() if distributed == True else nullcontext():
             learner.fit_one_cycle(epochs, lr_max=lr_max, cbs=self.callbacks())
         
-        learner.export()
+        self.save_model(learner, run_name)
         return learner
 
     def project_name(self):
@@ -332,7 +341,8 @@ class FastApp:
     
     def logging_callbacks(self, callbacks):
         return callbacks
-    
+    def save_model(self, learner, run_name):
+        learner.save(run_name)
     
 
 
