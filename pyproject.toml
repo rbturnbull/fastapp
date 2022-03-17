@@ -20,6 +20,7 @@ Pillow = "^9.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
+ipython = "^8.1.1"
 ipykernel = "^6.6.1"
 coverage = "^5.5"
 autopep8 = "^1.5.7"
