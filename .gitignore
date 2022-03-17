@@ -4,3 +4,5 @@ fastapp/*.ipynb
 wandb/*
 outputs/*
 fastapp/outputs/*
+*.ipynb
+*.csv
