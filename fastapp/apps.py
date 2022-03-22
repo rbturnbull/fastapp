@@ -347,13 +347,16 @@ class FastApp:
 
 
 class WandbLoggingMixin(object):
+    upload_model = Param(default=False, help="If true, logs model to WandB project")
+    model_name = Param(default='trained_model', help='name of trained model artifact')
 
     def init_run(self, run_name, output_dir, **kwargs):
+
         
         
         if not run_name:
             run_name = Path(output_dir).name
-        wandb.init(
+        self.run = wandb.init(
             project=self.project_name(), 
             name=run_name,
             reinit=True,
@@ -364,13 +367,29 @@ class WandbLoggingMixin(object):
 
     def log(self, param):
         wandb.log(param)
+    
+    def log_artifact(self,artifact_path, artifact_name, artifact_type, upload = False, **kwargs):
+
+        model_artifact = wandb.Artifact(artifact_name, type=artifact_type, **kwargs)
+        if upload == True:
+            model_artifact.add_file(artifact_path)
+        else:
+            model_artifact.add_reference(artifact_path)
+        self.run.log_artifact(model_artifact)
 
     def logging_callbacks(self, callbacks):
         wandb_callback = WandbCallback(log_preds=False)
         callbacks.extend([wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)])
         return callbacks
 
-    
+    def save_model(self, learner: Learner, run_name):
+        super().save(learner, run_name)
+
+        model_path = learner.path/learner.model_dir/run_name
+
+        self.log_artifact(model_path, self.model_name, 'model',upload=self.upload_model)
+        
+
     def tune(
         self,
         id: str=None,
