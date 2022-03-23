@@ -27,10 +27,14 @@ fastapp is a tool for jumpstarting the creation of deep learning projects with f
 
 fastai allows for simple creation of world-class deep learning models. Designed for an interactive notebook environment. 
 
+
+Most machine learning models never go into production [https://venturebeat.com/2019/07/19/why-do-87-of-data-science-projects-never-make-it-into-production/]
+
 Typer
 
 # App Development
 
+[@fastai2]
 
 
 # Experiment Tracking and Hyper-parameter Tuning
@@ -46,6 +50,7 @@ Cookiecutter. Testing and documentation
 
 
 # Acknowledgements
+
 
 
 # References
