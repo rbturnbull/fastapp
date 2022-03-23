@@ -22,7 +22,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Project Generation" href="generation.html" />
+    <link rel="next" title="Project Setup" href="setup.html" />
     <link rel="prev" title="Welcome to fastapp’s documentation!" href="index.html" /> 
 </head>
 
@@ -51,7 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#project-generation">Project Generation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="generation.html">Project Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Project Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tuning.html">Hyperparameter Tuning</a></li>
@@ -133,7 +133,7 @@ You can add parameter values with typing hints in the function signature and the
         <span class="n">csv</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;The path to a CSV file with the data.&quot;</span><span class="p">),</span>
         <span class="n">x</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The column name of the independent variable.&quot;</span><span class="p">),</span>
         <span class="n">y</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The column name of the dependent variable.&quot;</span><span class="p">),</span>
-        <span class="n">validation_proportion</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The column name of the dependent variable.&quot;</span><span class="p">),</span>
+        <span class="n">validation_proportion</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The column name of the dependent variable.&quot;</span><span class="p">),</span>
         <span class="n">batch_size</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tune_min</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">tune_max</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
     <span class="p">):</span>
         <span class="k">def</span> <span class="nf">unsqueeze</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
@@ -225,7 +225,7 @@ You can add parameter values with typing hints in the function signature and the
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to fastapp’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="generation.html" class="btn btn-neutral float-right" title="Project Generation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="setup.html" class="btn btn-neutral float-right" title="Project Setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

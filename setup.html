@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Generation &mdash; fastapp 0.1.0 documentation</title>
+  <title>Project Setup &mdash; fastapp 0.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -44,7 +44,11 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Project Generation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Project Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#automatic-generation">Automatic Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manual-setup">Manual Setup</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tuning.html">Hyperparameter Tuning</a></li>
@@ -66,9 +70,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Project Generation</li>
+      <li>Project Setup</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/generation.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/setup.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -100,8 +104,11 @@
     text-align: unset;
 }
 </style>
-<section id="project-generation">
-<h1>Project Generation<a class="headerlink" href="#project-generation" title="Permalink to this headline"></a></h1>
+<section id="project-setup">
+<h1>Project Setup<a class="headerlink" href="#project-setup" title="Permalink to this headline"></a></h1>
+<p>You can set up a FastApp project automatically using the built in cookiecutter template or you can add it manually to an existing Python package.</p>
+<section id="automatic-generation">
+<h2>Automatic Generation<a class="headerlink" href="#automatic-generation" title="Permalink to this headline"></a></h2>
 <p>To generate a project using fastapp, then run the command-line utility.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fastapp
 </pre></div>
@@ -112,6 +119,55 @@
 </pre></div>
 </div>
 <p>This will use the template from the fastapp-cookiecutter repository on Github. If you wish to create your own template, feel free to fork that repository and use the new URL as the command-line argument.</p>
+<p>The dependency management is handeled using poetry. Install poetry using the instructions here: <a class="reference external" href="https://python-poetry.org/docs/#installation">https://python-poetry.org/docs/#installation</a>
+Then to install the dependencies, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry install
+</pre></div>
+</div>
+<p>Enter the virtual environment with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry setup
+</pre></div>
+</div>
+<p>The command-line utility should be installed to your path automatically in that environment.</p>
+</section>
+<section id="manual-setup">
+<h2>Manual Setup<a class="headerlink" href="#manual-setup" title="Permalink to this headline"></a></h2>
+<p>You can use FastApp in an existing project, by following these steps.</p>
+<p>If you are using the poetry dependency management system, the install the app like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry add git+https://github.com/rbturnbull/fastapp.git#main
+</pre></div>
+</div>
+<p>If using pip then:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/rbturnbull/fastapp.git#main
+</pre></div>
+</div>
+<p>Then in your code (perhaps in a file named <code class="docutils literal notranslate"><span class="pre">apps.py</span></code>) subclass FastApp and implement at least the ‘model’ and the ‘dataloaders’ methods.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">fastapp</span> <span class="k">as</span> <span class="nn">fa</span>
+
+<span class="k">class</span> <span class="nc">MyApp</span><span class="p">(</span><span class="n">fa</span><span class="o">.</span><span class="n">FastApp</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">dataloaders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">dataloaders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>If you are using a file as the main script then instantiate the app and call the main function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">MyApp</span><span class="p">()</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If you wish to include the app in a python package, it is easiest to use the poetry dependency management system. In the pyproject.toml file add the main method of your app to the scripts section like this:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.poetry.scripts]</span><span class="w"></span>
+<span class="n">executable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;path.to.script:MyApp.main&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>For example, if the name of the executable was going to be <code class="docutils literal notranslate"><span class="pre">logistic</span></code> and the path to the file from the base directory was <code class="docutils literal notranslate"><span class="pre">logistic/apps.py</span></code> and the subclass of FastApp was called <code class="docutils literal notranslate"><span class="pre">LogisticApp</span></code>, then the following would be added to pyproject.toml:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.poetry.scripts]</span><span class="w"></span>
+<span class="n">logistic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;logistic.apps:LogisticApp.main&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
