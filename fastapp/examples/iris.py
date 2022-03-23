@@ -9,6 +9,7 @@ import fastapp as fa
 
 class IrisApp(fa.FastApp):
     def __init__(self):
+        super().__init__()
         self.data = load_iris(as_frame=True)
 
     def dataloaders(
@@ -38,3 +39,4 @@ class IrisWandbApp(fa.apps.WandbLoggingMixin, IrisApp):
     
     def __init__(self):
         super().__init__()
+
