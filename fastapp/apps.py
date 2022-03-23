@@ -55,7 +55,9 @@ class FastApp:
     extra_params = None
 
     def __init__(self):
-        # All these would be better as decorators
+        super().__init__()
+
+        # All these would be better as decorator
         delegates(to=self.dataloaders, keep=True)(self.train)
         delegates(to=self.model)(self.train)
 
@@ -279,7 +281,8 @@ class FastApp:
         
         kwargs_plus_lr  = kwargs.copy()
         kwargs_plus_lr['lr_max'] = lr_max
-        
+        if run_name == '':
+            run_name = output_dir.name
         self.init_run(run_name=run_name, output_dir=output_dir, **kwargs_plus_lr)
 
         dataloaders = run_callback(self.dataloaders, kwargs)
@@ -341,18 +344,22 @@ class FastApp:
     
     def logging_callbacks(self, callbacks):
         return callbacks
+
     def save_model(self, learner, run_name):
         learner.save(run_name)
     
 
-
 class WandbLoggingMixin(object):
-    upload_model = Param(default=False, help="If true, logs model to WandB project")
-    model_name = Param(default='trained_model', help='name of trained model artifact')
 
-    def init_run(self, run_name, output_dir, **kwargs):
+    def __init__(self):
+        super().__init__()
+        delegates(to=self.init_run)(self.train)
 
-        
+    def init_run(self, output_dir, run_name,
+        upload_model = Param(default=False, help="If true, logs model to WandB project"),
+        **kwargs):
+
+        self.upload_model = upload_model
         
         if not run_name:
             run_name = Path(output_dir).name
@@ -383,11 +390,11 @@ class WandbLoggingMixin(object):
         return callbacks
 
     def save_model(self, learner: Learner, run_name):
-        super().save(learner, run_name)
+        super().save_model(learner, run_name)
 
         model_path = learner.path/learner.model_dir/run_name
-
-        self.log_artifact(model_path, self.model_name, 'model',upload=self.upload_model)
+        # import pdb;pdb.set_trace()
+        self.log_artifact(model_path, run_name, 'model',upload=self.upload_model)
         
 
     def tune(
