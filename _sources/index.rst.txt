@@ -11,7 +11,7 @@ Welcome to fastapp's documentation!
    :caption: Contents:
 
    quickstart
-   generation
+   setup
    parameters
    training
    tuning
