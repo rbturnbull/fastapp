@@ -124,11 +124,19 @@ class FastApp:
 
     @classmethod
     def main(cls):
-        self = cls()
-        cli = self.cli()
+        cli = cls.click()
         return cli()
 
+    @classmethod
+    def click(cls):
+        self = cls()
+        cli = self.cli()
+        return cli
+
     def cli(self):
+        """
+        Returns a 'Click' object which defines the command-line interface of the app.
+        """
         cli = typer.Typer()
 
         @cli.callback()
@@ -234,13 +242,22 @@ class FastApp:
         return learner
 
     def loss_func(self):
+        """ The loss function. If None, then fastai will use the default loss function if it exists for this model. """
         return None
     
     def activation(self):
         """ The activation for the last layer. If None, then fastai will use the default activiation of the loss if it exists. """
         return None
 
-    def metrics(self):
+    def metrics(self) -> list:
+        """
+        The list of metrics to use with this app.
+
+        By default this list is empty. This method should be subclassed to add metrics in child classes of FastApp.
+
+        Returns:
+            list: The list of metrics
+        """
         return []
 
     def monitor(self):
@@ -256,7 +273,13 @@ class FastApp:
         # Compare fastai.callback.tracker
         return "minimize" if 'loss' in monitor or 'err' in monitor else "maximize"
 
-    def callbacks(self):
+    def callbacks(self) -> list:
+        """
+        The list of callbacks to use with this app in the fastai training loop.
+
+        Returns:
+            list: The list of callbacks.
+        """
         callbacks = [CSVLogger()]        
         monitor = self.monitor()
         if monitor:
@@ -278,12 +301,33 @@ class FastApp:
         run_name:str = Param(default="", help="The name for this run in Weights & Biases. If no name is given then the name of the output directory is used."),
         **kwargs,
     ) -> Learner:
-        
-        kwargs_plus_lr  = kwargs.copy()
-        kwargs_plus_lr['lr_max'] = lr_max
-        if run_name == '':
-            run_name = output_dir.name
-        self.init_run(run_name=run_name, output_dir=output_dir, **kwargs_plus_lr)
+        """
+        Trains a model for this app.
+
+        Args:
+            output_dir (Path, optional): _description_. Defaults to Path("./outputs").
+            epochs (int, optional): The number of epochs. Defaults to 20.
+            lr_max (float, optional): The max learning rate. Defaults to 1e-4.
+            distributed (bool, optional): _description_. Defaults to Param(default=False, help="If the learner is distributed.").
+            wandb (bool, optional): _description_. Defaults to Param(default=False, help="If training should use Weights & Biases.").
+            wandb_name (str, optional): _description_. Defaults to Param(default="", help="The name for this run in Weights & Biases. If no name is given then the name of the output directory is used.").
+
+        Returns:
+            Learner: The fastai Learner object created for training.
+        """
+        if wandb:
+            import wandb
+            if not wandb_name:
+                wandb_name = Path(output_dir).name
+            wandb.init(
+                project=self.wandb_project_name(), 
+                name=wandb_name,
+                reinit=True,
+                config=dict(
+                    lr_max=lr_max,
+                    **kwargs,
+                )
+            )
 
         dataloaders = run_callback(self.dataloaders, kwargs)
 
@@ -295,7 +339,12 @@ class FastApp:
         self.save_model(learner, run_name)
         return learner
 
-    def project_name(self):
+    def wandb_project_name(self)->str:
+        """ 
+        The name to use for a W&B project. 
+        
+        The default is to use the class name.
+        """
         return self.__class__.__name__
 
     def tune(
@@ -451,7 +500,6 @@ class WandbLoggingMixin(object):
         return id
 
 class VisionApp(FastApp):
-
     def default_model_name(self):
         return "resnet18"
 

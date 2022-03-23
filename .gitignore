@@ -163,3 +163,5 @@ wandb
 mlruns
 
 .DS_store
+*.ipynb
+*.csv
