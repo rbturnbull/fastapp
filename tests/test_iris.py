@@ -9,4 +9,6 @@ class TestIris(unittest.TestCase):
         self.app = IrisApp()
 
     def test_model(self):
-        self.assertIsInstance( self.app.model(), nn.Module )
+        import pdb; pdb.set_trace()
+        model = self.app.model()
+        self.assertIsInstance( model, nn.Module )

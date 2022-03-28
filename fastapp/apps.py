@@ -2,34 +2,25 @@ from contextlib import nullcontext
 from pathlib import Path
 import inspect
 from typing import List, Optional, Union, Dict
-
-import wandb
-
 from torch import nn
 from fastcore.meta import delegates
 from fastai.learner import Learner, load_learner
-from fastai.vision.learner import cnn_learner
 from fastai.data.core import DataLoaders
 from fastai.callback.schedule import fit_one_cycle
 from fastai.distributed import distrib_ctx
 from fastai.callback.tracker import SaveModelCallback
-from fastai.callback.wandb import WandbCallback
 from fastai.callback.progress import CSVLogger
-
 import click
 import typer
 from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.utils import get_params_from_function
-
-from rich.traceback import install
 from rich.pretty import pprint
 from rich.console import Console
-
+from rich.traceback import install
 install()
 console = Console()
 
 from .params import Param
-from .callbacks import WandbCallbackTime
 
 
 def run_callback(callback, params):
@@ -37,7 +28,6 @@ def run_callback(callback, params):
     allowed_param_names = [p.name for p in allowed_params]
     kwargs = {key:value for key,value in params.items() if key in allowed_param_names}
     return callback(**kwargs)
-
 
 def version_callback(value: bool):
     """
@@ -163,7 +153,6 @@ class FastApp:
         )
         typer_click_object.add_command(command, 'show-batch')
 
-        
         params, _, _ = get_params_convertors_ctx_param_name_from_function(self.tune)
         tuning_params = self.tuning_params()
         for param in params:
@@ -297,8 +286,7 @@ class FastApp:
         epochs:int = Param(default=20, help="The number of epochs."),
         lr_max:float = Param(default=1e-4, help="The max learning rate."),
         distributed:bool = Param(default=False, help="If the learner is distributed."),
-        # wandb:bool = Param(default=False, help="If training should use Weights & Biases."),
-        run_name:str = Param(default="", help="The name for this run in Weights & Biases. If no name is given then the name of the output directory is used."),
+        run_name:str = Param(default="", help="The name for this run for logging purposes. If no name is given then the name of the output directory is used."),
         **kwargs,
     ) -> Learner:
         """
@@ -309,25 +297,12 @@ class FastApp:
             epochs (int, optional): The number of epochs. Defaults to 20.
             lr_max (float, optional): The max learning rate. Defaults to 1e-4.
             distributed (bool, optional): _description_. Defaults to Param(default=False, help="If the learner is distributed.").
-            wandb (bool, optional): _description_. Defaults to Param(default=False, help="If training should use Weights & Biases.").
-            wandb_name (str, optional): _description_. Defaults to Param(default="", help="The name for this run in Weights & Biases. If no name is given then the name of the output directory is used.").
+            run_name (str): The name for this run for logging purposes. If no name is given then the name of the output directory is used.
 
         Returns:
             Learner: The fastai Learner object created for training.
         """
-        if wandb:
-            import wandb
-            if not wandb_name:
-                wandb_name = Path(output_dir).name
-            wandb.init(
-                project=self.wandb_project_name(), 
-                name=wandb_name,
-                reinit=True,
-                config=dict(
-                    lr_max=lr_max,
-                    **kwargs,
-                )
-            )
+        self.init_run(run_name=run_name, output_dir=output_dir, **kwargs)
 
         dataloaders = run_callback(self.dataloaders, kwargs)
 
@@ -339,9 +314,9 @@ class FastApp:
         self.save_model(learner, run_name)
         return learner
 
-    def wandb_project_name(self)->str:
+    def project_name(self)->str:
         """ 
-        The name to use for a W&B project. 
+        The name to use for a project for logging purposes. 
         
         The default is to use the class name.
         """
@@ -360,7 +335,6 @@ class FastApp:
             name = f"{self.project_name()}-tuning"
 
         if not id:
-
             parameters_config = dict()
             tuning_params = self.tuning_params()
             for key, value in tuning_params.items():
@@ -384,12 +358,12 @@ class FastApp:
     def init_run(self, run_name, output_dir, **kwargs):
         if not run_name:
             run_name = Path(output_dir).name
-        print(f'from {self.project_name}')
-        print(f'running {run_name}')
-        print(f'with these parameters: \n {kwargs}')
+        console.print(f'from {self.project_name()}')
+        console.print(f'running {run_name}')
+        console.print(f'with these parameters: \n {kwargs}')
     
     def log(self, param):
-        print(param)
+        console.print(param)
     
     def logging_callbacks(self, callbacks):
         return callbacks
@@ -397,126 +371,3 @@ class FastApp:
     def save_model(self, learner, run_name):
         learner.save(run_name)
     
-
-class WandbLoggingMixin(object):
-
-    def __init__(self):
-        super().__init__()
-        delegates(to=self.init_run)(self.train)
-
-    def init_run(self, output_dir, run_name,
-        upload_model = Param(default=False, help="If true, logs model to WandB project"),
-        **kwargs):
-
-        self.upload_model = upload_model
-        
-        if not run_name:
-            run_name = Path(output_dir).name
-        self.run = wandb.init(
-            project=self.project_name(), 
-            name=run_name,
-            reinit=True,
-            config=dict(
-                **kwargs,
-            )
-        )
-
-    def log(self, param):
-        wandb.log(param)
-    
-    def log_artifact(self,artifact_path, artifact_name, artifact_type, upload = False, **kwargs):
-
-        model_artifact = wandb.Artifact(artifact_name, type=artifact_type, **kwargs)
-        if upload == True:
-            model_artifact.add_file(artifact_path)
-        else:
-            model_artifact.add_reference(artifact_path)
-        self.run.log_artifact(model_artifact)
-
-    def logging_callbacks(self, callbacks):
-        wandb_callback = WandbCallback(log_preds=False)
-        callbacks.extend([wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)])
-        return callbacks
-
-    def save_model(self, learner: Learner, run_name):
-        super().save_model(learner, run_name)
-
-        model_path = learner.path/learner.model_dir/run_name
-        # import pdb;pdb.set_trace()
-        self.log_artifact(model_path, run_name, 'model',upload=self.upload_model)
-        
-
-    def tune(
-        self,
-        id: str=None,
-        name: str=None,
-        method: str="random", # Should be enum
-        runs: int=1,
-        min_iter: int=None,
-        **kwargs,
-    ):
-        if not name:
-            name = f"{self.project_name()}-tuning"
-        self.init_run(run_name=name)
-        if not id:
-
-            parameters_config = dict()
-            tuning_params = self.tuning_params()
-            for key, value in tuning_params.items():
-                if key in kwargs and kwargs[key] is None:
-                    parameters_config[key] = value.config()
-            
-            sweep_config = {
-                "name" : name,
-                "method" : method,
-                "parameters" : parameters_config,
-            }
-            if self.monitor():
-                sweep_config['metric'] = dict(name=self.monitor(), goal=self.goal())
-
-            if min_iter:
-                sweep_config['early_terminate'] = dict(type="hyperband", min_iter=min_iter)
-
-            console.print("Configuration for hyper-parameter tuning:", style="bold red")
-            pprint(sweep_config)
-
-            id = wandb.sweep(sweep_config, project=name)
-            console.print(f"The wandb sweep id is: {id}", style="bold red")
-
-        def agent_train():
-            with wandb.init() as run:
-                run_kwargs = dict(kwargs)
-                run_kwargs.update(wandb.config)
-                if 'output_dir' in run_kwargs:
-                    run_kwargs['output_dir'] = Path(run_kwargs['output_dir'])/run.name
-
-                console.print("Training with parameters:", style="bold red")
-                pprint(run_kwargs)
-
-                run_callback(self.train, run_kwargs)
-
-        wandb.agent(id, function=agent_train, count=runs, project=name)
-
-        return id
-
-class VisionApp(FastApp):
-    def default_model_name(self):
-        return "resnet18"
-
-    def model(
-        self,
-        model_name:str = Param(default="", help="The name of a model architecture in torchvision.models (https://pytorch.org/vision/stable/models.html)."),
-        pretrained:bool = Param(default=True, help="Whether or not to use the pretrained weights.")
-    ):
-        import torchvision.models as models
-
-        if not model_name:
-            model_name = self.default_model_name()
-
-        if not hasattr(models, model_name):
-            raise ValueError(f"Model '{model_name}' not recognized.")
-        
-        return getattr( models, model_name )(pretrained=pretrained)
-
-    def build_learner_func(self):
-        return cnn_learner

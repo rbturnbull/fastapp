@@ -39,4 +39,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 fastapp = "fastapp.main:app"
-iriswandb = "fastapp.examples.iris:IrisWandbApp.main"
+fastapp-iris = "fastapp.examples.iris:IrisApp.main"

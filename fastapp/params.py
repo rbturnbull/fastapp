@@ -3,7 +3,6 @@ from typer.models import OptionInfo
 
 
 class Param(OptionInfo):
-        
     def __init__(self, tune=False, tune_min=None, tune_max=None, log=False, distribution=None, annotation=None, **kwargs):
         super().__init__(**kwargs)
         self.tune = tune
@@ -13,7 +12,7 @@ class Param(OptionInfo):
         self.annotation = annotation
         self.distribution = distribution
         if distribution:
-            raise NotImplementedError("distribution for parameters not implemented yet")
+            raise NotImplementedError("Distribution for parameters not implemented yet")
 
     def config(self):
         if self.annotation in [int, float]:
