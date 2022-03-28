@@ -107,26 +107,30 @@
 <h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h1>
 <section id="logistic-regression">
 <h2>Logistic Regression<a class="headerlink" href="#logistic-regression" title="Permalink to this headline"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">fastai.data.block</span> <span class="kn">import</span> <span class="n">DataBlock</span><span class="p">,</span> <span class="n">TransformBlock</span><span class="p">,</span> <span class="n">CategoryBlock</span>
 <span class="kn">from</span> <span class="nn">fastai.data.transforms</span> <span class="kn">import</span> <span class="n">ColReader</span><span class="p">,</span> <span class="n">RandomSplitter</span>
-<span class="kn">import</span> <span class="nn">fastapp</span> <span class="k">as</span> <span class="nn">fa</span>
 <span class="kn">from</span> <span class="nn">fastai.metrics</span> <span class="kn">import</span> <span class="n">accuracy</span>
-
+<span class="kn">import</span> <span class="nn">fastapp</span> <span class="k">as</span> <span class="nn">fa</span>
 
 <span class="k">class</span> <span class="nc">LogisticRegressionApp</span><span class="p">(</span><span class="n">fa</span><span class="o">.</span><span class="n">FastApp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a basic app to do logistic regression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">dataloaders</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">csv</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s2">&quot;The path to a CSV file with the data.&quot;</span><span class="p">),</span>
         <span class="n">x</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The column name of the independent variable.&quot;</span><span class="p">),</span>
         <span class="n">y</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The column name of the dependent variable.&quot;</span><span class="p">),</span>
-        <span class="n">validation_proportion</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The column name of the dependent variable.&quot;</span><span class="p">),</span>
-        <span class="n">batch_size</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tune_min</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">tune_max</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">validation_proportion</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The proportion of the dataset to use for validation.&quot;</span><span class="p">),</span>
+        <span class="n">batch_size</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tune_min</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">tune_max</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The number of items to use in each batch.&quot;</span><span class="p">),</span>
     <span class="p">):</span>
-        <span class="k">def</span> <span class="nf">unsqueeze</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">unsqueeze</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot; This is needed to transform the input with an extra dimension added to the end of the tensor. &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">inputs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 
         <span class="n">datablock</span> <span class="o">=</span> <span class="n">DataBlock</span><span class="p">(</span>
             <span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">TransformBlock</span><span class="p">,</span> <span class="n">CategoryBlock</span><span class="p">],</span>
@@ -140,6 +144,7 @@
         <span class="k">return</span> <span class="n">datablock</span><span class="o">.</span><span class="n">dataloaders</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">bs</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Builds a simple logistic regression model. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">(),</span>
@@ -150,53 +155,59 @@
 
     <span class="k">def</span> <span class="nf">metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">accuracy</span><span class="p">]</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">LogisticRegressionApp</span><span class="p">()</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
 <section id="iris">
 <h2>Iris<a class="headerlink" href="#iris" title="Permalink to this headline"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fastapp.apps</span> <span class="kn">import</span> <span class="n">WandbLoggingMixin</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">fastai.tabular.data</span> <span class="kn">import</span> <span class="n">TabularDataLoaders</span>
 <span class="kn">from</span> <span class="nn">fastai.tabular.all</span> <span class="kn">import</span> <span class="n">tabular_learner</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
-
 <span class="kn">import</span> <span class="nn">fastapp</span> <span class="k">as</span> <span class="nn">fa</span>
 
 <span class="k">class</span> <span class="nc">IrisApp</span><span class="p">(</span><span class="n">fa</span><span class="o">.</span><span class="n">FastApp</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A classification app to predict the type of iris from sepal and petal lengths and widths.</span>
 
+<span class="sd">    A classic dataset publised in:</span>
+<span class="sd">        Fisher, R.A. “The use of multiple measurements in taxonomic problems” Annual Eugenics, 7, Part II, 179-188 (1936). </span>
+<span class="sd">    For more information about the dataset, see:</span>
+<span class="sd">        https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">dataloaders</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span>  <span class="n">tune_min</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">tune_max</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">batch_size</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">tune_min</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">tune_max</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
     <span class="p">):</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;frame&#39;</span><span class="p">]</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;target_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;target_names&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">])</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;target_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;target_names&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">])</span>
         
         <span class="k">return</span> <span class="n">TabularDataLoaders</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;frame&#39;</span><span class="p">],</span>
-            <span class="n">cont_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;feature_names&#39;</span><span class="p">],</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;frame&#39;</span><span class="p">],</span>
+            <span class="n">cont_names</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;feature_names&#39;</span><span class="p">],</span>
             <span class="n">y_names</span><span class="o">=</span><span class="s1">&#39;target_name&#39;</span><span class="p">,</span>
             <span class="n">bs</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">hidden_size</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">fa</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">tune_min</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">tune_max</span><span class="o">=</span><span class="mi">1028</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The number of hidden layers.&quot;</span><span class="p">),</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">build_learner_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">tabular_learner</span>
 
-<span class="k">class</span> <span class="nc">IrisWandbApp</span><span class="p">(</span><span class="n">fa</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">WandbLoggingMixin</span><span class="p">,</span> <span class="n">IrisApp</span><span class="p">):</span>
-    
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
+<span class="c1"># class IrisWandbApp(fastapp.logging.WandbMixin, IrisApp):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     A version of the iris app which also includes logging to &#39;Weights &amp; Biases&#39; (https://wandb.ai/).</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">IrisApp</span><span class="p">()</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
