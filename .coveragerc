@@ -1,0 +1,6 @@
+[run]
+source = fastapp
+
+[report]
+precision = 2
+

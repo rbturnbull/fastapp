@@ -25,7 +25,7 @@ jobs:
         poetry install
     - name: Coverage
       run: |
-        poetry run coverage run -m pytest
+        poetry run coverage run -m pytest tests
         poetry run coverage html
         echo "COVERAGE=$(poetry run coverage report --precision 2 | grep TOTAL | tr -s ' ' | cut -f 4 -d " ")" >> $GITHUB_ENV
     # - name: Create Badge
