@@ -7,6 +7,12 @@ from fastai.learner import Learner
 from .params import Param
 from .callbacks import WandbCallbackTime
 
+from rich.pretty import pprint
+from rich.console import Console
+from rich.traceback import install
+install()
+console = Console()
+
 
 class WandbMixin(object):
     def __init__(self):
@@ -16,21 +22,21 @@ class WandbMixin(object):
     def init_run(
         self, 
         output_dir, 
-        run_name,
+        project_name= None,
+        config = {},
         upload_model = Param(default=False, help="If true, logs model to WandB project"),
         **kwargs
     ):
         self.upload_model = upload_model
         
-        if not run_name:
-            run_name = Path(output_dir).name
+        if project_name is None:
+            project_name = self.project_name()
         self.run = wandb.init(
-            project=self.project_name(), 
-            name=run_name,
+            dir = output_dir,
+            project=project_name, 
             reinit=True,
-            config=dict(
-                **kwargs,
-            )
+            config=config, 
+            **kwargs
         )
 
     def log(self, param):
