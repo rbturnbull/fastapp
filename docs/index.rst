@@ -3,8 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to fastapp's documentation!
+fastapp
 ===================================
+
+.. include:: ../README.rst
+   :start-after: start-badges
+   :end-before: end-badges
+
+fastapp is a tool for jumpstarting the creation of deep learning projects with fastai and allows for easy command-line interfaces and hyper-parameter tuning.
+
 
 .. toctree::
    :maxdepth: 2
@@ -18,7 +25,6 @@ Welcome to fastapp's documentation!
    testing
    examples
 
-fastapp is a tool for jumpstarting the creation of deep learning projects with fastai and allows for easy command-line interfaces and hyper-parameter tuning.
 
 Indices and tables
 ==================
