@@ -17,6 +17,7 @@ wandb = "^0.12.9"
 cookiecutter = "^1.7.3"
 scikit-learn = "^1.0.2"
 Pillow = "^9.0.1"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

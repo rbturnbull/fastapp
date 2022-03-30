@@ -1,13 +1,8 @@
 import unittest
-from torch import nn
 
+from fastapp.testing.testcases import FastAppTestCase
 from fastapp.examples.logistic_regression import LogisticRegressionApp
 
 
-class TestLogisticRegressionApp(unittest.TestCase):
-    def setUp(self):
-        self.app = LogisticRegressionApp()
-
-    def test_model(self):
-        model = self.app.model()
-        self.assertIsInstance(model, nn.Module)
+class TestLogisticRegressionApp(FastAppTestCase, unittest.TestCase):
+    app_class = LogisticRegressionApp
