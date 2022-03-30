@@ -17,6 +17,7 @@ from typer.utils import get_params_from_function
 from rich.pretty import pprint
 from rich.console import Console
 from rich.traceback import install
+
 install()
 console = Console()
 
@@ -26,8 +27,9 @@ from .params import Param
 def run_callback(callback, params):
     allowed_params, _, _ = get_params_convertors_ctx_param_name_from_function(callback)
     allowed_param_names = [p.name for p in allowed_params]
-    kwargs = {key:value for key,value in params.items() if key in allowed_param_names}
+    kwargs = {key: value for key, value in params.items() if key in allowed_param_names}
     return callback(**kwargs)
+
 
 def version_callback(value: bool):
     """
@@ -35,6 +37,7 @@ def version_callback(value: bool):
     """
     if value:
         import importlib.metadata
+
         module_name = str(__name__).split(".")[0]
         version = importlib.metadata.version(module_name)
         console.print(version)
@@ -63,16 +66,21 @@ class FastApp:
         return ""
 
     def pretrained_local_path(
-        self, 
-        pretrained:str = Param(default=None, help="The location (URL or filepath) of a pretrained model."), 
-        reload:bool = Param(default=False, help="Should the pretrained model be downloaded again if it is online and already present locally."),
+        self,
+        pretrained: str = Param(
+            default=None, help="The location (URL or filepath) of a pretrained model."
+        ),
+        reload: bool = Param(
+            default=False,
+            help="Should the pretrained model be downloaded again if it is online and already present locally.",
+        ),
         **kwargs,
     ):
         if pretrained:
             location = pretrained
         else:
             location = str(run_callback(self.pretrained_location, kwargs))
-        
+
         # Check if needs to be downloaded
         if location.startswith("http"):
             # TODO get user cache dir
@@ -90,14 +98,14 @@ class FastApp:
     def output_results(self, results, data, prepared_data, output):
         print(results)
         if output:
-            with open(output, 'w') as f:
+            with open(output, "w") as f:
                 f.write(results)
 
     def test_dataloader(self, learner, prepared_data):
         dataloader = learner.dls.test_dl(prepared_data)
         return dataloader
 
-    def __call__(self, data, output:str = "", **kwargs):
+    def __call__(self, data, output: str = "", **kwargs):
         path = run_callback(self.pretrained_local_path, kwargs)
 
         # open learner from pickled file
@@ -106,7 +114,9 @@ class FastApp:
         # Classify results
         prepared_data = self.prepare_source(data)
         dataloader = self.test_dataloader(learner, prepared_data)
-        results = learner.get_preds(dl=dataloader, reorder=False, with_decoded=False, act=self.activation())
+        results = learner.get_preds(
+            dl=dataloader, reorder=False, with_decoded=False, act=self.activation()
+        )
 
         results = self.output_results(results, data, prepared_data, output)
 
@@ -131,27 +141,38 @@ class FastApp:
 
         @cli.callback()
         def base_callback(
-            version: Optional[bool] = typer.Option(None, "--version", "-v", callback=version_callback, is_eager=True, help="Prints the current version."), 
+            version: Optional[bool] = typer.Option(
+                None,
+                "--version",
+                "-v",
+                callback=version_callback,
+                is_eager=True,
+                help="Prints the current version.",
+            ),
         ):
             pass
 
         typer_click_object = typer.main.get_command(cli)
 
-        train_params, _, _ = get_params_convertors_ctx_param_name_from_function(self.train)
+        train_params, _, _ = get_params_convertors_ctx_param_name_from_function(
+            self.train
+        )
         train_command = click.Command(
-            name='train',
+            name="train",
             callback=self.train,
             params=train_params,
         )
-        typer_click_object.add_command(train_command, 'train')
+        typer_click_object.add_command(train_command, "train")
 
-        show_batch_params, _, _ = get_params_convertors_ctx_param_name_from_function(self.show_batch)
+        show_batch_params, _, _ = get_params_convertors_ctx_param_name_from_function(
+            self.show_batch
+        )
         command = click.Command(
-            name='show-batch',
+            name="show-batch",
             callback=self.show_batch,
             params=show_batch_params,
         )
-        typer_click_object.add_command(command, 'show-batch')
+        typer_click_object.add_command(command, "show-batch")
 
         params, _, _ = get_params_convertors_ctx_param_name_from_function(self.tune)
         tuning_params = self.tuning_params()
@@ -159,19 +180,19 @@ class FastApp:
             if param.name in tuning_params:
                 param.default = None
         command = click.Command(
-            name='tune',
+            name="tune",
             callback=self.tune,
             params=params,
         )
-        typer_click_object.add_command(command, 'tune')
+        typer_click_object.add_command(command, "tune")
 
         params, _, _ = get_params_convertors_ctx_param_name_from_function(self.__call__)
         command = click.Command(
-            name='predict',
+            name="predict",
             callback=self.__call__,
             params=params,
         )
-        typer_click_object.add_command(command, 'predict')
+        typer_click_object.add_command(command, "predict")
 
         return typer_click_object
 
@@ -203,7 +224,10 @@ class FastApp:
         self,
         dataloaders,
         output_dir: Path,
-        fp16:bool = Param(default=True, help="Whether or not the floating-point precision of learner should be set to 16 bit."),
+        fp16: bool = Param(
+            default=True,
+            help="Whether or not the floating-point precision of learner should be set to 16 bit.",
+        ),
         **params,
     ) -> Learner:
         """
@@ -218,24 +242,37 @@ class FastApp:
         console.print("Building learner", style="bold")
         build_learner_func = self.build_learner_func()
         if model is not None:
-            learner = build_learner_func(dataloaders, model, loss_func=self.loss_func(), metrics=self.metrics(), path=output_dir)
+            learner = build_learner_func(
+                dataloaders,
+                model,
+                loss_func=self.loss_func(),
+                metrics=self.metrics(),
+                path=output_dir,
+            )
 
         else:
-            learner = build_learner_func(dataloaders, model, loss_func=self.loss_func(), metrics=self.metrics(), path=output_dir)
-
+            learner = build_learner_func(
+                dataloaders,
+                model,
+                loss_func=self.loss_func(),
+                metrics=self.metrics(),
+                path=output_dir,
+            )
 
         if fp16:
-            console.print("Setting floating-point precision of learner to 16 bit", style="red")
+            console.print(
+                "Setting floating-point precision of learner to 16 bit", style="red"
+            )
             learner = learner.to_fp16()
 
         return learner
 
     def loss_func(self):
-        """ The loss function. If None, then fastai will use the default loss function if it exists for this model. """
+        """The loss function. If None, then fastai will use the default loss function if it exists for this model."""
         return None
-    
+
     def activation(self):
-        """ The activation for the last layer. If None, then fastai will use the default activiation of the loss if it exists. """
+        """The activation for the last layer. If None, then fastai will use the default activiation of the loss if it exists."""
         return None
 
     def metrics(self) -> list:
@@ -253,14 +290,14 @@ class FastApp:
         return None
 
     def goal(self):
-        """ 
+        """
         Sets the optimality direction when evaluating the metric from `monitor`.
 
         By default it is set to "minimize" if the monitor metric has the string 'loss' or 'err' otherwise it is "maximize".
         """
         monitor = self.monitor()
         # Compare fastai.callback.tracker
-        return "minimize" if 'loss' in monitor or 'err' in monitor else "maximize"
+        return "minimize" if "loss" in monitor or "err" in monitor else "maximize"
 
     def callbacks(self) -> list:
         """
@@ -269,7 +306,7 @@ class FastApp:
         Returns:
             list: The list of callbacks.
         """
-        callbacks = [CSVLogger()]        
+        callbacks = [CSVLogger()]
         monitor = self.monitor()
         if monitor:
             callbacks.append(SaveModelCallback(monitor=monitor))
@@ -283,10 +320,13 @@ class FastApp:
     def train(
         self,
         output_dir: Path = Path("./outputs"),
-        epochs:int = Param(default=20, help="The number of epochs."),
-        lr_max:float = Param(default=1e-4, help="The max learning rate."),
-        distributed:bool = Param(default=False, help="If the learner is distributed."),
-        run_name:str = Param(default="", help="The name for this run for logging purposes. If no name is given then the name of the output directory is used."),
+        epochs: int = Param(default=20, help="The number of epochs."),
+        lr_max: float = Param(default=1e-4, help="The max learning rate."),
+        distributed: bool = Param(default=False, help="If the learner is distributed."),
+        run_name: str = Param(
+            default="",
+            help="The name for this run for logging purposes. If no name is given then the name of the output directory is used.",
+        ),
         **kwargs,
     ) -> Learner:
         """
@@ -310,25 +350,25 @@ class FastApp:
 
         with learner.distrib_ctx() if distributed == True else nullcontext():
             learner.fit_one_cycle(epochs, lr_max=lr_max, cbs=self.callbacks())
-        
+
         self.save_model(learner, run_name)
         return learner
 
-    def project_name(self)->str:
-        """ 
-        The name to use for a project for logging purposes. 
-        
+    def project_name(self) -> str:
+        """
+        The name to use for a project for logging purposes.
+
         The default is to use the class name.
         """
         return self.__class__.__name__
 
     def tune(
         self,
-        id: str=None,
-        name: str=None,
-        method: str="random", # Should be enum
-        runs: int=1,
-        min_iter: int=None,
+        id: str = None,
+        name: str = None,
+        method: str = "random",  # Should be enum
+        runs: int = 1,
+        min_iter: int = None,
         **kwargs,
     ):
         if not name:
@@ -340,17 +380,19 @@ class FastApp:
             for key, value in tuning_params.items():
                 if key in kwargs and kwargs[key] is None:
                     parameters_config[key] = value.config()
-            
+
             sweep_config = {
-                "name" : name,
-                "method" : method,
-                "parameters" : parameters_config,
+                "name": name,
+                "method": method,
+                "parameters": parameters_config,
             }
             if self.monitor():
-                sweep_config['metric'] = dict(name=self.monitor(), goal=self.goal())
+                sweep_config["metric"] = dict(name=self.monitor(), goal=self.goal())
 
             if min_iter:
-                sweep_config['early_terminate'] = dict(type="hyperband", min_iter=min_iter)
+                sweep_config["early_terminate"] = dict(
+                    type="hyperband", min_iter=min_iter
+                )
 
             console.print("Configuration for hyper-parameter tuning:", style="bold red")
             pprint(sweep_config)
@@ -358,16 +400,15 @@ class FastApp:
     def init_run(self, run_name, output_dir, **kwargs):
         if not run_name:
             run_name = Path(output_dir).name
-        console.print(f'from {self.project_name()}')
-        console.print(f'running {run_name}')
-        console.print(f'with these parameters: \n {kwargs}')
-    
+        console.print(f"from {self.project_name()}")
+        console.print(f"running {run_name}")
+        console.print(f"with these parameters: \n {kwargs}")
+
     def log(self, param):
         console.print(param)
-    
+
     def logging_callbacks(self, callbacks):
         return callbacks
 
     def save_model(self, learner, run_name):
         learner.save(run_name)
-    

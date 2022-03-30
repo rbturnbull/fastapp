@@ -5,26 +5,28 @@ from fastai.tabular.all import tabular_learner
 from sklearn.datasets import load_iris
 import fastapp as fa
 
+
 class IrisApp(fa.FastApp):
     """
     A classification app to predict the type of iris from sepal and petal lengths and widths.
 
     A classic dataset publised in:
-        Fisher, R.A. “The use of multiple measurements in taxonomic problems” Annual Eugenics, 7, Part II, 179-188 (1936). 
+        Fisher, R.A. “The use of multiple measurements in taxonomic problems” Annual Eugenics, 7, Part II, 179-188 (1936).
     For more information about the dataset, see:
         https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset
     """
+
     def dataloaders(
         self,
-        batch_size:int = fa.Param(32, tune_min=8, tune_max=128, log=True),
+        batch_size: int = fa.Param(32, tune_min=8, tune_max=128, log=True),
     ):
         df = load_iris(as_frame=True)
-        df['target_name'] = np.take(df['target_names'], df["target"])
-        
+        df["target_name"] = np.take(df["target_names"], df["target"])
+
         return TabularDataLoaders.from_df(
-            df['frame'],
-            cont_names=df['feature_names'],
-            y_names='target_name',
+            df["frame"],
+            cont_names=df["feature_names"],
+            y_names="target_name",
             bs=batch_size,
         )
 

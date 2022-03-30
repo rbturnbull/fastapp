@@ -10,6 +10,7 @@ from .callbacks import WandbCallbackTime
 from rich.pretty import pprint
 from rich.console import Console
 from rich.traceback import install
+
 install()
 console = Console()
 
@@ -20,29 +21,27 @@ class WandbMixin(object):
         delegates(to=self.init_run)(self.train)
 
     def init_run(
-        self, 
-        output_dir, 
-        project_name= None,
-        config = {},
-        upload_model = Param(default=False, help="If true, logs model to WandB project"),
-        **kwargs
+        self,
+        output_dir,
+        project_name=None,
+        config={},
+        upload_model=Param(default=False, help="If true, logs model to WandB project"),
+        **kwargs,
     ):
         self.upload_model = upload_model
-        
+
         if project_name is None:
             project_name = self.project_name()
         self.run = wandb.init(
-            dir = output_dir,
-            project=project_name, 
-            reinit=True,
-            config=config, 
-            **kwargs
+            dir=output_dir, project=project_name, reinit=True, config=config, **kwargs
         )
 
     def log(self, param):
         wandb.log(param)
-    
-    def log_artifact(self,artifact_path, artifact_name, artifact_type, upload = False, **kwargs):
+
+    def log_artifact(
+        self, artifact_path, artifact_name, artifact_type, upload=False, **kwargs
+    ):
         model_artifact = wandb.Artifact(artifact_name, type=artifact_type, **kwargs)
         if upload == True:
             model_artifact.add_file(artifact_path)
@@ -52,23 +51,25 @@ class WandbMixin(object):
 
     def logging_callbacks(self, callbacks):
         wandb_callback = WandbCallback(log_preds=False)
-        callbacks.extend([wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)])
+        callbacks.extend(
+            [wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)]
+        )
         return callbacks
 
     def save_model(self, learner: Learner, run_name):
         super().save_model(learner, run_name)
 
-        model_path = learner.path/learner.model_dir/run_name
+        model_path = learner.path / learner.model_dir / run_name
         # import pdb;pdb.set_trace()
-        self.log_artifact(model_path, run_name, 'model',upload=self.upload_model)
-        
+        self.log_artifact(model_path, run_name, "model", upload=self.upload_model)
+
     def tune(
         self,
-        id: str=None,
-        name: str=None,
-        method: str="random", # Should be enum
-        runs: int=1,
-        min_iter: int=None,
+        id: str = None,
+        name: str = None,
+        method: str = "random",  # Should be enum
+        runs: int = 1,
+        min_iter: int = None,
         **kwargs,
     ):
         if not name:
@@ -81,17 +82,19 @@ class WandbMixin(object):
             for key, value in tuning_params.items():
                 if key in kwargs and kwargs[key] is None:
                     parameters_config[key] = value.config()
-            
+
             sweep_config = {
-                "name" : name,
-                "method" : method,
-                "parameters" : parameters_config,
+                "name": name,
+                "method": method,
+                "parameters": parameters_config,
             }
             if self.monitor():
-                sweep_config['metric'] = dict(name=self.monitor(), goal=self.goal())
+                sweep_config["metric"] = dict(name=self.monitor(), goal=self.goal())
 
             if min_iter:
-                sweep_config['early_terminate'] = dict(type="hyperband", min_iter=min_iter)
+                sweep_config["early_terminate"] = dict(
+                    type="hyperband", min_iter=min_iter
+                )
 
             console.print("Configuration for hyper-parameter tuning:", style="bold red")
             pprint(sweep_config)
@@ -103,8 +106,8 @@ class WandbMixin(object):
             with wandb.init() as run:
                 run_kwargs = dict(kwargs)
                 run_kwargs.update(wandb.config)
-                if 'output_dir' in run_kwargs:
-                    run_kwargs['output_dir'] = Path(run_kwargs['output_dir'])/run.name
+                if "output_dir" in run_kwargs:
+                    run_kwargs["output_dir"] = Path(run_kwargs["output_dir"]) / run.name
 
                 console.print("Training with parameters:", style="bold red")
                 pprint(run_kwargs)

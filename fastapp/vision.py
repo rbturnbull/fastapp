@@ -22,12 +22,16 @@ def torchvision_model_choices() -> List[str]:
 
             # Only accept if the return value is a pytorch module
             hints = get_type_hints(obj)
-            return_value = hints.get('return', "")
+            return_value = hints.get("return", "")
             if nn.Module in return_value.mro():
                 model_choices.append(item)
     return model_choices
 
-TorchvisionModelEnum = enum.Enum('TorchvisionModelName', {model_name:model_name for model_name in torchvision_model_choices()})
+
+TorchvisionModelEnum = enum.Enum(
+    "TorchvisionModelName",
+    {model_name: model_name for model_name in torchvision_model_choices()},
+)
 
 
 class VisionApp(FastApp):
@@ -36,16 +40,21 @@ class VisionApp(FastApp):
 
     def model(
         self,
-        model_name:TorchvisionModelEnum = Param(default="", help="The name of a model architecture in torchvision.models (https://pytorch.org/vision/stable/models.html). If not given, then it is given by `default_model_name`"),
-        pretrained:bool = Param(default=True, help="Whether or not to use the pretrained weights.")
+        model_name: TorchvisionModelEnum = Param(
+            default="",
+            help="The name of a model architecture in torchvision.models (https://pytorch.org/vision/stable/models.html). If not given, then it is given by `default_model_name`",
+        ),
+        pretrained: bool = Param(
+            default=True, help="Whether or not to use the pretrained weights."
+        ),
     ):
         if not model_name:
             model_name = self.default_model_name()
 
         if not hasattr(models, model_name):
             raise ValueError(f"Model '{model_name}' not recognized.")
-        
-        return getattr( models, model_name )(pretrained=pretrained)
+
+        return getattr(models, model_name)(pretrained=pretrained)
 
     def build_learner_func(self):
         return cnn_learner

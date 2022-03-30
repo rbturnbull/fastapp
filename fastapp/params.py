@@ -3,7 +3,16 @@ from typer.models import OptionInfo
 
 
 class Param(OptionInfo):
-    def __init__(self, tune=False, tune_min=None, tune_max=None, log=False, distribution=None, annotation=None, **kwargs):
+    def __init__(
+        self,
+        tune=False,
+        tune_min=None,
+        tune_max=None,
+        log=False,
+        distribution=None,
+        annotation=None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.tune = tune
         self.log = log
@@ -27,15 +36,17 @@ class Param(OptionInfo):
                     distribution=distribution,
                     min=math.log(self.tune_min),
                     max=math.log(self.tune_max),
-                )            
+                )
 
             return dict(
                 distribution=distribution,
                 min=self.tune_min,
                 max=self.tune_max,
             )
-        
+
         # TODO add categorical
 
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         raise NotImplementedError

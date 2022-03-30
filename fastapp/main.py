@@ -5,25 +5,26 @@ from cookiecutter.main import cookiecutter as cookiecutter_main
 
 app = typer.Typer()
 
+
 @app.command()
 def cookiecutter(
-    template:str="",
-    checkout:str=None,
-    no_input:bool=False,
-    extra_context:str=None,
-    replay:bool=False,
-    overwrite_if_exists:bool=False,
-    output_dir:Path='.',
-    config_file:Path=None,
-    default_config:bool=False,
-    directory:str=None,
-    skip_if_file_exists:bool=False,
+    template: str = "",
+    checkout: str = None,
+    no_input: bool = False,
+    extra_context: str = None,
+    replay: bool = False,
+    overwrite_if_exists: bool = False,
+    output_dir: Path = ".",
+    config_file: Path = None,
+    default_config: bool = False,
+    directory: str = None,
+    skip_if_file_exists: bool = False,
 ):
     """
     Generate a fastapp project using cookiecutter.
     """
     if not template:
-        template = Path(__file__).parent.resolve()/"cookiecutter"
+        template = Path(__file__).parent.resolve() / "cookiecutter"
     elif template in ["gh", "github"]:
         template = "https://github.com/rbturnbull/fastapp-cookiecutter"
 
