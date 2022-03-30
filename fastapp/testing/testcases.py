@@ -1,27 +1,51 @@
-import yaml
-from pathlib import Path
-import unittest
-from torch import nn
-import importlib
 import pdb
 import sys
+import yaml
+import importlib
+import pytest
+from pathlib import Path
+
+# import unittest
+from torch import nn
+from collections import OrderedDict
 
 from ..apps import FastApp
+
+######################################################################
+## YAML functions from https://stackoverflow.com/a/8641732
+######################################################################
+class quoted(str):
+    pass
+
+
+def quoted_presenter(dumper, data):
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
+
+
+yaml.add_representer(quoted, quoted_presenter)
+
+
+class literal(str):
+    pass
+
+
+def literal_presenter(dumper, data):
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+
+
+yaml.add_representer(literal, literal_presenter)
+
+
+def ordered_dict_presenter(dumper, data):
+    return dumper.represent_dict(data.items())
+
+
+yaml.add_representer(OrderedDict, ordered_dict_presenter)
 
 
 class FastAppTestCase:
     app_class = None
     expected_base = None
-
-    @classmethod
-    def setUpClass(cls):
-        if cls is FastAppTestCase:
-            raise unittest.SkipTest("Skip FastAppTestCase since it is a base class")
-        super().setUpClass()
-
-    def setUp(self):
-        self.app = self.get_app()
-        self.expected_dir = self.get_expected_dir()
 
     def get_expected_base(self) -> Path:
         if not self.expected_base:
@@ -49,37 +73,54 @@ class FastAppTestCase:
         Override `app_class` or this method so the correct app is returned from calling this method.
         """
         # pdb.set_trace()
-        self.assertIsNotNone(self.app_class)
+        assert self.app_class is not None
         app = self.app_class()
 
-        self.assertIsInstance(app, FastApp)
+        assert isinstance(app, FastApp)
         return app
 
     def subtests(self, name: str):
         if name.startswith("test_"):
             name = name[5:]
-        directory = self.expected_dir / name
+        directory = self.get_expected_dir() / name
         directory.mkdir(exist_ok=True, parents=True)
         files = list(directory.glob("*.yaml"))
 
         if len(files) == 0:
-            raise unittest.SkipTest(
-                f"Skipping '{name}' because there are no files with expected output in '{directory}'."
-            )
+            assert False
+            # raise unittest.SkipTest(
+            #     f"Skipping '{name}' because there are no files with expected output in '{directory}'."
+            # )
 
         for file in files:
             with open(file) as f:
-                file_dict = yaml.safe_load(f)
+                file_dict = yaml.safe_load(f) or {}
                 params = file_dict.get("params", {})
                 output = file_dict.get("output", "")
-                with self.subTest(msg=file.name, **params):
-                    yield params, output
+                yield params, output, file
 
-    def test_model(self):
-        for params, output in self.subtests(sys._getframe().f_code.co_name):
-            model = self.app.model(**params)
-            if not output:
-                self.assertIsNone(model)
+    def test_model(self, prompt_option):
+        app = self.get_app()
+        for params, output, file in self.subtests(sys._getframe().f_code.co_name):
+            model = app.model(**params)
+            if model is None:
+                model_summary = "None"
             else:
-                self.assertIsInstance(model, nn.Module)
-                self.assertEqual(str(model), output)
+                assert isinstance(model, nn.Module)
+                model_summary = str(model)
+
+            if prompt_option and model_summary != output:
+                if (
+                    input(
+                        f"File '{file}' does not match test output. Should this file be replaced? (y/N) "
+                    ).lower()
+                    == "y"
+                ):
+                    with open(file, "w") as f:
+                        data = OrderedDict(
+                            params=OrderedDict(params), output=literal(model_summary)
+                        )
+                        yaml.dump(data, f)
+                        output = model_summary
+
+            assert model_summary == output
