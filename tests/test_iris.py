@@ -1,4 +1,4 @@
-from fastapp.testing.testcases import FastAppTestCase
+from fastapp.testing import FastAppTestCase
 from fastapp.examples.iris import IrisApp
 
 
