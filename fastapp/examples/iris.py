@@ -18,11 +18,12 @@ class IrisApp(fa.FastApp):
 
     def dataloaders(
         self,
-        batch_size: int = fa.Param(32, tune_min=8, tune_max=128, log=True),
+        batch_size:int = fa.Param(32, tune_min=8, tune_max=128, log=True, tune=True),
     ):
         df = load_iris(as_frame=True)
-        df["target_name"] = np.take(df["target_names"], df["target"])
-
+        
+        df['frame']['target_name'] = np.take(df['target_names'], df["target"])
+        
         return TabularDataLoaders.from_df(
             df["frame"],
             cont_names=df["feature_names"],

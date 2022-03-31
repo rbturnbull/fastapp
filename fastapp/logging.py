@@ -38,16 +38,14 @@ class WandbMixin(object):
 
     def log(self, param):
         wandb.log(param)
-
-    def log_artifact(
-        self, artifact_path, artifact_name, artifact_type, upload=False, **kwargs
-    ):
-        model_artifact = wandb.Artifact(artifact_name, type=artifact_type, **kwargs)
+    
+    def log_artifact(self,artifact_path, artifact_name, artifact_type, upload = False, **kwargs):
+        artifact = wandb.Artifact(artifact_name, type=artifact_type, **kwargs)
         if upload == True:
-            model_artifact.add_file(artifact_path)
+            artifact.add_file(artifact_path)
         else:
-            model_artifact.add_reference(artifact_path)
-        self.run.log_artifact(model_artifact)
+            artifact.add_reference(artifact_path)
+        self.run.log_artifact(artifact)
 
     def logging_callbacks(self, callbacks):
         wandb_callback = WandbCallback(log_preds=False)
@@ -74,7 +72,7 @@ class WandbMixin(object):
     ):
         if not name:
             name = f"{self.project_name()}-tuning"
-        self.init_run(run_name=name)
+        # self.init_run(run_name=name)
         if not id:
 
             parameters_config = dict()

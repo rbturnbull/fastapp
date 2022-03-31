@@ -2,6 +2,7 @@ docshtml
 paper.pdf
 fastapp/*.ipynb
 wandb/*
+wandb*/*
 outputs/*
 fastapp/outputs/*
 *.pyc
