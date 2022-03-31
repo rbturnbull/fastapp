@@ -74,13 +74,14 @@ class WandbMixin(object):
             name = f"{self.project_name()}-tuning"
         # self.init_run(run_name=name)
         if not id:
-
+            
             parameters_config = dict()
             tuning_params = self.tuning_params()
+            
             for key, value in tuning_params.items():
-                if key in kwargs and kwargs[key] is None:
+                if ((key in kwargs) and (kwargs[key] is None)) or (key not in kwargs):
                     parameters_config[key] = value.config()
-
+            
             sweep_config = {
                 "name": name,
                 "method": method,
