@@ -1,0 +1,23 @@
+﻿fastapp
+=======
+
+.. automodule:: fastapp
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
