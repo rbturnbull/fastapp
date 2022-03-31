@@ -3,7 +3,7 @@ import wandb
 from fastcore.meta import delegates
 from fastai.callback.wandb import WandbCallback
 from fastai.learner import Learner
-
+from typing import Union, Optional
 from .params import Param
 from .callbacks import WandbCallbackTime
 
@@ -22,10 +22,12 @@ class WandbMixin(object):
 
     def init_run(
         self,
-        output_dir,
-        project_name=None,
-        config={},
-        upload_model=Param(default=False, help="If true, logs model to WandB project"),
+        output_dir: Union[Path, str],
+        project_name: Optional[str] = None,
+        config: dict = {},
+        upload_model: Union[Param, bool] = Param(
+            default=False, help="If true, logs model to WandB project"
+        ),
         **kwargs,
     ):
         self.upload_model = upload_model
@@ -38,8 +40,10 @@ class WandbMixin(object):
 
     def log(self, param):
         wandb.log(param)
-    
-    def log_artifact(self,artifact_path, artifact_name, artifact_type, upload = False, **kwargs):
+
+    def log_artifact(
+        self, artifact_path, artifact_name, artifact_type, upload=False, **kwargs
+    ):
         artifact = wandb.Artifact(artifact_name, type=artifact_type, **kwargs)
         if upload == True:
             artifact.add_file(artifact_path)
@@ -74,14 +78,14 @@ class WandbMixin(object):
             name = f"{self.project_name()}-tuning"
         # self.init_run(run_name=name)
         if not id:
-            
+
             parameters_config = dict()
             tuning_params = self.tuning_params()
-            
+
             for key, value in tuning_params.items():
                 if ((key in kwargs) and (kwargs[key] is None)) or (key not in kwargs):
                     parameters_config[key] = value.config()
-            
+
             sweep_config = {
                 "name": name,
                 "method": method,
