@@ -64,6 +64,8 @@ yaml.add_representer(OrderedDict, ordered_dict_presenter)
 
 
 class FastAppTestCase:
+    """Automated tests for FastApp classes"""
+
     app_class = None
     expected_base = None
 
@@ -100,13 +102,11 @@ class FastAppTestCase:
         return app
 
     def subtests(self, name: str):
-        if name.startswith("test_"):
-            name = name[5:]
         directory = self.get_expected_dir() / name
         directory.mkdir(exist_ok=True, parents=True)
         files = list(directory.glob("*.yaml"))
 
-        assert len(files) >= 0
+        assert len(files) > 0
 
         for file in files:
             with open(file) as f:
@@ -115,7 +115,15 @@ class FastAppTestCase:
                 output = file_dict.get("output", "")
                 yield params, output, file
 
-    def test_model(self, prompt_option):
+    def test_model(self, prompt_option: bool):
+        """
+        Tests the method of a FastApp to create a pytorch model.
+
+        The expected output is the string representation of the model created.
+
+        Args:
+            prompt_option (bool): Whether or not failed tests should prompt the user to regenerate the expected files.
+        """
         app = self.get_app()
         for params, output, file in self.subtests(sys._getframe().f_code.co_name):
             model = app.model(**params)
@@ -126,12 +134,11 @@ class FastAppTestCase:
                 model_summary = str(model)
 
             if prompt_option and model_summary != output:
-                if (
-                    input(
-                        f"File '{file}' does not match test output. Should this file be replaced? (y/N) "
-                    ).lower()
-                    == "y"
-                ):
+                prompt_response = input(
+                    f"Expected file '{file.name}' does not match test output."
+                    "Should this file be replaced? (y/N) "
+                )
+                if prompt_response.lower() == "y":
                     with open(file, "w") as f:
                         data = OrderedDict(
                             params=OrderedDict(params), output=literal(model_summary)
