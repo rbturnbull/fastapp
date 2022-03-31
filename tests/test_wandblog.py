@@ -86,7 +86,6 @@ class TestApp(WandbMixin, IrisApp):
     
     pass
 
-
 class WandbMixinTest(unittest.TestCase):
     def setUp(self) -> None:
         self.wandb_app = TestApp()
@@ -197,5 +196,4 @@ class WandbMixinTest(unittest.TestCase):
     @patch.object(TestApp, 'train', mock_train)
     @patch('fastapp.logging.wandb.agent',mock_agent )
     def test_sweep_tune(self):
-        import pdb;pdb.set_trace()
         self.wandb_app.tune()

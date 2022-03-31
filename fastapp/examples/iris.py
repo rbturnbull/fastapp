@@ -18,7 +18,7 @@ class IrisApp(fa.FastApp):
 
     def dataloaders(
         self,
-        batch_size:int = fa.Param(32, tune = True, tune_min=8, tune_max=128, log=True),
+        batch_size:int = fa.Param(32, tune_min=8, tune_max=128, log=True, tune=True),
     ):
         df = load_iris(as_frame=True)
         
