@@ -5,6 +5,7 @@ from typer.models import OptionInfo
 class Param(OptionInfo):
     def __init__(
         self,
+        default = None,
         tune=False,
         tune_min=None,
         tune_max=None,
@@ -13,7 +14,7 @@ class Param(OptionInfo):
         annotation=None,
         **kwargs,
     ):
-        super().__init__(**kwargs)
+        super().__init__(default = default, **kwargs)
         self.tune = tune
         self.log = log
         self.tune_min = tune_min if tune_min is not None else self.min
