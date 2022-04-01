@@ -378,7 +378,7 @@ class FastApp:
             parameters_config = dict()
             tuning_params = self.tuning_params()
             for key, value in tuning_params.items():
-                if key in kwargs and kwargs[key] is None:
+                if ((key in kwargs) and (kwargs[key] is None)) or (key in kwargs):
                     parameters_config[key] = value.config()
 
             sweep_config = {

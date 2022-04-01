@@ -2,9 +2,12 @@ docshtml
 paper.pdf
 fastapp/*.ipynb
 wandb/*
+wandb*/*
 outputs/*
 fastapp/outputs/*
 *.pyc
+
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -165,3 +168,4 @@ mlruns
 .DS_store
 *.ipynb
 *.csv
+.vscode
