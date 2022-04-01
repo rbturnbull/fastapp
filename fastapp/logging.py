@@ -39,6 +39,8 @@ from rich.pretty import pprint
 from rich.console import Console
 from rich.traceback import install
 
+from .apps import run_callback
+
 install()
 console = Console()
 
@@ -129,9 +131,7 @@ class WandbMixin(object):
         :rtype: _type_
         """
         wandb_callback = WandbCallback(log_preds=False)
-        callbacks.extend(
-            [wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)]
-        )
+        callbacks.extend([wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)])
         return callbacks
 
     def save_model(self, learner: Learner, run_name: str):
@@ -191,9 +191,7 @@ class WandbMixin(object):
                 sweep_config["metric"] = dict(name=self.monitor(), goal=self.goal())
 
             if min_iter:
-                sweep_config["early_terminate"] = dict(
-                    type="hyperband", min_iter=min_iter
-                )
+                sweep_config["early_terminate"] = dict(type="hyperband", min_iter=min_iter)
             console.print("Configuration for hyper-parameter tuning:", style="bold red")
             pprint(sweep_config)
 

@@ -7,6 +7,7 @@ from pathlib import Path
 from torch import nn
 from collections import OrderedDict
 
+from fastai.data.core import DataLoaders
 from .apps import FastApp
 
 ######################################################################
@@ -14,17 +15,9 @@ from .apps import FastApp
 ######################################################################
 
 
-def pytest_addoption(parser):
-    parser.addoption(
-        "--prompt",
-        action="store_true",
-        help="Whether or not to prompt for saving output in new expected files.",
-    )
-
-
 @pytest.fixture
-def prompt_option(request):
-    return request.config.getoption("--prompt")
+def interactive(request):
+    return request.config.getoption("-s") or request.config.getoption("--capture=no")
 
 
 ######################################################################
@@ -61,6 +54,31 @@ yaml.add_representer(OrderedDict, ordered_dict_presenter)
 ######################################################################
 ## FastApp Testing Utils
 ######################################################################
+
+
+def assert_output(file: Path, interactive: bool, params: dict, output: str, expected: str):
+    """
+    Tests to see if the output is the same as the expected data and allows for saving a new version of the expected files if needed.
+
+    Args:
+        file (Path): The path to the expected file in yaml format.
+        interactive (bool): Whether or not to prompt for replacing the expected file.
+        params (dict): The dictionary of parameters to store in the expected file.
+        output (str): The string representation of the output from the app.
+        expected (str): The expected output from the yaml file.
+    """
+    if interactive and expected != output:
+        prompt_response = input(
+            f"Expected file '{file.name}' does not match test output.\n"
+            "Should this file be replaced? (y/N) "
+        )
+        if prompt_response.lower() == "y":
+            with open(file, "w") as f:
+                data = OrderedDict(params=OrderedDict(params), output=literal(output))
+                yaml.dump(data, f)
+                expected = output
+
+    assert expected == output
 
 
 class FastAppTestCase:
@@ -106,7 +124,10 @@ class FastAppTestCase:
         directory.mkdir(exist_ok=True, parents=True)
         files = list(directory.glob("*.yaml"))
 
-        assert len(files) > 0
+        if len(files) == 0:
+            pytest.skip(
+                f"Skipping test for '{name}' because no expected files were found in '{directory}'."
+            )
 
         for file in files:
             with open(file) as f:
@@ -115,17 +136,17 @@ class FastAppTestCase:
                 output = file_dict.get("output", "")
                 yield params, output, file
 
-    def test_model(self, prompt_option: bool):
+    def test_model(self, interactive: bool):
         """
         Tests the method of a FastApp to create a pytorch model.
 
         The expected output is the string representation of the model created.
 
         Args:
-            prompt_option (bool): Whether or not failed tests should prompt the user to regenerate the expected files.
+            interactive (bool): Whether or not failed tests should prompt the user to regenerate the expected files.
         """
         app = self.get_app()
-        for params, output, file in self.subtests(sys._getframe().f_code.co_name):
+        for params, expected_output, file in self.subtests(sys._getframe().f_code.co_name):
             model = app.model(**params)
             if model is None:
                 model_summary = "None"
@@ -133,17 +154,25 @@ class FastAppTestCase:
                 assert isinstance(model, nn.Module)
                 model_summary = str(model)
 
-            if prompt_option and model_summary != output:
-                prompt_response = input(
-                    f"Expected file '{file.name}' does not match test output."
-                    "Should this file be replaced? (y/N) "
-                )
-                if prompt_response.lower() == "y":
-                    with open(file, "w") as f:
-                        data = OrderedDict(
-                            params=OrderedDict(params), output=literal(model_summary)
-                        )
-                        yaml.dump(data, f)
-                        output = model_summary
+            assert_output(file, interactive, params, model_summary, expected_output)
 
-            assert model_summary == output
+    def test_dataloaders(self, interactive: bool):
+        app = self.get_app()
+        for params, expected_output, file in self.subtests(sys._getframe().f_code.co_name):
+            dataloaders = app.dataloaders(**params)
+
+            assert isinstance(dataloaders, DataLoaders)
+
+            batch = dataloaders.train.one_batch()
+            dataloaders_summary = dict(
+                type=type(dataloaders),
+                train_size=len(dataloaders.train),
+                validation_size=len(dataloaders.valid),
+                batch_x_type=type(batch[0]),
+                batch_y_type=type(batch[1]),
+                batch_x_shape=batch[0].shape,
+                batch_y_shape=batch[1].shape,
+            )
+
+            dataloaders_summary = str(dataloaders_summary)
+            assert_output(file, interactive, params, dataloaders_summary, expected_output)
