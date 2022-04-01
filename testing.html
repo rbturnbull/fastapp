@@ -48,7 +48,11 @@
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tuning.html">Hyperparameter Tuning</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Testing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#logistic-regression-app-example">Logistic Regression App Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fastapptestcase-reference">FastAppTestCase Reference</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
@@ -103,7 +107,79 @@
 </style>
 <section id="testing">
 <h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline"></a></h1>
-<p>Information to come.</p>
+<p>Classes inheriting from <code class="docutils literal notranslate"><span class="pre">FastApp</span></code> can be tested automatically by inheriting from the <code class="docutils literal notranslate"><span class="pre">FastAppTestCase</span></code>.
+This creates a number of automated tests designed to be used in conjunction with <code class="docutils literal notranslate"><span class="pre">pytest</span></code>.
+The expected results of the tests are definied in yaml files in a directory named <code class="docutils literal notranslate"><span class="pre">expected</span></code> next to the scripts with the testing code
+and in a subdirectory with the class name which is an instance of <code class="docutils literal notranslate"><span class="pre">FastAppTestCase</span></code>. Each test has its own subdirectory there.
+There can be multiple expected files for testing the same method to test different combinations of arguments.
+The format for the yaml files is:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">...</span><span class="p p-Indicator">}</span><span class="w"></span>
+<span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;...&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The params gives a list of keyword arguments for the FastApp method being tested and the output is some data in a format required by the testing function.
+For example the expected output for the model method is the string representation of the model definied by the params.</p>
+<p>If you want to change the expected output for a test then run pytest with the <code class="docutils literal notranslate"><span class="pre">--prompt</span></code> option. This will find failing tests and prompt the user to ask if the expected file should be regenerated.
+One way to automatically create expectation files is to add blank files and prompt for adding the expected result.
+The resulting file should be read to make sure that it is correct.</p>
+<section id="logistic-regression-app-example">
+<h2>Logistic Regression App Example<a class="headerlink" href="#logistic-regression-app-example" title="Permalink to this headline"></a></h2>
+<p>For instance, the LogisticRegression app included as an example in this project is tested as follows in <code class="docutils literal notranslate"><span class="pre">tests/test_logistic.py</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fastapp.testing</span> <span class="kn">import</span> <span class="n">FastAppTestCase</span>
+<span class="kn">from</span> <span class="nn">fastapp.examples.logistic_regression</span> <span class="kn">import</span> <span class="n">LogisticRegressionApp</span>
+
+
+<span class="k">class</span> <span class="nc">TestLogisticRegressionApp</span><span class="p">(</span><span class="n">FastAppTestCase</span><span class="p">):</span>
+    <span class="n">app_class</span> <span class="o">=</span> <span class="n">LogisticRegressionApp</span>
+</pre></div>
+</div>
+<p>The expected values for the tests are in <code class="docutils literal notranslate"><span class="pre">tests/expected/TestLogisticRegressionApp</span></code>.
+The file for testing the model is in <code class="docutils literal notranslate"><span class="pre">tests/expected/TestLogisticRegressionApp/test_model/model.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
+<span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span><span class="w"></span>
+<span class="w">  </span><span class="no">Sequential(</span><span class="w"></span>
+<span class="w">    </span><span class="no">(0): Linear(in_features=1, out_features=1, bias=True)</span><span class="w"></span>
+<span class="w">    </span><span class="no">(1): Sigmoid()</span><span class="w"></span>
+<span class="w">  </span><span class="no">)</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="fastapptestcase-reference">
+<h2>FastAppTestCase Reference<a class="headerlink" href="#fastapptestcase-reference" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fastapp.testing.</span></span><span class="sig-name descname"><span class="pre">FastAppTestCase</span></span><a class="headerlink" href="#fastapp.testing.FastAppTestCase" title="Permalink to this definition"></a></dt>
+<dd><p>Automated tests for FastApp classes</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase.get_app">
+<span class="sig-name descname"><span class="pre">get_app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">fastapp.apps.FastApp</span></span></span><a class="headerlink" href="#fastapp.testing.FastAppTestCase.get_app" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an instance of the app for this test case.</p>
+<p>It instantiates an object from <cite>app_class</cite>.
+Override <cite>app_class</cite> or this method so the correct app is returned from calling this method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase.get_expected_dir">
+<span class="sig-name descname"><span class="pre">get_expected_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pathlib.Path</span></span></span><a class="headerlink" href="#fastapp.testing.FastAppTestCase.get_expected_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the path to the directory where the expected files.</p>
+<p>It creates the directory if it doesn’t already exist.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase.test_model">
+<span class="sig-name descname"><span class="pre">test_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastapp.testing.FastAppTestCase.test_model" title="Permalink to this definition"></a></dt>
+<dd><p>Tests the method of a FastApp to create a pytorch model.</p>
+<p>The expected output is the string representation of the model created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>prompt_option</strong> (<em>bool</em>) – Whether or not failed tests should prompt the user to regenerate the expected files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 </section>
 
 
