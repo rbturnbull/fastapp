@@ -38,6 +38,13 @@ Enter the virtual environment with:
 
 The command-line utility should be installed to your path automatically in that environment.
 
+Automatic Generation Reference
+------------------------------
+
+.. click:: fastapp.main:app
+   :prog: fastapp
+   :nested: full
+
 
 Manual Setup
 =======================
