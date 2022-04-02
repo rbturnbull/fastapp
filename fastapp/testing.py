@@ -2,6 +2,7 @@ import sys
 import yaml
 import importlib
 import pytest
+from typing import get_type_hints
 from pathlib import Path
 
 from torch import nn
@@ -17,7 +18,7 @@ from .apps import FastApp
 
 @pytest.fixture
 def interactive(request):
-    return request.config.getoption("-s") or request.config.getoption("--capture=no")
+    return request.config.getoption("-s") == "no"
 
 
 ######################################################################
@@ -56,7 +57,7 @@ yaml.add_representer(OrderedDict, ordered_dict_presenter)
 ######################################################################
 
 
-def assert_output(file: Path, interactive: bool, params: dict, output: str, expected: str):
+def assert_output(file: Path, interactive: bool, params: dict, output, expected):
     """
     Tests to see if the output is the same as the expected data and allows for saving a new version of the expected files if needed.
 
@@ -74,7 +75,10 @@ def assert_output(file: Path, interactive: bool, params: dict, output: str, expe
         )
         if prompt_response.lower() == "y":
             with open(file, "w") as f:
-                data = OrderedDict(params=OrderedDict(params), output=literal(output))
+                output_for_yaml = (
+                    literal(output) if isinstance(output, str) and "\n" in output else output
+                )
+                data = OrderedDict(params=OrderedDict(params), output=output_for_yaml)
                 yaml.dump(data, f)
                 expected = output
 
@@ -159,20 +163,27 @@ class FastAppTestCase:
     def test_dataloaders(self, interactive: bool):
         app = self.get_app()
         for params, expected_output, file in self.subtests(sys._getframe().f_code.co_name):
-            dataloaders = app.dataloaders(**params)
+            # Make all paths relative to the result of get_expected_dir()
+            modified_params = dict(params)
+            hints = get_type_hints(app.dataloaders)
+            for key, value in hints.items():
+                if key in params and Path in value.__mro__:
+                    relative_path = params[key]
+                    modified_params[key] = (self.get_expected_dir() / relative_path).resolve()
+
+            dataloaders = app.dataloaders(**modified_params)
 
             assert isinstance(dataloaders, DataLoaders)
 
             batch = dataloaders.train.one_batch()
-            dataloaders_summary = dict(
-                type=type(dataloaders),
+            dataloaders_summary = OrderedDict(
+                type=type(dataloaders).__name__,
                 train_size=len(dataloaders.train),
                 validation_size=len(dataloaders.valid),
-                batch_x_type=type(batch[0]),
-                batch_y_type=type(batch[1]),
-                batch_x_shape=batch[0].shape,
-                batch_y_shape=batch[1].shape,
+                batch_x_type=type(batch[0]).__name__,
+                batch_y_type=type(batch[1]).__name__,
+                batch_x_shape=str(batch[0].shape),
+                batch_y_shape=str(batch[1].shape),
             )
 
-            dataloaders_summary = str(dataloaders_summary)
             assert_output(file, interactive, params, dataloaders_summary, expected_output)
