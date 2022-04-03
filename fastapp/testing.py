@@ -194,7 +194,7 @@ class FastAppTestCase:
 
         Args:
             interactive (bool): Whether or not the user should be prompted for creating or regenerating expected files.
-            name (str): The name of the method to be tested with the string "test_" prepended to it.
+            name (str): The name of the method to be tested with the string `test_` prepended to it.
         """
         app = self.get_app()
         for params, expected_output, file in self.subtests(name):

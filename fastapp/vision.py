@@ -72,13 +72,15 @@ class UNetApp(VisionApp):
     """
     A FastApp which uses a base model from torchvision which is modified.
 
+    Useful for image segmentation, super-resolution or colorization.
     The default base torchvision model is resnet18.
 
     For more information see:
-        Olaf Ronneberger, Philipp Fischer, Thomas Brox,
-            U-Net: Convolutional Networks for Biomedical Image Segmentation,
-            https://arxiv.org/abs/1505.04597
-        https://github.com/fastai/fastbook/blob/master/15_arch_details.ipynb
+    Olaf Ronneberger, Philipp Fischer, Thomas Brox,
+    U-Net: Convolutional Networks for Biomedical Image Segmentation,
+    https://arxiv.org/abs/1505.04597
+    https://github.com/fastai/fastbook/blob/master/15_arch_details.ipynb
+
     """
 
     def build_learner_func(self):
