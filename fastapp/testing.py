@@ -187,3 +187,27 @@ class FastAppTestCase:
             )
 
             assert_output(file, interactive, params, dataloaders_summary, expected_output)
+
+    def perform_subtests(self, interactive: bool, name: str):
+        """
+        Performs a number of subtests for a method on the app.
+
+        Args:
+            interactive (bool): Whether or not the user should be prompted for creating or regenerating expected files.
+            name (str): The name of the method to be tested with the string "test_" prepended to it.
+        """
+        app = self.get_app()
+        for params, expected_output, file in self.subtests(name):
+            method_name = name[5:] if name.startswith("test_") else name
+            method = getattr(app, method_name)
+            output = str(method(**params))
+            assert_output(file, interactive, params, output, expected_output)
+
+    def test_goal(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
+    def test_monitor(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
+    def test_activation(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)

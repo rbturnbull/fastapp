@@ -154,9 +154,7 @@ class FastApp:
 
         typer_click_object = typer.main.get_command(cli)
 
-        train_params, _, _ = get_params_convertors_ctx_param_name_from_function(
-            self.train
-        )
+        train_params, _, _ = get_params_convertors_ctx_param_name_from_function(self.train)
         train_command = click.Command(
             name="train",
             callback=self.train,
@@ -287,7 +285,7 @@ class FastApp:
         return []
 
     def monitor(self):
-        return None
+        return "loss"
 
     def goal(self):
         """
@@ -390,9 +388,7 @@ class FastApp:
                 sweep_config["metric"] = dict(name=self.monitor(), goal=self.goal())
 
             if min_iter:
-                sweep_config["early_terminate"] = dict(
-                    type="hyperband", min_iter=min_iter
-                )
+                sweep_config["early_terminate"] = dict(type="hyperband", min_iter=min_iter)
 
             console.print("Configuration for hyper-parameter tuning:", style="bold red")
             pprint(sweep_config)
