@@ -3,7 +3,7 @@ import types
 from typing import get_type_hints, List
 import torchvision.models as models
 from torch import nn
-from fastai.vision.learner import cnn_learner
+from fastai.vision.learner import cnn_learner, unet_learner
 
 from .apps import FastApp
 from .params import Param
@@ -12,6 +12,8 @@ from .params import Param
 def torchvision_model_choices() -> List[str]:
     """
     Returns a list of function names in torchvision.models which can produce torch modules.
+
+    For more information see: https://pytorch.org/vision/stable/models.html
     """
     model_choices = []
     for item in dir(models):
@@ -35,6 +37,10 @@ TorchvisionModelEnum = enum.Enum(
 
 
 class VisionApp(FastApp):
+    """
+    A FastApp which uses a model from torchvision.
+    """
+
     def default_model_name(self):
         return "resnet18"
 
@@ -58,3 +64,19 @@ class VisionApp(FastApp):
 
     def build_learner_func(self):
         return cnn_learner
+
+
+class UNetApp(VisionApp):
+    """
+    A FastApp which uses a base model from torchvision which is modified
+
+    For more information see:
+        Olaf Ronneberger, Philipp Fischer, Thomas Brox,
+            U-Net: Convolutional Networks for Biomedical Image Segmentation,
+            https://arxiv.org/abs/1505.04597
+        https://fastai1.fast.ai/vision.learner.html#unet_learner
+        https://github.com/fastai/fastbook/blob/master/15_arch_details.ipynb
+    """
+
+    def build_learner_func(self):
+        return unet_learner
