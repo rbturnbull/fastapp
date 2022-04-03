@@ -39,6 +39,8 @@ TorchvisionModelEnum = enum.Enum(
 class VisionApp(FastApp):
     """
     A FastApp which uses a model from torchvision.
+
+    The default base torchvision model is resnet18.
     """
 
     def default_model_name(self):
@@ -68,15 +70,21 @@ class VisionApp(FastApp):
 
 class UNetApp(VisionApp):
     """
-    A FastApp which uses a base model from torchvision which is modified
+    A FastApp which uses a base model from torchvision which is modified.
+
+    The default base torchvision model is resnet18.
 
     For more information see:
         Olaf Ronneberger, Philipp Fischer, Thomas Brox,
             U-Net: Convolutional Networks for Biomedical Image Segmentation,
             https://arxiv.org/abs/1505.04597
-        https://fastai1.fast.ai/vision.learner.html#unet_learner
         https://github.com/fastai/fastbook/blob/master/15_arch_details.ipynb
     """
 
     def build_learner_func(self):
+        """
+        Returns unet_learner
+
+        For more information see: https://docs.fast.ai/vision.learner.html#unet_learner
+        """
         return unet_learner
