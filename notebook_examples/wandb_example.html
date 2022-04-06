@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; fastapp 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> fastapp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Project Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../training.html">Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuning.html">Hyperparameter Tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vision.html">Computer Vision Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">fastapp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/notebook_examples/wandb_example.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fastapp.logging</span> <span class="kn">import</span> <span class="n">WandbMixin</span>
+<span class="kn">import</span> <span class="nn">wandb</span>
+<span class="kn">from</span> <span class="nn">fastapp.examples.iris</span> <span class="kn">import</span> <span class="n">IrisApp</span>
+
+<span class="kn">from</span> <span class="nn">fastapp.examples.logistic_regression</span> <span class="kn">import</span> <span class="n">LogisticRegressionApp</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#### Define a new mixin here like MLflow Mixin</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### If you are doing mlflow mixin do it like this</span>
+
+<span class="c1"># class TestIris(MlflowMixin, IrisApp):</span>
+<span class="c1">#     pass</span>
+
+<span class="c1">######</span>
+<span class="k">class</span> <span class="nc">TestIris</span><span class="p">(</span><span class="n">WandbMixin</span><span class="p">,</span> <span class="n">IrisApp</span><span class="p">):</span>
+    <span class="n">upload_model</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="n">iris</span> <span class="o">=</span> <span class="n">TestIris</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iris</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">lr_max</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">4</span><span class="p">),</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>  <span class="n">run_name</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Finishing last run (ID:sxqx78fi) before initializing another...</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Waiting for W&B process to finish... <strong style="color:green">(success).</strong></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    table.wandb td:nth-child(1) { padding: 0 10px; text-align: right }
+    .wandb-row { display: flex; flex-direction: row; flex-wrap: wrap; width: 100% }
+    .wandb-col { display: flex; flex-direction: column; flex-basis: 100%; flex: 1; padding: 10px; }
+    </style>
+<div class="wandb-row"><div class="wandb-col"><h3>Run history:</h3><br/><table class="wandb"><tr><td>accuracy</td><td>█▁</td></tr><tr><td>epoch</td><td>▁▂▄▅▇█</td></tr><tr><td>eps_0</td><td>▁▁▁▁▁▁</td></tr><tr><td>error_rate</td><td>▁█</td></tr><tr><td>lr_0</td><td>▁▆█▆▄▂</td></tr><tr><td>mom_0</td><td>█▃▁▃▅▇</td></tr><tr><td>raw_loss</td><td>▆▄█▄▁▁</td></tr><tr><td>sqr_mom_0</td><td>▁▁▁▁▁▁</td></tr><tr><td>time</td><td>█▁</td></tr><tr><td>train_loss</td><td>█▅█▆▃▁</td></tr><tr><td>valid_loss</td><td>█▁</td></tr><tr><td>wd_0</td><td>▁▁▁▁▁▁</td></tr></table><br/></div><div class="wandb-col"><h3>Run summary:</h3><br/><table class="wandb"><tr><td>accuracy</td><td>0.36667</td></tr><tr><td>epoch</td><td>2</td></tr><tr><td>eps_0</td><td>1e-05</td></tr><tr><td>error_rate</td><td>0.63333</td></tr><tr><td>lr_0</td><td>1e-05</td></tr><tr><td>mom_0</td><td>0.9383</td></tr><tr><td>raw_loss</td><td>1.09236</td></tr><tr><td>sqr_mom_0</td><td>0.99</td></tr><tr><td>time</td><td>0.04421</td></tr><tr><td>train_loss</td><td>1.19318</td></tr><tr><td>valid_loss</td><td>1.10903</td></tr><tr><td>wd_0</td><td>0.01</td></tr></table><br/></div></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Synced <strong style="color:#cdcd00">engineer-nimoy-3</strong>: <a href="https://wandb.ai/sailngarbwm/TestIris/runs/sxqx78fi" target="_blank">https://wandb.ai/sailngarbwm/TestIris/runs/sxqx78fi</a><br/>Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Find logs at: <code>outputs/wandb/run-20220406_163633-sxqx78fi/logs</code></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Successfully finished last run (ID:sxqx78fi). Initializing new run:<br/></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+wandb version 0.12.12 is available!  To upgrade, please run:
+ $ pip install wandb --upgrade</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Tracking run with wandb version 0.12.11</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Run data is saved locally in <code>outputs/wandb/run-20220406_163747-235qnt5h</code></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Syncing run <strong><a href="https://wandb.ai/sailngarbwm/TestIris/runs/235qnt5h" target="_blank">betazoid-q-4</a></strong> to <a href="https://wandb.ai/sailngarbwm/TestIris" target="_blank">Weights & Biases</a> (<a href="https://wandb.me/run" target="_blank">docs</a>)<br/></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">Building model</span>
+</pre></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">Building learner</span>
+</pre></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800000; text-decoration-color: #800000">Setting floating-point precision of learner to </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">16</span><span style="color: #800000; text-decoration-color: #800000"> bit</span>
+</pre></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+WandbCallback requires use of &#34;SaveModelCallback&#34; to log best model
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/torch/autocast_mode.py:141: UserWarning: User provided device_type of &#39;cuda&#39;, but CUDA is not available. Disabling
+  warnings.warn(&#39;User provided device_type of \&#39;cuda\&#39;, but CUDA is not available. Disabling&#39;)
+/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/torch/cuda/amp/grad_scaler.py:115: UserWarning: torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.
+  warnings.warn(&#34;torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.&#34;)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>accuracy</th>
+      <th>error_rate</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>1.237922</td>
+      <td>1.118341</td>
+      <td>0.300000</td>
+      <td>0.700000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>1.170880</td>
+      <td>1.103573</td>
+      <td>0.300000</td>
+      <td>0.700000</td>
+      <td>00:00</td>
+    </tr>
+  </tbody>
+</table></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ff0000; text-decoration-color: #ff0000">╭──────────────────────────── </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">Traceback </span><span style="color: #bf7f7f; text-decoration-color: #bf7f7f; font-weight: bold">(most recent call last)</span><span style="color: #ff0000; text-decoration-color: #ff0000"> ────────────────────────────╮</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/var/folders/07/8rc203z16fs7h26gb4xmv62c0000gp/T/ipykernel_13696/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">2002062411.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">1</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">&lt;cell</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #00ff00; text-decoration-color: #00ff00">line: 1&gt;</span>                                                                                  <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000; font-style: italic">[Errno 2] No such file or directory: </span>                                                     <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000; font-style: italic">'/var/folders/07/8rc203z16fs7h26gb4xmv62c0000gp/T/ipykernel_13696/2002062411.py'</span>          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/repositories/fastapp/fastapp/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">apps.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">352</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">train</span>                          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">349 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">with</span> learner.distrib_ctx() <span style="color: #0000ff; text-decoration-color: #0000ff">if</span> distributed == <span style="color: #0000ff; text-decoration-color: #0000ff">True</span> <span style="color: #0000ff; text-decoration-color: #0000ff">else</span> nullcontext():       <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">350 │   │   │   </span>learner.fit_one_cycle(epochs, lr_max=lr_max, cbs=<span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.callbacks())      <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">351 │   │   </span>                                                                            <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span>352 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.save_model(learner, run_name)                                          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">353 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> learner                                                              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">354 │   </span>                                                                                <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">355 │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">def</span> <span style="color: #00ff00; text-decoration-color: #00ff00">project_name</span>(<span style="color: #00ffff; text-decoration-color: #00ffff">self</span>) -&gt; <span style="color: #00ffff; text-decoration-color: #00ffff">str</span>:                                                  <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/repositories/fastapp/fastapp/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">logging.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">150</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">save_model</span>                  <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">147 │   │   </span>                                                                            <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">148 │   │   </span>model_path = learner.path / learner.model_dir / run_name                    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">149 │   │   # import pdb;pdb.set_trace()</span>                                                <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span>150 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.log_artifact(model_path, run_name, <span style="color: #808000; text-decoration-color: #808000">"model"</span>, upload=<span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.upload_model)  <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">151 │   </span>                                                                                <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">152 │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">def</span> <span style="color: #00ff00; text-decoration-color: #00ff00">tune</span>(                                                                       <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">153 │   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>,                                                                       <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/repositories/fastapp/fastapp/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">logging.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">123</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">log_artifact</span>                <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">120 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">if</span> upload == <span style="color: #0000ff; text-decoration-color: #0000ff">True</span>:                                                          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">121 │   │   │   </span>artifact.add_file(artifact_path)                                        <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">122 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">else</span>:                                                                       <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span>123 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   │   </span>artifact.add_reference(artifact_path)                                   <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">124 │   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.run.log_artifact(artifact)                                             <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">125 │   </span>                                                                                <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">126 │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">def</span> <span style="color: #00ff00; text-decoration-color: #00ff00">logging_callbacks</span>(<span style="color: #00ffff; text-decoration-color: #00ffff">self</span>, callbacks: <span style="color: #00ffff; text-decoration-color: #00ffff">list</span>):                                   <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/wandb/sdk/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">wandb</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #808000; text-decoration-color: #808000; font-weight: bold">_artifacts.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">443</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">add_reference</span>                                                        <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 440 │   │   │   </span>uri_str = ref_url_fn()                                                 <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 441 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">elif</span> <span style="color: #00ffff; text-decoration-color: #00ffff">isinstance</span>(uri, <span style="color: #00ffff; text-decoration-color: #00ffff">str</span>):                                                 <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 442 │   │   │   </span>uri_str = uri                                                          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span> 443 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   </span>url = urlparse(<span style="color: #00ffff; text-decoration-color: #00ffff">str</span>(uri_str))                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 444 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">if</span> <span style="color: #ff00ff; text-decoration-color: #ff00ff">not</span> url.scheme:                                                         <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 445 │   │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">raise</span> <span style="color: #00ffff; text-decoration-color: #00ffff">ValueError</span>(                                                      <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 446 │   │   │   │   </span><span style="color: #808000; text-decoration-color: #808000">"References must be URIs. To reference a local file, use file://"</span>  <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">╰───────────────────────────────────────────────────────────────────────────────────────────╯</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000; font-weight: bold">UnboundLocalError: </span>local variable <span style="color: #008000; text-decoration-color: #008000">'uri_str'</span> referenced before assignment
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">from LogisticRegressionApp
+</pre></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">running <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">fastapp.params.Param</span><span style="color: #000000; text-decoration-color: #000000"> object at </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0x7fdf084a9d60</span><span style="font-weight: bold">&gt;</span>
+</pre></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">with these parameters:
+ <span style="font-weight: bold">{}</span>
+</pre></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #ff0000; text-decoration-color: #ff0000">╭──────────────────────────── </span><span style="color: #800000; text-decoration-color: #800000; font-weight: bold">Traceback </span><span style="color: #bf7f7f; text-decoration-color: #bf7f7f; font-weight: bold">(most recent call last)</span><span style="color: #ff0000; text-decoration-color: #ff0000"> ────────────────────────────╮</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/var/folders/07/8rc203z16fs7h26gb4xmv62c0000gp/T/ipykernel_12210/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">373083588.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">1</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">&lt;cell </span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #00ff00; text-decoration-color: #00ff00">line: 1&gt;</span>                                                                                  <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000; font-style: italic">[Errno 2] No such file or directory: </span>                                                     <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000; font-style: italic">'/var/folders/07/8rc203z16fs7h26gb4xmv62c0000gp/T/ipykernel_12210/373083588.py'</span>           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/repositories/fastapp/fastapp/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">apps.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">345</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">train</span>                          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">342 </span><span style="color: #bfbf7f; text-decoration-color: #bfbf7f">│   │   </span><span style="color: #808000; text-decoration-color: #808000">"""</span>                                                                         <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">343 │   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.init_run(run_name=run_name, output_dir=output_dir, **kwargs)           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">344 │   │   </span>                                                                            <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span>345 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   </span>dataloaders = run_callback(<span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.dataloaders, kwargs)                        <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">346 │   │   </span>                                                                            <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">347 │   │   </span>learner = <span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.learner(dataloaders, output_dir=output_dir, **kwargs)        <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">348 </span>                                                                                    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/repositories/fastapp/fastapp/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">apps.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">31</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">run_callback</span>                    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 28 │   </span>allowed_params, _, _ = get_params_convertors_ctx_param_name_from_function(callb <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 29 │   </span>allowed_param_names = [p.name <span style="color: #0000ff; text-decoration-color: #0000ff">for</span> p <span style="color: #ff00ff; text-decoration-color: #ff00ff">in</span> allowed_params]                          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 30 │   </span>kwargs = {key: value <span style="color: #0000ff; text-decoration-color: #0000ff">for</span> key, value <span style="color: #ff00ff; text-decoration-color: #ff00ff">in</span> params.items() <span style="color: #0000ff; text-decoration-color: #0000ff">if</span> key <span style="color: #ff00ff; text-decoration-color: #ff00ff">in</span> allowed_param_n <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span> 31 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> callback(**kwargs)                                                       <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 32 </span>                                                                                    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 33 </span>                                                                                    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 34 </span><span style="color: #0000ff; text-decoration-color: #0000ff">def</span> <span style="color: #00ff00; text-decoration-color: #00ff00">version_callback</span>(value: <span style="color: #00ffff; text-decoration-color: #00ffff">bool</span>):                                                  <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/repositories/fastapp/fastapp/examples/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">logistic_regression.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">44</span> in         <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #00ff00; text-decoration-color: #00ff00">dataloaders</span>                                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">41 │   │   │   </span>splitter=RandomSplitter(validation_proportion),                          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">42 │   │   │   </span>batch_tfms=unsqueeze,                                                    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">43 │   │   </span>)                                                                            <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span>44 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   </span>df = pd.read_csv(csv)                                                        <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">45 │   │   </span>                                                                             <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">46 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> datablock.dataloaders(df, bs=batch_size)                              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">47 </span>                                                                                     <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/pandas/util/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">_de</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #808000; text-decoration-color: #808000; font-weight: bold">corators.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">311</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">wrapper</span>                                                                <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">308 │   │   │   │   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">FutureWarning</span>,                                                  <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">309 │   │   │   │   │   </span>stacklevel=stacklevel,                                          <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">310 │   │   │   │   </span>)                                                                   <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span>311 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> func(*args, **kwargs)                                            <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">312 │   │   </span>                                                                            <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">313 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> wrapper                                                              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">314 </span>                                                                                    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/pandas/io/parse</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">rs/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">readers.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">680</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">read_csv</span>                                                             <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 677 │   </span>)                                                                              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 678 │   </span>kwds.update(kwds_defaults)                                                     <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 679 │   </span>                                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span> 680 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> _read(filepath_or_buffer, kwds)                                         <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 681 </span>                                                                                   <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 682 </span>                                                                                   <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 683 </span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">@deprecate_nonkeyword_arguments</span>(                                                   <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/pandas/io/parse</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">rs/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">readers.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">575</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">_read</span>                                                                <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 572 │   </span>_validate_names(kwds.get(<span style="color: #808000; text-decoration-color: #808000">"names"</span>, <span style="color: #0000ff; text-decoration-color: #0000ff">None</span>))                                       <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 573 │   </span>                                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 574 │   # Create the parser.</span>                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span> 575 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   </span>parser = TextFileReader(filepath_or_buffer, **kwds)                            <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 576 │   </span>                                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 577 │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">if</span> chunksize <span style="color: #ff00ff; text-decoration-color: #ff00ff">or</span> iterator:                                                      <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 578 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> parser                                                              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/pandas/io/parse</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">rs/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">readers.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">933</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">__init__</span>                                                             <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 930 │   │   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.options[<span style="color: #808000; text-decoration-color: #808000">"has_index_names"</span>] = kwds[<span style="color: #808000; text-decoration-color: #808000">"has_index_names"</span>]              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 931 │   │   </span>                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 932 │   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.handles: IOHandles | <span style="color: #0000ff; text-decoration-color: #0000ff">None</span> = <span style="color: #0000ff; text-decoration-color: #0000ff">None</span>                                      <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span> 933 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>._engine = <span style="color: #00ffff; text-decoration-color: #00ffff">self</span>._make_engine(f, <span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.engine)                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 934 │   </span>                                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 935 │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">def</span> <span style="color: #00ff00; text-decoration-color: #00ff00">close</span>(<span style="color: #00ffff; text-decoration-color: #00ffff">self</span>):                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 936 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">if</span> <span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.handles <span style="color: #ff00ff; text-decoration-color: #ff00ff">is</span> <span style="color: #ff00ff; text-decoration-color: #ff00ff">not</span> <span style="color: #0000ff; text-decoration-color: #0000ff">None</span>:                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/pandas/io/parse</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">rs/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">readers.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">1217</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">_make_engine</span>                                                        <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1214 │   │   │   # error: No overload variant of "get_handle" matches argument types</span>    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1215 │   │   │   # "Union[str, PathLike[str], ReadCsvBuffer[bytes], ReadCsvBuffer[str]]</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1216 │   │   │   # , "str", "bool", "Any", "Any", "Any", "Any", "Any"</span>                   <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span>1217 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   │   │   </span><span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.handles = get_handle(  <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"># type: ignore[call-overload]</span>              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1218 │   │   │   │   </span>f,                                                                 <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1219 │   │   │   │   </span>mode,                                                              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1220 │   │   │   │   </span>encoding=<span style="color: #00ffff; text-decoration-color: #00ffff">self</span>.options.get(<span style="color: #808000; text-decoration-color: #808000">"encoding"</span>, <span style="color: #0000ff; text-decoration-color: #0000ff">None</span>),                       <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/pandas/io/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">commo</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #808000; text-decoration-color: #808000; font-weight: bold">n.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">661</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">get_handle</span>                                                                    <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 658 │   </span>encoding = encoding <span style="color: #ff00ff; text-decoration-color: #ff00ff">or</span> <span style="color: #808000; text-decoration-color: #808000">"utf-8"</span>                                                 <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 659 │   </span>                                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 660 │   # read_csv does not know whether the buffer is opened in binary/text mode</span>      <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span> 661 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   </span><span style="color: #0000ff; text-decoration-color: #0000ff">if</span> _is_binary_mode(path_or_buf, mode) <span style="color: #ff00ff; text-decoration-color: #ff00ff">and</span> <span style="color: #808000; text-decoration-color: #808000">"b"</span> <span style="color: #ff00ff; text-decoration-color: #ff00ff">not</span> <span style="color: #ff00ff; text-decoration-color: #ff00ff">in</span> mode:                     <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 662 │   │   </span>mode += <span style="color: #808000; text-decoration-color: #808000">"b"</span>                                                                <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 663 │   </span>                                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f"> 664 │   # validate encoding and errors</span>                                                 <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #bfbf7f; text-decoration-color: #bfbf7f">/Users/garberj/opt/anaconda3/envs/fastapp_env/lib/python3.9/site-packages/pandas/io/</span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">commo</span> <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #808000; text-decoration-color: #808000; font-weight: bold">n.py</span>:<span style="color: #0000ff; text-decoration-color: #0000ff">1128</span> in <span style="color: #00ff00; text-decoration-color: #00ff00">_is_binary_mode</span>                                                              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>                                                                                           <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1125 │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">if</span> <span style="color: #00ffff; text-decoration-color: #00ffff">issubclass</span>(<span style="color: #00ffff; text-decoration-color: #00ffff">type</span>(handle), text_classes):                                     <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1126 │   │   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> <span style="color: #0000ff; text-decoration-color: #0000ff">False</span>                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1127 │   </span>                                                                               <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span> <span style="color: #800000; text-decoration-color: #800000">❱ </span>1128 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│   </span><span style="color: #0000ff; text-decoration-color: #0000ff">return</span> <span style="color: #00ffff; text-decoration-color: #00ffff">isinstance</span>(handle, _get_binary_io_classes()) <span style="color: #ff00ff; text-decoration-color: #ff00ff">or</span> <span style="color: #808000; text-decoration-color: #808000">"b"</span> <span style="color: #ff00ff; text-decoration-color: #ff00ff">in</span> <span style="color: #00ffff; text-decoration-color: #00ffff">getattr</span>(         <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1129 │   │   </span>handle, <span style="color: #808000; text-decoration-color: #808000">"mode"</span>, mode                                                       <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1130 │   </span>)                                                                              <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">│</span>   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1131 </span>                                                                                   <span style="color: #ff0000; text-decoration-color: #ff0000">│</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000">╰───────────────────────────────────────────────────────────────────────────────────────────╯</span>
+<span style="color: #ff0000; text-decoration-color: #ff0000; font-weight: bold">TypeError: </span>argument of type <span style="color: #008000; text-decoration-color: #008000">'NoneType'</span> is not iterable
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Robert Turnbull.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
