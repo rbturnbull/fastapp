@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 from fastai.tabular.data import TabularDataLoaders
-from fastai.tabular.all import tabular_learner
+from fastai.tabular.all import tabular_learner, accuracy, error_rate
 from sklearn.datasets import load_iris
 import fastapp as fa
 
@@ -18,18 +18,24 @@ class IrisApp(fa.FastApp):
 
     def dataloaders(
         self,
-        batch_size:int = fa.Param(32, tune_min=8, tune_max=128, log=True, tune=True),
+        batch_size: int = fa.Param(default=32, tune_min=8, tune_max=128, log=True, tune=True),
     ):
         df = load_iris(as_frame=True)
-        
-        df['frame']['target_name'] = np.take(df['target_names'], df["target"])
-        
+
+        df["frame"]["target_name"] = np.take(df["target_names"], df["target"])
+
         return TabularDataLoaders.from_df(
             df["frame"],
             cont_names=df["feature_names"],
             y_names="target_name",
             bs=batch_size,
         )
+
+    def metrics(self) -> list:
+        return [accuracy, error_rate]
+
+    def monitor(self):
+        return False
 
     def model(self):
         return None
