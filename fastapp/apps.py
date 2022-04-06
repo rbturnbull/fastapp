@@ -340,7 +340,7 @@ class FastApp:
         Returns:
             Learner: The fastai Learner object created for training.
         """
-        self.init_run(run_name=run_name, output_dir=output_dir, **kwargs)
+        self.init_run(run_name=run_name, output_dir=output_dir)
 
         dataloaders = run_callback(self.dataloaders, kwargs)
 
