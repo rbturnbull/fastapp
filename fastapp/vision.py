@@ -15,7 +15,7 @@ def torchvision_model_choices() -> List[str]:
 
     For more information see: https://pytorch.org/vision/stable/models.html
     """
-    model_choices = []
+    model_choices = [""]  # Allow for blank option
     for item in dir(models):
         obj = getattr(models, item)
 

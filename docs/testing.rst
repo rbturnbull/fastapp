@@ -17,7 +17,7 @@ The format for the yaml files is:
 The params gives a list of keyword arguments for the FastApp method being tested and the output is some data in a format required by the testing function.
 For example the expected output for the model method is the string representation of the model definied by the params.
 
-If you want to change the expected output for a test then run pytest with the ``--prompt`` option. This will find failing tests and prompt the user to ask if the expected file should be regenerated.
+If you want to change the expected output for a test then run pytest with the ``-s`` option. This will find failing tests and prompt the user to ask if the expected file should be regenerated.
 One way to automatically create expectation files is to add blank files and prompt for adding the expected result. 
 The resulting file should be read to make sure that it is correct.
 
