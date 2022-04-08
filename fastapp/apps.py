@@ -284,18 +284,28 @@ class FastApp:
         """
         return []
 
-    def monitor(self):
+    def monitor(self) -> str:
+        """
+        The metric to optimize for when performing hyperparameter tuning.
+
+        By default it returns 'loss'.
+        """
         return "loss"
 
-    def goal(self):
+    def goal(self) -> str:
         """
         Sets the optimality direction when evaluating the metric from `monitor`.
 
-        By default it is set to "minimize" if the monitor metric has the string 'loss' or 'err' otherwise it is "maximize".
+        By default it produces the same behaviour as fastai callbacks (fastai.callback.tracker)
+        ie. it is set to "minimize" if the monitor metric has the string 'loss' or 'err' otherwise it is "maximize".
+
+        If the monitor is empty then this function returns None.
         """
         monitor = self.monitor()
-        # Compare fastai.callback.tracker
-        return "minimize" if "loss" in monitor or "err" in monitor else "maximize"
+        if not monitor or not isinstance(monitor, str):
+            return None
+
+        return "minimize" if ("loss" in monitor) or ("err" in monitor) else "maximize"
 
     def callbacks(self) -> list:
         """

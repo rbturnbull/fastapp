@@ -7,7 +7,7 @@ fastapp
 |pipline badge| |coverage badge| |docs badge| |black badge|
 
 .. |pipline badge| image:: https://github.com/rbturnbull/fastapp/actions/workflows/coverage.yml/badge.svg
-    :target: https://rbturnbull.github.io/fastapp
+    :target: https://github.com/rbturnbull/fastapp/actions
 
 .. |docs badge| image:: https://github.com/rbturnbull/fastapp/actions/workflows/docs.yml/badge.svg
     :target: https://rbturnbull.github.io/fastapp

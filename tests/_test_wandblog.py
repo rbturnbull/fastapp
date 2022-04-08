@@ -205,9 +205,7 @@ class WandbMixinTest(unittest.TestCase):
         self.wandb_app.init_run(
             "wandb_test", upload_model=True, mode="disabled", config=self.test_config
         )
-        learner = self.wandb_app.learner(
-            self.wandb_app.dataloaders(), output_dir="./tmp"
-        )
+        learner = self.wandb_app.learner(self.wandb_app.dataloaders(), output_dir="./tmp")
         self.wandb_app.save_model(learner, MODEL_RUN_NAME)
 
     def test_logging_callbacks(self):

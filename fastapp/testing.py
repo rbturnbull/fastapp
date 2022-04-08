@@ -3,6 +3,7 @@ import yaml
 import importlib
 import pytest
 from typing import get_type_hints
+from typer.testing import CliRunner
 from pathlib import Path
 
 from torch import nn
@@ -211,3 +212,17 @@ class FastAppTestCase:
 
     def test_activation(self, interactive: bool):
         self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
+    def test_cli(self, interactive: bool):
+        app = self.get_app()
+        runner = CliRunner()
+        for params, expected_output, file in self.subtests(sys._getframe().f_code.co_name):
+            result = runner.invoke(app.main(), params)
+            output = dict(
+                stdout=result.stdout,
+                exit_code=result.exit_code,
+            )
+            assert_output(file, interactive, params, output, expected_output)
+
+        assert result.exit_code == 0
+        assert_output(file, interactive, params, result.stdout, expected_output)

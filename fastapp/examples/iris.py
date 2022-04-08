@@ -34,9 +34,6 @@ class IrisApp(fa.FastApp):
     def metrics(self) -> list:
         return [accuracy, error_rate]
 
-    def monitor(self):
-        return False
-
     def model(self):
         return None
 
