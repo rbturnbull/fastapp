@@ -1,0 +1,16 @@
+params:
+- predict
+- --help
+output:
+  exit_code: 0
+  stdout: |
+    Usage: base-callback predict [OPTIONS] DATA
+
+    Options:
+      DATA                    [required]
+      --output TEXT
+      --pretrained TEXT       The location (URL or filepath) of a pretrained model.
+      --reload / --no-reload  Should the pretrained model be downloaded again if it
+                              is online and already present locally.  [default: no-
+                              reload]
+      --help                  Show this message and exit.

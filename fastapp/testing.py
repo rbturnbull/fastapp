@@ -3,7 +3,7 @@ import yaml
 import importlib
 import pytest
 from typing import get_type_hints
-from typer.testing import CliRunner
+from click.testing import CliRunner
 from pathlib import Path
 
 from torch import nn
@@ -71,15 +71,20 @@ def assert_output(file: Path, interactive: bool, params: dict, output, expected)
     """
     if interactive and expected != output:
         prompt_response = input(
-            f"Expected file '{file.name}' does not match test output.\n"
+            f"\nExpected file '{file.name}' does not match test output.\n"
             "Should this file be replaced? (y/N) "
         )
         if prompt_response.lower() == "y":
             with open(file, "w") as f:
+                # import pdb; pdb.set_trace()
                 output_for_yaml = (
                     literal(output) if isinstance(output, str) and "\n" in output else output
                 )
-                data = OrderedDict(params=OrderedDict(params), output=output_for_yaml)
+                # order the params dictionary if necessary
+                if isinstance(params, dict):
+                    params = OrderedDict(params)
+
+                data = OrderedDict(params=params, output=output_for_yaml)
                 yaml.dump(data, f)
                 expected = output
 
@@ -217,12 +222,10 @@ class FastAppTestCase:
         app = self.get_app()
         runner = CliRunner()
         for params, expected_output, file in self.subtests(sys._getframe().f_code.co_name):
-            result = runner.invoke(app.main(), params)
+            result = runner.invoke(app.cli(), params)
             output = dict(
-                stdout=result.stdout,
+                stdout=literal(result.stdout),
                 exit_code=result.exit_code,
             )
+            # import pdb; pdb.set_trace()
             assert_output(file, interactive, params, output, expected_output)
-
-        assert result.exit_code == 0
-        assert_output(file, interactive, params, result.stdout, expected_output)
