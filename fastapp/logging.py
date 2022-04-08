@@ -58,6 +58,7 @@ class WandbMixin(object):
 
     def init_run(
         self,
+        run_name: str,
         output_dir: Union[Path, str],
         project_name: Optional[str] = None,
         config: dict = {},
