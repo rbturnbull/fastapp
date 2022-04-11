@@ -71,15 +71,11 @@ def add_kwargs(from_func, to_func):
         from_func (callable): The function with new parameters to add.
         to_func (callable): The function which will receive the new parameters in its signature.
     """
-    print("---")
     # Get the existing parameters
     to_func = getattr(to_func, "__func__", to_func)
     from_func = getattr(from_func, "__func__", from_func)
     from_func_signature = inspect.signature(from_func)
     to_func_signature = inspect.signature(to_func)
-
-    print("get_type_hints to_func", to_func, get_type_hints(to_func))
-    print("get_type_hints from_func", from_func, get_type_hints(from_func))
 
     # Create a dictionary with both the existing parameters for the function and the new ones
     to_func_parameters = dict(to_func_signature.parameters)
@@ -106,8 +102,6 @@ class FastApp:
 
     def __init__(self):
         super().__init__()
-        print("================")
-
         self.train = MethodType(copy_func(self.train.__func__), self)
         self.show_batch = MethodType(copy_func(self.show_batch.__func__), self)
         self.pretrained_local_path = MethodType(
