@@ -64,7 +64,7 @@ If using pip then:
     pip install git+https://github.com/rbturnbull/fastapp.git#main
 
 
-Then in your code (perhaps in a file named ``apps.py``) subclass FastApp and implement at least the 'model' and the 'dataloaders' methods.
+Then in your code (perhaps in a file named ``apps.py``) subclass FastApp and implement at least the ``dataloaders`` and the ``model`` methods.
 
 .. code:: python
 
@@ -74,7 +74,7 @@ Then in your code (perhaps in a file named ``apps.py``) subclass FastApp and imp
         def dataloaders(self):
             ...
 
-        def dataloaders(self):
+        def model(self):
             ...
 
 If you are using a file as the main script then instantiate the app and call the main function:

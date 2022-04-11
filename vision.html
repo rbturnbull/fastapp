@@ -50,7 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tuning.html">Hyperparameter Tuning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Computer Vision Apps</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-fastapp.vision">Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -108,48 +108,8 @@
 <section id="computer-vision-apps">
 <h1>Computer Vision Apps<a class="headerlink" href="#computer-vision-apps" title="Permalink to this headline"></a></h1>
 <p>Fastapp includes subclasses to assist in building apps for computer vision tasks.</p>
-<section id="module-fastapp.vision">
-<span id="reference"></span><h2>Reference<a class="headerlink" href="#module-fastapp.vision" title="Permalink to this headline"></a></h2>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="fastapp.vision.TorchvisionModelEnum">
-<span class="sig-prename descclassname"><span class="pre">fastapp.vision.</span></span><span class="sig-name descname"><span class="pre">TorchvisionModelEnum</span></span><a class="headerlink" href="#fastapp.vision.TorchvisionModelEnum" title="Permalink to this definition"></a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">fastapp.vision.TorchvisionModelName</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="fastapp.vision.UNetApp">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fastapp.vision.</span></span><span class="sig-name descname"><span class="pre">UNetApp</span></span><a class="headerlink" href="#fastapp.vision.UNetApp" title="Permalink to this definition"></a></dt>
-<dd><p>A FastApp which uses a base model from torchvision which is modified.</p>
-<p>Useful for image segmentation, super-resolution or colorization.
-The default base torchvision model is resnet18.</p>
-<p>For more information see:
-Olaf Ronneberger, Philipp Fischer, Thomas Brox,
-U-Net: Convolutional Networks for Biomedical Image Segmentation,
-<a class="reference external" href="https://arxiv.org/abs/1505.04597">https://arxiv.org/abs/1505.04597</a>
-<a class="reference external" href="https://github.com/fastai/fastbook/blob/master/15_arch_details.ipynb">https://github.com/fastai/fastbook/blob/master/15_arch_details.ipynb</a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="fastapp.vision.UNetApp.build_learner_func">
-<span class="sig-name descname"><span class="pre">build_learner_func</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fastapp.vision.UNetApp.build_learner_func" title="Permalink to this definition"></a></dt>
-<dd><p>Returns unet_learner</p>
-<p>For more information see: <a class="reference external" href="https://docs.fast.ai/vision.learner.html#unet_learner">https://docs.fast.ai/vision.learner.html#unet_learner</a></p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="fastapp.vision.VisionApp">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fastapp.vision.</span></span><span class="sig-name descname"><span class="pre">VisionApp</span></span><a class="headerlink" href="#fastapp.vision.VisionApp" title="Permalink to this definition"></a></dt>
-<dd><p>A FastApp which uses a model from torchvision.</p>
-<p>The default base torchvision model is resnet18.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="fastapp.vision.torchvision_model_choices">
-<span class="sig-prename descclassname"><span class="pre">fastapp.vision.</span></span><span class="sig-name descname"><span class="pre">torchvision_model_choices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fastapp.vision.torchvision_model_choices" title="Permalink to this definition"></a></dt>
-<dd><p>Returns a list of function names in torchvision.models which can produce torch modules.</p>
-<p>For more information see: <a class="reference external" href="https://pytorch.org/vision/stable/models.html">https://pytorch.org/vision/stable/models.html</a></p>
-</dd></dl>
-
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline"></a></h2>
 </section>
 </section>
 
