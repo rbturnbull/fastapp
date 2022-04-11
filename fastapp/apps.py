@@ -13,6 +13,7 @@ from fastai.callback.progress import CSVLogger
 import click
 import typer
 import pdb
+from typing import get_type_hints
 from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.utils import get_params_from_function
 from rich.pretty import pprint
@@ -39,6 +40,7 @@ def copy_func(f, name=None):
     )
     # in case f was given attrs (note this dict is a shallow copy):
     fn.__dict__.update(f.__dict__)
+    fn.__annotations__.update(f.__annotations__)
     return fn
 
 
@@ -69,9 +71,15 @@ def add_kwargs(from_func, to_func):
         from_func (callable): The function with new parameters to add.
         to_func (callable): The function which will receive the new parameters in its signature.
     """
+    print("---")
     # Get the existing parameters
+    to_func = getattr(to_func, "__func__", to_func)
+    from_func = getattr(from_func, "__func__", from_func)
     from_func_signature = inspect.signature(from_func)
     to_func_signature = inspect.signature(to_func)
+
+    print("get_type_hints to_func", to_func, get_type_hints(to_func))
+    print("get_type_hints from_func", from_func, get_type_hints(from_func))
 
     # Create a dictionary with both the existing parameters for the function and the new ones
     to_func_parameters = dict(to_func_signature.parameters)
@@ -89,7 +97,6 @@ def add_kwargs(from_func, to_func):
     to_func_parameters.update(from_func_kwargs)
 
     # Modify function signature with the parameters in this dictionary
-    to_func = getattr(to_func, "__func__", to_func)
     # print('to_func', hex(id(to_func)))
     to_func.__signature__ = to_func_signature.replace(parameters=to_func_parameters.values())
 
@@ -99,8 +106,7 @@ class FastApp:
 
     def __init__(self):
         super().__init__()
-        # print(f"IN FASTAPP INIT {type(self)} {self}")
-        # print('pointer self', hex(id(self)))
+        print("================")
 
         self.train = MethodType(copy_func(self.train.__func__), self)
         self.show_batch = MethodType(copy_func(self.show_batch.__func__), self)
@@ -108,16 +114,9 @@ class FastApp:
             copy_func(self.pretrained_local_path.__func__), self
         )
         self.__call__ = MethodType(copy_func(self.__call__.__func__), self)
-        # # self.show_batch.__func__ = copy_func(self.show_batch.__func__)
-        # # self.pretrained_local_path.__func__ = copy_func(self.pretrained_local_path.__func__)
-        # # self.__call__.__func__ = copy_func(self.__call__.__func__)
-        # pdb.set_trace()
 
         add_kwargs(from_func=self.dataloaders, to_func=self.train)
         add_kwargs(from_func=self.model, to_func=self.train)
-
-        # sig = inspect.signature(self.train)
-        # sig.parameters.values()
 
         add_kwargs(from_func=self.dataloaders, to_func=self.show_batch)
 
@@ -125,9 +124,6 @@ class FastApp:
 
         add_kwargs(from_func=self.pretrained_location, to_func=self.pretrained_local_path)
         add_kwargs(from_func=self.pretrained_local_path, to_func=self.__call__)
-
-        # print('get_params_convertors_ctx_param_name_from_function(self.train)', get_params_convertors_ctx_param_name_from_function(self.train))
-        # print(f"END FASTAPP INIT {type(self)} {self}")
 
     def pretrained_location(self) -> Union[str, Path]:
         return ""
