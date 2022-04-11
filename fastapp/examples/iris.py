@@ -47,4 +47,4 @@ class IrisApp(fa.FastApp):
 #     """
 
 if __name__ == "__main__":
-    IrisApp().main()
+    IrisApp.main()

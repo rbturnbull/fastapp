@@ -60,4 +60,4 @@ class LogisticRegressionApp(fa.FastApp):
 
 
 if __name__ == "__main__":
-    LogisticRegressionApp().main()
+    LogisticRegressionApp.main()

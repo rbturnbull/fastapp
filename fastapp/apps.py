@@ -12,16 +12,34 @@ from fastai.callback.tracker import SaveModelCallback
 from fastai.callback.progress import CSVLogger
 import click
 import typer
+import pdb
 from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.utils import get_params_from_function
 from rich.pretty import pprint
 from rich.console import Console
 from rich.traceback import install
+from types import MethodType
 
 install()
 console = Console()
 
 from .params import Param
+
+
+import types
+
+
+def copy_func(f, name=None):
+    """
+    return a function with same code, globals, defaults, closure, and
+    name (or provide a new name)
+    """
+    fn = types.FunctionType(
+        f.__code__, f.__globals__, name or f.__name__, f.__defaults__, f.__closure__
+    )
+    # in case f was given attrs (note this dict is a shallow copy):
+    fn.__dict__.update(f.__dict__)
+    return fn
 
 
 def run_callback(callback, params):
@@ -44,23 +62,72 @@ def version_callback(value: bool):
         raise typer.Exit()
 
 
+def add_kwargs(from_func, to_func):
+    """Adds all the keyword arguments from one function to the signature of another function.
+
+    Args:
+        from_func (callable): The function with new parameters to add.
+        to_func (callable): The function which will receive the new parameters in its signature.
+    """
+    # Get the existing parameters
+    from_func_signature = inspect.signature(from_func)
+    to_func_signature = inspect.signature(to_func)
+
+    # Create a dictionary with both the existing parameters for the function and the new ones
+    to_func_parameters = dict(to_func_signature.parameters)
+
+    if "kwargs" in to_func_parameters:
+        kwargs_parameter = to_func_parameters.pop("kwargs")
+
+    from_func_kwargs = {
+        k: v
+        for k, v in from_func_signature.parameters.items()
+        if v.default != inspect.Parameter.empty and k not in to_func_parameters
+    }
+    # to_func_parameters['kwargs'] = kwargs_parameter
+
+    to_func_parameters.update(from_func_kwargs)
+
+    # Modify function signature with the parameters in this dictionary
+    to_func = getattr(to_func, "__func__", to_func)
+    # print('to_func', hex(id(to_func)))
+    to_func.__signature__ = to_func_signature.replace(parameters=to_func_parameters.values())
+
+
 class FastApp:
     extra_params = None
 
     def __init__(self):
         super().__init__()
+        # print(f"IN FASTAPP INIT {type(self)} {self}")
+        # print('pointer self', hex(id(self)))
 
-        # All these would be better as decorator
-        delegates(to=self.dataloaders, keep=True)(self.train)
-        delegates(to=self.model)(self.train)
+        self.train = MethodType(copy_func(self.train.__func__), self)
+        self.show_batch = MethodType(copy_func(self.show_batch.__func__), self)
+        self.pretrained_local_path = MethodType(
+            copy_func(self.pretrained_local_path.__func__), self
+        )
+        self.__call__ = MethodType(copy_func(self.__call__.__func__), self)
+        # # self.show_batch.__func__ = copy_func(self.show_batch.__func__)
+        # # self.pretrained_local_path.__func__ = copy_func(self.pretrained_local_path.__func__)
+        # # self.__call__.__func__ = copy_func(self.__call__.__func__)
+        # pdb.set_trace()
 
-        delegates(to=self.dataloaders)(self.show_batch)
+        add_kwargs(from_func=self.dataloaders, to_func=self.train)
+        add_kwargs(from_func=self.model, to_func=self.train)
 
-        delegates(to=self.train)(self.tune)
+        # sig = inspect.signature(self.train)
+        # sig.parameters.values()
 
-        delegates(to=self.pretrained_location)(self.pretrained_local_path)
+        add_kwargs(from_func=self.dataloaders, to_func=self.show_batch)
 
-        delegates(to=self.pretrained_local_path)(self.__call__)
+        add_kwargs(from_func=self.train, to_func=self.tune)
+
+        add_kwargs(from_func=self.pretrained_location, to_func=self.pretrained_local_path)
+        add_kwargs(from_func=self.pretrained_local_path, to_func=self.__call__)
+
+        # print('get_params_convertors_ctx_param_name_from_function(self.train)', get_params_convertors_ctx_param_name_from_function(self.train))
+        # print(f"END FASTAPP INIT {type(self)} {self}")
 
     def pretrained_location(self) -> Union[str, Path]:
         return ""
