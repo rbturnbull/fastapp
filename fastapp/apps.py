@@ -30,6 +30,10 @@ from .params import Param
 import types
 
 
+class FastAppInitializationError(Exception):
+    pass
+
+
 def copy_func(f, name=None):
     """
     return a function with same code, globals, defaults, closure, and
@@ -98,6 +102,7 @@ def add_kwargs(from_func, to_func):
 
 
 class FastApp:
+    fastapp_initialized = False
     extra_params = None
 
     def __init__(self):
@@ -118,6 +123,10 @@ class FastApp:
 
         add_kwargs(from_func=self.pretrained_location, to_func=self.pretrained_local_path)
         add_kwargs(from_func=self.pretrained_local_path, to_func=self.__call__)
+
+        # Store a bool to let the app know later on (in self.assert_initialized)
+        # that __init__ has been called on this parent class
+        self.fastapp_initialized = True
 
     def pretrained_location(self) -> Union[str, Path]:
         return ""
@@ -190,10 +199,19 @@ class FastApp:
         cli = self.cli()
         return cli
 
+    def assert_initialized(self):
+        if not self.fastapp_initialized:
+            raise FastAppInitializationError(
+                """The initialization function for this FastApp has not been called.
+                Please ensure sub-classes of FastApp call 'super().__init__()'"""
+            )
+
     def cli(self):
         """
         Returns a 'Click' object which defines the command-line interface of the app.
         """
+        self.assert_initialized()
+
         cli = typer.Typer()
 
         @cli.callback()
