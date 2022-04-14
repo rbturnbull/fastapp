@@ -59,18 +59,16 @@ def run_callback(callback, params):
 
 def change_typer_to_defaults(func):
     func = getattr(func, "__func__", func)
-    # signature = inspect.signature(func)
+    signature = inspect.signature(func)
 
-    # # Create a dictionary with both the existing parameters for the function and the new ones
-    # parameters = dict(signature.parameters)
+    # Create a dictionary with both the existing parameters for the function and the new ones
+    parameters = dict(signature.parameters)
 
-    # for key, value in parameters.items():
-    #     if isinstance(value.default, OptionInfo):
-    #         parameters[key] = value.replace(default=value.default.default)
+    for key, value in parameters.items():
+        if isinstance(value.default, OptionInfo):
+            parameters[key] = value.replace(default=value.default.default)
 
-    # func.__signature__ = signature.replace(parameters=parameters.values())
-
-    # import pdb; pdb.set_trace()
+    func.__signature__ = signature.replace(parameters=parameters.values())
 
     # Change defaults directly
     if func.__defaults__ is not None:
