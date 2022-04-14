@@ -363,9 +363,9 @@ class FastApp:
         """
         The metric to optimize for when performing hyperparameter tuning.
 
-        By default it returns 'loss'.
+        By default it returns 'valid_loss'.
         """
-        return "loss"
+        return "valid_loss"
 
     def goal(self) -> str:
         """
