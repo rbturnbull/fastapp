@@ -1,7 +1,10 @@
 from contextlib import nullcontext
 from pathlib import Path
+from types import MethodType
+from collections.abc import Iterable
 import inspect
 from typing import List, Optional, Union, Dict
+from typing import get_type_hints
 from torch import nn
 from fastcore.meta import delegates
 from fastai.learner import Learner, load_learner
@@ -12,14 +15,11 @@ from fastai.callback.tracker import SaveModelCallback
 from fastai.callback.progress import CSVLogger
 import click
 import typer
-import pdb
-from typing import get_type_hints
 from typer.main import get_params_convertors_ctx_param_name_from_function
-from typer.utils import get_params_from_function
+from typer.models import OptionInfo
 from rich.pretty import pprint
 from rich.console import Console
 from rich.traceback import install
-from types import MethodType
 
 install()
 console = Console()
@@ -36,12 +36,14 @@ class FastAppInitializationError(Exception):
 
 def copy_func(f, name=None):
     """
-    return a function with same code, globals, defaults, closure, and
-    name (or provide a new name)
+    Returns a deep copy of a function.
+
+    The new function has the same code, globals, defaults, closure, annotations, and name
+    (unless a new name is provided)
+
+    Derived from https://stackoverflow.com/a/30714299
     """
-    fn = types.FunctionType(
-        f.__code__, f.__globals__, name or f.__name__, f.__defaults__, f.__closure__
-    )
+    fn = types.FunctionType(f.__code__, f.__globals__, name or f.__name__, f.__defaults__, f.__closure__)
     # in case f was given attrs (note this dict is a shallow copy):
     fn.__dict__.update(f.__dict__)
     fn.__annotations__.update(f.__annotations__)
@@ -53,6 +55,22 @@ def run_callback(callback, params):
     allowed_param_names = [p.name for p in allowed_params]
     kwargs = {key: value for key, value in params.items() if key in allowed_param_names}
     return callback(**kwargs)
+
+
+def change_typer_to_defaults(func):
+    func = getattr(func, "__func__", func)
+    signature = inspect.signature(func)
+
+    # import pdb; pdb.set_trace()
+
+    # Create a dictionary with both the existing parameters for the function and the new ones
+    parameters = dict(signature.parameters)
+
+    for key, value in parameters.items():
+        if isinstance(value.default, OptionInfo):
+            parameters[key] = value.replace(default=value.default.default)
+
+    func.__signature__ = signature.replace(parameters=parameters.values())
 
 
 def version_callback(value: bool):
@@ -68,37 +86,42 @@ def version_callback(value: bool):
         raise typer.Exit()
 
 
-def add_kwargs(from_func, to_func):
+def add_kwargs(to_func, from_funcs):
     """Adds all the keyword arguments from one function to the signature of another function.
 
     Args:
-        from_func (callable): The function with new parameters to add.
+        from_funcs (callable or iterable): The function with new parameters to add.
         to_func (callable): The function which will receive the new parameters in its signature.
     """
-    # Get the existing parameters
-    to_func = getattr(to_func, "__func__", to_func)
-    from_func = getattr(from_func, "__func__", from_func)
-    from_func_signature = inspect.signature(from_func)
-    to_func_signature = inspect.signature(to_func)
 
-    # Create a dictionary with both the existing parameters for the function and the new ones
-    to_func_parameters = dict(to_func_signature.parameters)
+    if not isinstance(from_funcs, Iterable):
+        from_funcs = [from_funcs]
 
-    if "kwargs" in to_func_parameters:
-        kwargs_parameter = to_func_parameters.pop("kwargs")
+    for from_func in from_funcs:
+        # Get the existing parameters
+        to_func = getattr(to_func, "__func__", to_func)
+        from_func = getattr(from_func, "__func__", from_func)
+        from_func_signature = inspect.signature(from_func)
+        to_func_signature = inspect.signature(to_func)
 
-    from_func_kwargs = {
-        k: v
-        for k, v in from_func_signature.parameters.items()
-        if v.default != inspect.Parameter.empty and k not in to_func_parameters
-    }
-    # to_func_parameters['kwargs'] = kwargs_parameter
+        # Create a dictionary with both the existing parameters for the function and the new ones
+        to_func_parameters = dict(to_func_signature.parameters)
 
-    to_func_parameters.update(from_func_kwargs)
+        if "kwargs" in to_func_parameters:
+            kwargs_parameter = to_func_parameters.pop("kwargs")
 
-    # Modify function signature with the parameters in this dictionary
-    # print('to_func', hex(id(to_func)))
-    to_func.__signature__ = to_func_signature.replace(parameters=to_func_parameters.values())
+        from_func_kwargs = {
+            k: v
+            for k, v in from_func_signature.parameters.items()
+            if v.default != inspect.Parameter.empty and k not in to_func_parameters
+        }
+        # to_func_parameters['kwargs'] = kwargs_parameter
+
+        to_func_parameters.update(from_func_kwargs)
+
+        # Modify function signature with the parameters in this dictionary
+        # print('to_func', hex(id(to_func)))
+        to_func.__signature__ = to_func_signature.replace(parameters=to_func_parameters.values())
 
 
 class FastApp:
@@ -107,35 +130,48 @@ class FastApp:
 
     def __init__(self):
         super().__init__()
-        self.train = MethodType(copy_func(self.train.__func__), self)
-        self.show_batch = MethodType(copy_func(self.show_batch.__func__), self)
-        self.pretrained_local_path = MethodType(
-            copy_func(self.pretrained_local_path.__func__), self
-        )
-        self.__call__ = MethodType(copy_func(self.__call__.__func__), self)
 
-        add_kwargs(from_func=self.dataloaders, to_func=self.train)
-        add_kwargs(from_func=self.model, to_func=self.train)
+        # Make deep copies of methods so that we can change the function signatures dynamically
+        self.train = self.copy_method(self.train)
+        self.show_batch = self.copy_method(self.show_batch)
+        self.tune = self.copy_method(self.tune)
+        self.pretrained_local_path = self.copy_method(self.pretrained_local_path)
+        self.__call__ = self.copy_method(self.__call__)
 
-        add_kwargs(from_func=self.dataloaders, to_func=self.show_batch)
+        # Add keyword arguments to the signatures of the methods used in the CLI
+        add_kwargs(to_func=self.train, from_funcs=[self.dataloaders, self.model])
+        add_kwargs(to_func=self.show_batch, from_funcs=self.dataloaders)
+        add_kwargs(to_func=self.tune, from_funcs=self.train)
+        add_kwargs(to_func=self.pretrained_local_path, from_funcs=self.pretrained_location)
+        add_kwargs(to_func=self.__call__, from_funcs=self.pretrained_local_path)
 
-        add_kwargs(from_func=self.train, to_func=self.tune)
+        # Make copies of methods to use just for the CLI
+        self.train_cli = self.copy_method(self.train)
+        self.show_batch_cli = self.copy_method(self.show_batch)
+        self.tune_cli = self.copy_method(self.tune)
+        self.pretrained_local_path_cli = self.copy_method(self.pretrained_local_path)
+        self.call_cli = self.copy_method(self.__call__)
 
-        add_kwargs(from_func=self.pretrained_location, to_func=self.pretrained_local_path)
-        add_kwargs(from_func=self.pretrained_local_path, to_func=self.__call__)
+        # Remove params from defaults in methods not used for the cli
+        change_typer_to_defaults(self.train)
+        change_typer_to_defaults(self.show_batch)
+        change_typer_to_defaults(self.tune)
+        change_typer_to_defaults(self.pretrained_local_path)
+        change_typer_to_defaults(self.__call__)
 
         # Store a bool to let the app know later on (in self.assert_initialized)
         # that __init__ has been called on this parent class
         self.fastapp_initialized = True
+
+    def copy_method(self, method):
+        return MethodType(copy_func(method.__func__), self)
 
     def pretrained_location(self) -> Union[str, Path]:
         return ""
 
     def pretrained_local_path(
         self,
-        pretrained: str = Param(
-            default=None, help="The location (URL or filepath) of a pretrained model."
-        ),
+        pretrained: str = Param(default=None, help="The location (URL or filepath) of a pretrained model."),
         reload: bool = Param(
             default=False,
             help="Should the pretrained model be downloaded again if it is online and already present locally.",
@@ -180,9 +216,7 @@ class FastApp:
         # Classify results
         prepared_data = self.prepare_source(data)
         dataloader = self.test_dataloader(learner, prepared_data)
-        results = learner.get_preds(
-            dl=dataloader, reorder=False, with_decoded=False, act=self.activation()
-        )
+        results = learner.get_preds(dl=dataloader, reorder=False, with_decoded=False, act=self.activation())
 
         results = self.output_results(results, data, prepared_data, output)
 
@@ -229,40 +263,38 @@ class FastApp:
 
         typer_click_object = typer.main.get_command(cli)
 
-        train_params, _, _ = get_params_convertors_ctx_param_name_from_function(self.train)
+        train_params, _, _ = get_params_convertors_ctx_param_name_from_function(self.train_cli)
         train_command = click.Command(
             name="train",
-            callback=self.train,
+            callback=self.train_cli,
             params=train_params,
         )
         typer_click_object.add_command(train_command, "train")
 
-        show_batch_params, _, _ = get_params_convertors_ctx_param_name_from_function(
-            self.show_batch
-        )
+        show_batch_params, _, _ = get_params_convertors_ctx_param_name_from_function(self.show_batch_cli)
         command = click.Command(
             name="show-batch",
-            callback=self.show_batch,
+            callback=self.show_batch_cli,
             params=show_batch_params,
         )
         typer_click_object.add_command(command, "show-batch")
 
-        params, _, _ = get_params_convertors_ctx_param_name_from_function(self.tune)
+        params, _, _ = get_params_convertors_ctx_param_name_from_function(self.tune_cli)
         tuning_params = self.tuning_params()
         for param in params:
             if param.name in tuning_params:
                 param.default = None
         command = click.Command(
             name="tune",
-            callback=self.tune,
+            callback=self.tune_cli,
             params=params,
         )
         typer_click_object.add_command(command, "tune")
 
-        params, _, _ = get_params_convertors_ctx_param_name_from_function(self.__call__)
+        params, _, _ = get_params_convertors_ctx_param_name_from_function(self.call_cli)
         command = click.Command(
             name="predict",
-            callback=self.__call__,
+            callback=self.call_cli,
             params=params,
         )
         typer_click_object.add_command(command, "predict")
@@ -333,9 +365,7 @@ class FastApp:
             )
 
         if fp16:
-            console.print(
-                "Setting floating-point precision of learner to 16 bit", style="red"
-            )
+            console.print("Setting floating-point precision of learner to 16 bit", style="red")
             learner = learner.to_fp16()
 
         return learner

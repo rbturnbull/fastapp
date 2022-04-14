@@ -39,7 +39,8 @@ sphinx-click = {git = "https://github.com/rbturnbull/sphinx-click.git"}
 jupyter = "^1.0.0"
 
 [tool.black]
-line-length = 94
+line-length = 120
+skip_string_normalization = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
