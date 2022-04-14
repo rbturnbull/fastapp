@@ -59,18 +59,24 @@ def run_callback(callback, params):
 
 def change_typer_to_defaults(func):
     func = getattr(func, "__func__", func)
-    signature = inspect.signature(func)
+    # signature = inspect.signature(func)
+
+    # # Create a dictionary with both the existing parameters for the function and the new ones
+    # parameters = dict(signature.parameters)
+
+    # for key, value in parameters.items():
+    #     if isinstance(value.default, OptionInfo):
+    #         parameters[key] = value.replace(default=value.default.default)
+
+    # func.__signature__ = signature.replace(parameters=parameters.values())
 
     # import pdb; pdb.set_trace()
 
-    # Create a dictionary with both the existing parameters for the function and the new ones
-    parameters = dict(signature.parameters)
-
-    for key, value in parameters.items():
-        if isinstance(value.default, OptionInfo):
-            parameters[key] = value.replace(default=value.default.default)
-
-    func.__signature__ = signature.replace(parameters=parameters.values())
+    # Change defaults directly
+    if func.__defaults__ is not None:
+        func.__defaults__ = tuple(
+            [value.default if isinstance(value, OptionInfo) else value for value in func.__defaults__]
+        )
 
 
 def version_callback(value: bool):
@@ -133,6 +139,9 @@ class FastApp:
 
         # Make deep copies of methods so that we can change the function signatures dynamically
         self.train = self.copy_method(self.train)
+        self.dataloaders = self.copy_method(self.dataloaders)
+        self.model = self.copy_method(self.model)
+        self.pretrained_location = self.copy_method(self.pretrained_location)
         self.show_batch = self.copy_method(self.show_batch)
         self.tune = self.copy_method(self.tune)
         self.pretrained_local_path = self.copy_method(self.pretrained_local_path)
@@ -153,11 +162,14 @@ class FastApp:
         self.call_cli = self.copy_method(self.__call__)
 
         # Remove params from defaults in methods not used for the cli
+        change_typer_to_defaults(self.model)
         change_typer_to_defaults(self.train)
         change_typer_to_defaults(self.show_batch)
         change_typer_to_defaults(self.tune)
         change_typer_to_defaults(self.pretrained_local_path)
         change_typer_to_defaults(self.__call__)
+        change_typer_to_defaults(self.dataloaders)
+        change_typer_to_defaults(self.pretrained_location)
 
         # Store a bool to let the app know later on (in self.assert_initialized)
         # that __init__ has been called on this parent class

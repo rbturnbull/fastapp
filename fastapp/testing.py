@@ -6,7 +6,7 @@ from typing import get_type_hints
 from click.testing import CliRunner
 from pathlib import Path
 import difflib
-
+from typing import _UnionGenericAlias
 
 from torch import nn
 from collections import OrderedDict
@@ -77,9 +77,7 @@ def get_diff(a, b):
     return "".join(diff)
 
 
-def assert_output(
-    file: Path, interactive: bool, params: dict, output, expected, regenerate: bool = False
-):
+def assert_output(file: Path, interactive: bool, params: dict, output, expected, regenerate: bool = False):
     """
     Tests to see if the output is the same as the expected data and allows for saving a new version of the expected files if needed.
 
@@ -95,17 +93,14 @@ def assert_output(
         # If we aren't automatically regenerating the expected files, then prompt the user
         if not regenerate:
             prompt_response = input(
-                f"\nExpected file '{file.name}' does not match test output.\n"
-                "Should this file be replaced? (y/N) "
+                f"\nExpected file '{file.name}' does not match test output.\n" "Should this file be replaced? (y/N) "
             )
             regenerate = prompt_response.lower() == "y"
 
         if regenerate:
             with open(file, "w") as f:
                 # import pdb; pdb.set_trace()
-                output_for_yaml = (
-                    literal(output) if isinstance(output, str) and "\n" in output else output
-                )
+                output_for_yaml = literal(output) if isinstance(output, str) and "\n" in output else output
                 # order the params dictionary if necessary
                 if isinstance(params, dict):
                     params = OrderedDict(params)
@@ -181,8 +176,7 @@ class FastAppTestCase:
 
         if len(files) == 0:
             pytest.skip(
-                f"Skipping test for '{name}' because no expected files were found in:\n"
-                f"{self.subtest_dir(name)}."
+                f"Skipping test for '{name}' because no expected files were found in:\n" f"{self.subtest_dir(name)}."
             )
 
         for file in files:
@@ -219,9 +213,17 @@ class FastAppTestCase:
             modified_params = dict(params)
             hints = get_type_hints(app.dataloaders)
             for key, value in hints.items():
-                if key in params and Path in value.__mro__:
-                    relative_path = params[key]
-                    modified_params[key] = (self.get_expected_dir() / relative_path).resolve()
+                # if this is a union class, then loop over all options
+                if isinstance(value, _UnionGenericAlias):
+                    values = value.__args__
+                else:
+                    values = [value]
+
+                for v in values:
+                    if key in params and Path in v.__mro__:
+                        relative_path = params[key]
+                        modified_params[key] = (self.get_expected_dir() / relative_path).resolve()
+                        break
 
             dataloaders = app.dataloaders(**modified_params)
 
@@ -269,9 +271,7 @@ class FastAppTestCase:
             method_name = name[5:] if name.startswith("test_") else name
             method = getattr(app, method_name)
             output = str(method(**params))
-            assert_output(
-                file, interactive, params, output, expected_output, regenerate=regenerate
-            )
+            assert_output(file, interactive, params, output, expected_output, regenerate=regenerate)
 
     def test_goal(self, interactive: bool):
         self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
@@ -312,6 +312,4 @@ class FastAppTestCase:
                 exit_code=result.exit_code,
             )
             # import pdb; pdb.set_trace()
-            assert_output(
-                file, interactive, params, output, expected_output, regenerate=regenerate
-            )
+            assert_output(file, interactive, params, output, expected_output, regenerate=regenerate)
