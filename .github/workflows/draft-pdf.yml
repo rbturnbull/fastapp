@@ -1,3 +1,4 @@
+name: Draft Paper PDF
 on: [push]
 
 jobs:
@@ -21,3 +22,13 @@ jobs:
           # PDF. Note, this should be the same directory as the input
           # paper.md
           path: paper.pdf
+      - name: Copy to preprint folder
+        run: |
+          mkdir preprint
+          cp paper.pdf preprint/paper.pdf
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: preprint # The folder the action should deploy.
+          target-folder: preprint
