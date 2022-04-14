@@ -429,6 +429,10 @@ class FastApp:
 
         dataloaders = run_callback(self.dataloaders, kwargs)
 
+        # Allow the dataloaders to go to GPU so long as it hasn't explicitly been set as a different device
+        if dataloaders.device is None:
+            dataloaders.cuda()  # This will revert to CPU if cuda is not available
+
         learner = self.learner(dataloaders, output_dir=output_dir, **kwargs)
 
         with learner.distrib_ctx() if distributed == True else nullcontext():
