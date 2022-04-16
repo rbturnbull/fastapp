@@ -1,3 +1,4 @@
+import re
 import sys
 import yaml
 import importlib
@@ -75,6 +76,12 @@ def get_diff(a, b):
     diff = difflib.unified_diff(a, b)
 
     return "".join(diff)
+
+
+def clean_output(output):
+    output = str(output)
+    output = re.sub(r"0[xX][0-9a-fA-F]+", "<HEX>", output)
+    return output
 
 
 def assert_output(file: Path, interactive: bool, params: dict, output, expected, regenerate: bool = False):
@@ -276,7 +283,7 @@ class FastAppTestCase:
         if interactive:
             if not self.subtest_files(name):
                 prompt_response = input(
-                    f"\nNo expected files for {name}.\n"
+                    f"\nNo expected files for '{name}' when testing '{app}'.\n"
                     "Should a default expected file be automatically generated? (y/N) "
                 )
                 if prompt_response.lower() == "y":
@@ -288,10 +295,16 @@ class FastAppTestCase:
                         yaml.dump(data, f)
 
         for params, expected_output, file in self.subtests(name):
-            output = str(method(**params))
+            output = clean_output(method(**params))
             assert_output(file, interactive, params, output, expected_output, regenerate=regenerate)
 
     def test_goal(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
+    def test_metrics(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
+    def test_loss_func(self, interactive: bool):
         self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
 
     def test_monitor(self, interactive: bool):
@@ -308,7 +321,7 @@ class FastAppTestCase:
         if interactive:
             if not self.subtest_files(name):
                 prompt_response = input(
-                    f"\nNo expected files for {name}.\n"
+                    f"\nNo expected files for '{name}' when testing '{app}'.\n"
                     "Should default expected files be automatically generated? (y/N) "
                 )
                 if prompt_response.lower() == "y":
