@@ -32,7 +32,7 @@ def torchvision_model_choices() -> List[str]:
 
 TorchvisionModelEnum = enum.Enum(
     "TorchvisionModelName",
-    {model_name: model_name for model_name in torchvision_model_choices()},
+    {model_name if model_name else "default": model_name for model_name in torchvision_model_choices()},
 )
 
 
@@ -52,9 +52,7 @@ class VisionApp(FastApp):
             default="",
             help="The name of a model architecture in torchvision.models (https://pytorch.org/vision/stable/models.html). If not given, then it is given by `default_model_name`",
         ),
-        pretrained: bool = Param(
-            default=True, help="Whether or not to use the pretrained weights."
-        ),
+        pretrained: bool = Param(default=True, help="Whether or not to use the pretrained weights."),
     ):
         if not model_name:
             model_name = self.default_model_name()
