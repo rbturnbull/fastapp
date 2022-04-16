@@ -173,6 +173,9 @@ class FastApp:
         # that __init__ has been called on this parent class
         self.fastapp_initialized = True
 
+    def __str__(self):
+        return self.__class__.__name__
+
     def copy_method(self, method):
         return MethodType(copy_func(method.__func__), self)
 
