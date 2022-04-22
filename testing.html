@@ -147,6 +147,53 @@ The file for testing the model is in <code class="docutils literal notranslate">
 </section>
 <section id="fastapptestcase-reference">
 <h2>FastAppTestCase Reference<a class="headerlink" href="#fastapptestcase-reference" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fastapp.testing.</span></span><span class="sig-name descname"><span class="pre">FastAppTestCase</span></span><a class="headerlink" href="#fastapp.testing.FastAppTestCase" title="Permalink to this definition"></a></dt>
+<dd><p>Automated tests for FastApp classes</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase.get_app">
+<span class="sig-name descname"><span class="pre">get_app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">fastapp.apps.FastApp</span></span></span><a class="headerlink" href="#fastapp.testing.FastAppTestCase.get_app" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an instance of the app for this test case.</p>
+<p>It instantiates an object from <cite>app_class</cite>.
+Override <cite>app_class</cite> or this method so the correct app is returned from calling this method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase.get_expected_dir">
+<span class="sig-name descname"><span class="pre">get_expected_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pathlib.Path</span></span></span><a class="headerlink" href="#fastapp.testing.FastAppTestCase.get_expected_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the path to the directory where the expected files.</p>
+<p>It creates the directory if it doesn’t already exist.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase.perform_subtests">
+<span class="sig-name descname"><span class="pre">perform_subtests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastapp.testing.FastAppTestCase.perform_subtests" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a number of subtests for a method on the app.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interactive</strong> (<em>bool</em>) – Whether or not the user should be prompted for creating or regenerating expected files.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the method to be tested with the string <cite>test_</cite> prepended to it.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastapp.testing.FastAppTestCase.test_model">
+<span class="sig-name descname"><span class="pre">test_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastapp.testing.FastAppTestCase.test_model" title="Permalink to this definition"></a></dt>
+<dd><p>Tests the method of a FastApp to create a pytorch model.</p>
+<p>The expected output is the string representation of the model created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>interactive</strong> (<em>bool</em>) – Whether or not failed tests should prompt the user to regenerate the expected files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
