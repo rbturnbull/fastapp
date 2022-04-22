@@ -7,15 +7,12 @@ from typing import get_type_hints
 from click.testing import CliRunner
 from pathlib import Path
 import difflib
-from typing import _UnionGenericAlias
-
 from torch import nn
 from collections import OrderedDict
-
 from fastai.data.core import DataLoaders
-from .apps import FastApp
-
 from rich.console import Console
+
+from .apps import FastApp
 
 console = Console()
 
@@ -239,7 +236,7 @@ class FastAppTestCase:
             hints = get_type_hints(app.dataloaders)
             for key, value in hints.items():
                 # if this is a union class, then loop over all options
-                if isinstance(value, _UnionGenericAlias):
+                if not isinstance(value, type) and hasattr(value, "__args__"):  # This is the case for unions
                     values = value.__args__
                 else:
                     values = [value]
