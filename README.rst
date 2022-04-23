@@ -4,7 +4,7 @@ fastapp
 
 .. start-badges
 
-|pipline badge| |coverage badge| |docs badge| |black badge|
+|pipline badge| |coverage badge| |docs badge| |black badge| |git3moji badge|
 
 .. |pipline badge| image:: https://github.com/rbturnbull/fastapp/actions/workflows/coverage.yml/badge.svg
     :target: https://github.com/rbturnbull/fastapp/actions
@@ -17,6 +17,9 @@ fastapp
     
 .. |coverage badge| image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/rbturnbull/506563cd9b49c8126284e34864c862d0/raw/coverage-badge.json
     :target: https://rbturnbull.github.io/fastapp/coverage/
+
+.. |git3moji badge| image:: https://img.shields.io/badge/git3moji-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg
+    :target: https://robinpokorny.github.io/git3moji/
 
 .. end-badges
 
