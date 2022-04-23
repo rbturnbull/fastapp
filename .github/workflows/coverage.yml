@@ -21,11 +21,13 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: 'poetry'
     - run: poetry install
-    - name: Coverage
+
+    - name: Testing
       run: |
         poetry run coverage run -m pytest
         poetry run coverage html
         echo "COVERAGE=$(poetry run coverage report --precision 2 | grep TOTAL | tr -s ' ' | cut -f 4 -d " ")" >> $GITHUB_ENV
+
     - name: Create Badge
       uses: schneegans/dynamic-badges-action@v1.1.0 # instructions here: https://github.com/Schneegans/dynamic-badges-action
       with:

@@ -1,11 +1,19 @@
 import math
 from typer.models import OptionInfo
+from typing import NamedTuple
+from numbers import Number
+
+
+class ParamConfig(NamedTuple):
+    distribution: str
+    min: Number
+    max: Number
 
 
 class Param(OptionInfo):
     def __init__(
         self,
-        default = None,
+        default=None,
         tune=False,
         tune_min=None,
         tune_max=None,
@@ -14,7 +22,7 @@ class Param(OptionInfo):
         annotation=None,
         **kwargs,
     ):
-        super().__init__(default = default, **kwargs)
+        super().__init__(default=default, **kwargs)
         self.tune = tune
         self.log = log
         self.tune_min = tune_min if tune_min is not None else self.min
@@ -24,7 +32,7 @@ class Param(OptionInfo):
         if distribution:
             raise NotImplementedError("Distribution for parameters not implemented yet")
 
-    def config(self):
+    def config(self) -> ParamConfig:
         if self.annotation in [int, float]:
             assert self.tune_min is not None
             assert self.tune_max is not None
@@ -32,14 +40,15 @@ class Param(OptionInfo):
             distribution = "log_uniform" if self.log else "uniform"
             if self.annotation == int:
                 distribution = f"q_{distribution}"
+
             if self.log:
-                return dict(
+                return ParamConfig(
                     distribution=distribution,
                     min=math.log(self.tune_min),
                     max=math.log(self.tune_max),
                 )
 
-            return dict(
+            return ParamConfig(
                 distribution=distribution,
                 min=self.tune_min,
                 max=self.tune_max,
@@ -47,7 +56,4 @@ class Param(OptionInfo):
 
         # TODO add categorical
 
-        import pdb
-
-        pdb.set_trace()
         raise NotImplementedError
