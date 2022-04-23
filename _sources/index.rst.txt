@@ -25,7 +25,8 @@ fastapp is a tool for jumpstarting the creation of deep learning projects with f
    testing
    vision
    examples
-   modules
+   .. modules
+   contributing
 
 
 
