@@ -13,9 +13,6 @@ output:
       --distributed / --no-distributed
                                       If the learner is distributed.  [default: no-
                                       distributed]
-      --run-name TEXT                 The name for this run for logging purposes. If
-                                      no name is given then the name of the output
-                                      directory is used.
       --csv PATH                      The path to a CSV file with the data.
       --x TEXT                        The column name of the independent variable.
                                       [default: x]
@@ -25,4 +22,6 @@ output:
                                       validation.  [default: 0.2]
       --batch-size INTEGER            The number of items to use in each batch.
                                       [default: 32]
+      --wandb / --no-wandb            [default: no-wandb]
+      --mlflow / --no-mlflow          [default: no-mlflow]
       --help                          Show this message and exit.

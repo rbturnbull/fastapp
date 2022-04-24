@@ -13,8 +13,7 @@ output:
       --distributed / --no-distributed
                                       If the learner is distributed.  [default: no-
                                       distributed]
-      --run-name TEXT                 The name for this run for logging purposes. If
-                                      no name is given then the name of the output
-                                      directory is used.
       --batch-size INTEGER            [default: 32]
+      --wandb / --no-wandb            [default: no-wandb]
+      --mlflow / --no-mlflow          [default: no-mlflow]
       --help                          Show this message and exit.

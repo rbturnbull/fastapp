@@ -1,12 +1,9 @@
 from contextlib import nullcontext
 from pathlib import Path
 from types import MethodType
-from collections.abc import Iterable
 import inspect
 from typing import List, Optional, Union, Dict
-from typing import get_type_hints
 from torch import nn
-from fastcore.meta import delegates
 from fastai.learner import Learner, load_learner
 from fastai.data.core import DataLoaders
 from fastai.callback.schedule import fit_one_cycle
@@ -16,7 +13,6 @@ from fastai.callback.progress import CSVLogger
 import click
 import typer
 from typer.main import get_params_convertors_ctx_param_name_from_function
-from typer.models import OptionInfo
 from rich.pretty import pprint
 from rich.console import Console
 from rich.traceback import install
@@ -24,108 +20,13 @@ from rich.traceback import install
 install()
 console = Console()
 
+from .util import copy_func, run_callback, change_typer_to_defaults, version_callback, add_kwargs
 from .params import Param
-
-
-import types
+from .callbacks import FastAppWandbCallback, FastAppMlflowCallback
 
 
 class FastAppInitializationError(Exception):
     pass
-
-
-def copy_func(f, name=None):
-    """
-    Returns a deep copy of a function.
-
-    The new function has the same code, globals, defaults, closure, annotations, and name
-    (unless a new name is provided)
-
-    Derived from https://stackoverflow.com/a/30714299
-    """
-    fn = types.FunctionType(f.__code__, f.__globals__, name or f.__name__, f.__defaults__, f.__closure__)
-    # in case f was given attrs (note this dict is a shallow copy):
-    fn.__dict__.update(f.__dict__)
-    fn.__annotations__.update(f.__annotations__)
-    return fn
-
-
-def run_callback(callback, params):
-    allowed_params, _, _ = get_params_convertors_ctx_param_name_from_function(callback)
-    allowed_param_names = [p.name for p in allowed_params]
-    kwargs = {key: value for key, value in params.items() if key in allowed_param_names}
-    return callback(**kwargs)
-
-
-def change_typer_to_defaults(func):
-    func = getattr(func, "__func__", func)
-    signature = inspect.signature(func)
-
-    # Create a dictionary with both the existing parameters for the function and the new ones
-    parameters = dict(signature.parameters)
-
-    for key, value in parameters.items():
-        if isinstance(value.default, OptionInfo):
-            parameters[key] = value.replace(default=value.default.default)
-
-    func.__signature__ = signature.replace(parameters=parameters.values())
-
-    # Change defaults directly
-    if func.__defaults__ is not None:
-        func.__defaults__ = tuple(
-            [value.default if isinstance(value, OptionInfo) else value for value in func.__defaults__]
-        )
-
-
-def version_callback(value: bool):
-    """
-    Prints the current version.
-    """
-    if value:
-        import importlib.metadata
-
-        module_name = str(__name__).split(".")[0]
-        version = importlib.metadata.version(module_name)
-        console.print(version)
-        raise typer.Exit()
-
-
-def add_kwargs(to_func, from_funcs):
-    """Adds all the keyword arguments from one function to the signature of another function.
-
-    Args:
-        from_funcs (callable or iterable): The function with new parameters to add.
-        to_func (callable): The function which will receive the new parameters in its signature.
-    """
-
-    if not isinstance(from_funcs, Iterable):
-        from_funcs = [from_funcs]
-
-    for from_func in from_funcs:
-        # Get the existing parameters
-        to_func = getattr(to_func, "__func__", to_func)
-        from_func = getattr(from_func, "__func__", from_func)
-        from_func_signature = inspect.signature(from_func)
-        to_func_signature = inspect.signature(to_func)
-
-        # Create a dictionary with both the existing parameters for the function and the new ones
-        to_func_parameters = dict(to_func_signature.parameters)
-
-        if "kwargs" in to_func_parameters:
-            kwargs_parameter = to_func_parameters.pop("kwargs")
-
-        from_func_kwargs = {
-            k: v
-            for k, v in from_func_signature.parameters.items()
-            if v.default != inspect.Parameter.empty and k not in to_func_parameters
-        }
-        # to_func_parameters['kwargs'] = kwargs_parameter
-
-        to_func_parameters.update(from_func_kwargs)
-
-        # Modify function signature with the parameters in this dictionary
-        # print('to_func', hex(id(to_func)))
-        to_func.__signature__ = to_func_signature.replace(parameters=to_func_parameters.values())
 
 
 class FastApp:
@@ -144,9 +45,10 @@ class FastApp:
         self.tune = self.copy_method(self.tune)
         self.pretrained_local_path = self.copy_method(self.pretrained_local_path)
         self.__call__ = self.copy_method(self.__call__)
+        self.callbacks = self.copy_method(self.callbacks)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
-        add_kwargs(to_func=self.train, from_funcs=[self.dataloaders, self.model])
+        add_kwargs(to_func=self.train, from_funcs=[self.dataloaders, self.model, self.callbacks])
         add_kwargs(to_func=self.show_batch, from_funcs=self.dataloaders)
         add_kwargs(to_func=self.tune, from_funcs=self.train)
         add_kwargs(to_func=self.pretrained_local_path, from_funcs=self.pretrained_location)
@@ -161,6 +63,7 @@ class FastApp:
 
         # Remove params from defaults in methods not used for the cli
         change_typer_to_defaults(self.model)
+        change_typer_to_defaults(self.callbacks)
         change_typer_to_defaults(self.train)
         change_typer_to_defaults(self.show_batch)
         change_typer_to_defaults(self.tune)
@@ -425,7 +328,7 @@ class FastApp:
 
         return "minimize" if ("loss" in monitor) or ("err" in monitor) else "maximize"
 
-    def callbacks(self) -> list:
+    def callbacks(self, wandb: bool = False, mlflow: bool = False) -> list:
         """
         The list of callbacks to use with this app in the fastai training loop.
 
@@ -436,7 +339,13 @@ class FastApp:
         monitor = self.monitor()
         if monitor:
             callbacks.append(SaveModelCallback(monitor=monitor))
-        callbacks = self.logging_callbacks(callbacks)
+
+        if wandb:
+            callbacks.append(FastAppWandbCallback(app=self))
+
+        if mlflow:
+            callbacks.append(FastAppMlflowCallback(app=self))
+
         return callbacks
 
     def show_batch(self, **kwargs):
@@ -449,10 +358,6 @@ class FastApp:
         epochs: int = Param(default=20, help="The number of epochs."),
         lr_max: float = Param(default=1e-4, help="The max learning rate."),
         distributed: bool = Param(default=False, help="If the learner is distributed."),
-        run_name: str = Param(
-            default="",
-            help="The name for this run for logging purposes. If no name is given then the name of the output directory is used.",
-        ),
         **kwargs,
     ) -> Learner:
         """
@@ -468,8 +373,6 @@ class FastApp:
         Returns:
             Learner: The fastai Learner object created for training.
         """
-        self.init_run(run_name=run_name, output_dir=output_dir)
-
         dataloaders = run_callback(self.dataloaders, kwargs)
 
         # Allow the dataloaders to go to GPU so long as it hasn't explicitly been set as a different device
@@ -478,10 +381,12 @@ class FastApp:
 
         learner = self.learner(dataloaders, output_dir=output_dir, **kwargs)
 
-        with learner.distrib_ctx() if distributed == True else nullcontext():
-            learner.fit_one_cycle(epochs, lr_max=lr_max, cbs=self.callbacks())
+        callbacks = run_callback(self.callbacks, kwargs)
 
-        self.save_model(learner, run_name)
+        with learner.distrib_ctx() if distributed == True else nullcontext():
+            learner.fit_one_cycle(epochs, lr_max=lr_max, cbs=callbacks)
+            # more flexibility needs to be added here for other types of training loops
+
         return learner
 
     def project_name(self) -> str:
@@ -494,49 +399,38 @@ class FastApp:
 
     def tune(
         self,
-        id: str = None,
-        name: str = None,
-        method: str = "random",  # Should be enum
-        runs: int = 1,
-        min_iter: int = None,
+        runs: int = Param(default=1, help="The number of runs to attempt to train the model."),
+        engine: str = Param(
+            default="wandb", help="The optimizer to use to perform the hyperparameter tuning."
+        ),  # should be enum
+        id: str = Param(default="", help="The ID of this hyperparameter tuning job if being used by multiple agents."),
+        name: str = Param(
+            default="",
+            help="An informative name for this hyperparameter tuning job. If empty, then it creates a name from the project name.",
+        ),
+        wandb_method: str = Param(
+            default="random", help="The optimizer to use to perform the hyperparameter tuning."
+        ),  # should be enum
+        min_iter: int = Param(
+            default=None,
+            help="The minimum number of iterations if using early termination. If left empty, then early termination is not used.",
+        ),
         **kwargs,
     ):
         if not name:
             name = f"{self.project_name()}-tuning"
 
-        if not id:
-            parameters_config = dict()
-            tuning_params = self.tuning_params()
-            for key, value in tuning_params.items():
-                if ((key in kwargs) and (kwargs[key] is None)) or (key in kwargs):
-                    parameters_config[key] = value.config()
+        if engine == "wandb":
+            from .tuning.wandb import wandb_tune
 
-            sweep_config = {
-                "name": name,
-                "method": method,
-                "parameters": parameters_config,
-            }
-            if self.monitor():
-                sweep_config["metric"] = dict(name=self.monitor(), goal=self.goal())
-
-            if min_iter:
-                sweep_config["early_terminate"] = dict(type="hyperband", min_iter=min_iter)
-
-            console.print("Configuration for hyper-parameter tuning:", style="bold red")
-            pprint(sweep_config)
-
-    def init_run(self, run_name, output_dir, **kwargs):
-        if not run_name:
-            run_name = Path(output_dir).name
-        console.print(f"from {self.project_name()}")
-        console.print(f"running {run_name}")
-        console.print(f"with these parameters: \n {kwargs}")
-
-    def log(self, param):
-        console.print(param)
-
-    def logging_callbacks(self, callbacks):
-        return callbacks
-
-    def save_model(self, learner, run_name):
-        learner.save(run_name)
+            return wandb_tune(
+                self,
+                runs=runs,
+                sweep_id=id,
+                name=name,
+                method=wandb_method,
+                min_iter=min_iter,
+                **kwargs,
+            )
+        else:
+            raise NotImplementedError(f"Optimizer engine {engine} not implemented.")
