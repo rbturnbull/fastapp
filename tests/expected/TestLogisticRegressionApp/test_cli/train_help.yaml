@@ -22,6 +22,10 @@ output:
                                       validation.  [default: 0.2]
       --batch-size INTEGER            The number of items to use in each batch.
                                       [default: 32]
-      --wandb / --no-wandb            [default: no-wandb]
-      --mlflow / --no-mlflow          [default: no-mlflow]
+      --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
+                                      logging.  [default: no-wandb]
+      --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:
+                                      online]
+      --mlflow / --no-mlflow          Whether or not to use MLflow for logging.
+                                      [default: no-mlflow]
       --help                          Show this message and exit.

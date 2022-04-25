@@ -34,6 +34,10 @@ output:
                                       given by `default_model_name`
       --pretrained / --no-pretrained  Whether or not to use the pretrained weights.
                                       [default: pretrained]
-      --wandb / --no-wandb            [default: no-wandb]
-      --mlflow / --no-mlflow          [default: no-mlflow]
+      --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
+                                      logging.  [default: no-wandb]
+      --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:
+                                      online]
+      --mlflow / --no-mlflow          Whether or not to use MLflow for logging.
+                                      [default: no-mlflow]
       --help                          Show this message and exit.

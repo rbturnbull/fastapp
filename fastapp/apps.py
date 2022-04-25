@@ -328,7 +328,13 @@ class FastApp:
 
         return "minimize" if ("loss" in monitor) or ("err" in monitor) else "maximize"
 
-    def callbacks(self, wandb: bool = False, mlflow: bool = False) -> list:
+    def callbacks(
+        self,
+        wandb: bool = Param(default=False, help="Whether or not to use 'Weights and Biases' for logging."),
+        wandb_mode: str = Param(default="online", help="The mode for 'Weights and Biases'."),
+        wandb_dir: Path = Param(None, help="The location for 'Weights and Biases' output."),
+        mlflow: bool = Param(default=False, help="Whether or not to use MLflow for logging."),
+    ) -> List:
         """
         The list of callbacks to use with this app in the fastai training loop.
 
@@ -341,7 +347,7 @@ class FastApp:
             callbacks.append(SaveModelCallback(monitor=monitor))
 
         if wandb:
-            callbacks.append(FastAppWandbCallback(app=self))
+            callbacks.append(FastAppWandbCallback(app=self, mode=wandb_mode, dir=wandb_dir))
 
         if mlflow:
             callbacks.append(FastAppMlflowCallback(app=self))

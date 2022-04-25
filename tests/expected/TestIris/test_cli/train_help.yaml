@@ -14,6 +14,10 @@ output:
                                       If the learner is distributed.  [default: no-
                                       distributed]
       --batch-size INTEGER            [default: 32]
-      --wandb / --no-wandb            [default: no-wandb]
-      --mlflow / --no-mlflow          [default: no-mlflow]
+      --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
+                                      logging.  [default: no-wandb]
+      --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:
+                                      online]
+      --mlflow / --no-mlflow          Whether or not to use MLflow for logging.
+                                      [default: no-mlflow]
       --help                          Show this message and exit.
