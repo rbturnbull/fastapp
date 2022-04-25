@@ -24,6 +24,7 @@ output:
                                       logging.  [default: no-wandb]
       --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:
                                       online]
+      --wandb-dir PATH                The location for 'Weights and Biases' output.
       --mlflow / --no-mlflow          Whether or not to use MLflow for logging.
                                       [default: no-mlflow]
       --help                          Show this message and exit.
