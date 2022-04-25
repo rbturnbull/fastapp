@@ -26,6 +26,16 @@
 """
 
 
+from fastcore.meta import delegates
+from fastapp.params import Param
+from fastapp.apps import run_callback
+import mlflow
+import matplotlib
+# import plotly
+import pickle
+from mlflow.tracking import MlflowClient  
+
+
 from pathlib import Path
 import wandb
 from fastcore.meta import delegates
@@ -214,3 +224,188 @@ class WandbMixin(object):
         wandb.agent(id, function=agent_train, count=runs, project=name)
 
         return id
+
+ 
+
+
+"""The logging module contains prebuilt mixin classes
+for logging model runs to different mlOps metadata and artifact stores.
+At minimum, these classes need to contain the following methods:
+`init_run` - this initialises a run in the mlOps framework for the training run to log too
+`log` - function for logging a parameter or metric. Overwrites a function that just prints in to stdout
+`log_artifact`- a function to log file artifacts (files and models etc) to the mlOps artifact store
+`save_model` - function that will save the model weights and log them to an artifact store, overwrites the learner.save function in the base app.
+Other optional methods that may be added updated:
+Currently, a mixin for using MLFlow implemented, and includes
+a tuning function for using MLFlow sweeps for hyperparameter tuning
+"""
+  
+
+install()
+console = Console()
+
+def assert_dir_exists(path:Union[str, Path]):
+    if isinstance(path, (str)):
+        path = Path(path)
+    if path.exists() == False:
+        path.mkdir()
+        
+def _experiment_exists(experiment_id):
+    experiments = mlflow.list_experiments()
+    if experiment_id in [e.experiment_id for e in experiments]:
+        return True, 'id'
+    
+    elif experiment_id in [e.name for e in experiments]:
+        return True, 'name'
+    else:
+        return False, ''
+def create_experiment(experiment_name: Optional[str] = None):
+    if _experiment_exists(experiment_name)[0] ==False:
+        return mlflow.create_experiment(name = experiment_name)
+    
+def get_experiment_id(experiment_id):
+    e_exists, e_type = _experiment_exists(experiment_id)
+    if e_exists:
+        if e_type == 'name':
+            return mlflow.get_experiment_by_name(name=experiment_id).experiment_id
+        else:
+            return experiment_id
+    else:
+        return create_experiment(experiment_id)
+
+    
+class MLFlowMixin(object):
+    """app logging mixin for logging to mlflow
+    :param object: mixin for logging training runs, params, and metrics to Weights and Biases
+    :type object: MLFlowMixin
+    """
+
+    def __init__(self):
+        delegates(to=self.init_run)(self.train)
+        super().__init__()
+        
+
+    def init_run(
+        self,
+        run_name: Optional[str] = None,
+        output_dir: Optional[Union[Path, str]] = '', #An HTTP URI like https://my-tracking-server:5000.
+        experiment_id: Optional[str] = None,
+        
+#         config: dict = {},
+#         upload_model: Union[Param, bool] = Param(
+#             default=False, help="If true, logs model to MLFlow project"
+#         ),
+        **kwargs,
+    ):
+        """starts an mlflow run (with a given experiment, optional run name and tracking_uri) and
+        initiates mlflow.fastai.autolog(log_models=False)
+        
+        :param run_name: name of run, defaults to None, and uses name of App class
+        :type run_name: Optional[str], optional           
+        :param output_dir: output directory of model and other artifacts
+        :type output_dir: Union[Path, str]
+        :param experiment_id: ID of the experiment under which to create the current run, defaults to
+        None, and uses name of App class
+        :type output_dir: Optional[str], optional
+        :param kwargs: additional kwargs for `mlflow.init`
+        """      
+        #         self.upload_model = upload_model
+        # optional 'tracking_uri' can be set
+        if len(str(output_dir))> 0:
+            assert_dir_exists(output_dir)
+            mlflow.set_tracking_uri(f'file:./{str(output_dir)}')
+        
+        # if no experiment_id is given, then it should create self.project_name()
+        if experiment_id is None:
+            experiment_id = self.project_name()    
+        experiment_id = get_experiment_id(experiment_id)
+        import pdb;pdb.set_trace()
+
+        # starts an mlflow run with a given experiment_id and an optional run_name
+        if run_name is None:
+            mlflow.start_run(experiment_id=experiment_id) 
+        else:
+            mlflow.start_run(experiment_id=experiment_id, run_name=run_name)   #run_name parameter used only when run_id is unspecified
+        
+        mlflow.fastai.autolog(log_models=False)
+        
+        #checking functions    
+        self.run = mlflow.active_run()
+        print("Active run_id: {}".format(self.run.info.run_id))
+        tracking_uri = mlflow.get_tracking_uri()
+        print("Current tracking uri: {}".format(tracking_uri))
+        
+        
+    def log(self, param: dict, parameter_metric: bool=False, step: Optional[int] = None):
+        """log (param:dict) as a set of parameters or a set of metrics
+        if parameter metric = True, log as a set of metric with an optional argument 'step'
+        
+        :param param: dictionary of parameters to be logged
+        :type param: dict
+        :param parameter_metric: if True, log as a set of metrics
+        :type param: Boolean
+        """
+        if parameter_metric == True:
+            log_metrics(param, step=step)
+        else:
+            log_params(param)         
+
+                 
+    def log_artifact(
+        self,
+        artifact,
+        artifact_path: Union[Path, str],
+#         artifact_name: str,
+#         artifact_type: str,
+#         upload: bool = False,
+        **kwargs,
+    ):
+        """Input an artifact (padans df/matplotlib/plotly.figure/dict/str/path) to a saved file
+        
+        :param artifact: artifact to be logged
+        :type artifact: padans df/matplotlib/plotly.figure/dict/str/path
+        :param artifact_path: path to file to be uploaded
+        :type artifact_path: Union[Path, str]
+        """
+#         artifacts = mlflow.artifacts.download_artifacts
+    
+        if isinstance(artifact, pd.DataFrame):
+            csv_file = artifact.to_csv(None, sep='\t')
+            mlflow.log_text(csv_file, artifact_path)
+
+#         elif isinstance(artifact, plotly.graph_objs._figure.Figure ):
+#             mlflow.log_figure(artifact, artifact_path)
+
+        elif isinstance(artifact, matplotlib.figure.Figure):
+            mlflow.log_figure(artifact, artifact_path)
+
+        elif isinstance(artifact, dict):
+            mlflow.log_dict(artifact, artifact_path)
+
+        elif isinstance(artifact, str):
+            mlflow.log_text(artifact, artifact_path)
+
+#         elif isinstance(artifact, ):
+#             mlflow.log_artifact()
+        else:
+            pickle.dump(artifact, open(artifact_path, 'wb'))
+
+
+
+    def save_model(self, learner: Learner, path):
+        """saves model as a pytorch model (input = fastai.learner, output= pytorch version of the model)
+        
+        :param learner: fastai learner containing model weights
+        :type learner: Learner
+        :param path: path to file to be uploaded
+        :type path: str  
+        """
+
+        mlflow.pytorch.log_model(learner.model, artifact_path=path)
+
+        #         super().save_model(learner, run_name)
+        # mlflow.end_run()
+        #         model_path = learner.path / learner.model_dir / run_name
+        #         mlflow.fastai.save_model(learner, model_path,
+        #                           serialization_format=mlflow.sklearn.SERIALIZATION_FORMAT_PICKLE)
+
