@@ -233,10 +233,12 @@ class FastApp:
         return tuning_params
 
     def dataloaders(self):
-        raise NotImplementedError
+        raise NotImplementedError(
+            f"Please ensure that the 'dataloaders' method is implemented in {self.__class__.__name__}."
+        )
 
     def model(self) -> nn.Module:
-        raise NotImplementedError
+        raise NotImplementedError(f"Please ensure that the 'model' method is implemented in {self.__class__.__name__}.")
 
     def build_learner_func(self):
         return Learner
