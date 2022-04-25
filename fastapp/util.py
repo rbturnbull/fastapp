@@ -59,10 +59,6 @@ def version_callback(value: bool):
     if value:
         import importlib.metadata
 
-        import pdb
-
-        pdb.set_trace()
-
         module_name = str(__name__).split(".")[0]
         version = importlib.metadata.version(module_name)
         console.print(version)
