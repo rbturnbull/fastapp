@@ -1,3 +1,4 @@
+import sys
 from contextlib import nullcontext
 from pathlib import Path
 from types import MethodType
@@ -20,7 +21,7 @@ from rich.traceback import install
 install()
 console = Console()
 
-from .util import copy_func, run_callback, change_typer_to_defaults, version_callback, add_kwargs
+from .util import copy_func, run_callback, change_typer_to_defaults, add_kwargs
 from .params import Param
 from .callbacks import FastAppWandbCallback, FastAppMlflowCallback
 
@@ -156,6 +157,33 @@ class FastApp:
                 Please ensure sub-classes of FastApp call 'super().__init__()'"""
             )
 
+    def version(self, verbose: bool = False):
+        if verbose:
+            from importlib import metadata
+
+            module = inspect.getmodule(self)
+            package = ""
+            if module.__package__:
+                package = module.__package__.split('.')[0]
+            else:
+                path = Path(module.__file__).parent
+                while path.name:
+                    try:
+                        if metadata.distribution(path.name):
+                            package = path.name
+                            break
+                    except Exception:
+                        pass
+                    path = path.parent
+
+            if package:
+                version = metadata.version(package)
+                print(version)
+            else:
+                raise Exception("Cannot find package.")
+
+            raise typer.Exit()
+
     def cli(self):
         """
         Returns a 'Click' object which defines the command-line interface of the app.
@@ -170,7 +198,7 @@ class FastApp:
                 None,
                 "--version",
                 "-v",
-                callback=version_callback,
+                callback=self.version,
                 is_eager=True,
                 help="Prints the current version.",
             ),

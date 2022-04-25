@@ -52,19 +52,6 @@ def change_typer_to_defaults(func):
         )
 
 
-def version_callback(value: bool):
-    """
-    Prints the current version.
-    """
-    if value:
-        import importlib.metadata
-
-        module_name = str(__name__).split(".")[0]
-        version = importlib.metadata.version(module_name)
-        console.print(version)
-        raise typer.Exit()
-
-
 def add_kwargs(to_func, from_funcs):
     """Adds all the keyword arguments from one function to the signature of another function.
 

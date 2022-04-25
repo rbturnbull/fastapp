@@ -1,8 +1,6 @@
 params:
 - -v
 output:
-  exit_code: 1
-  stdout: "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\
-    \ PDB set_trace >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\
-    > /Users/rturnbull/MDAP/fastapp/fastapp/util.py(64)version_callback()\n-> module_name\
-    \ = str(__name__).split(\".\")[0]\n(Pdb) \n"
+  exit_code: 0
+  stdout: |
+    0.1.8
