@@ -18,13 +18,10 @@
 
     `tune` - a rewritten tuning function if mlOps packages includes that
 
-
-
     Currently, a mixin for using Weights and Biases implemented, and includes
     a tuning function for using Weighths and Biases sweeps for hyperparameter tuning
 
 """
-
 
 from fastcore.meta import delegates
 from fastapp.params import Param
@@ -58,8 +55,8 @@ console = Console()
 class WandbMixin(object):
     """app logging mixin for logging to weights and biases
 
-    :param object: mixin for logging training runs, params, and metrics to Weights and Biases
-    :type object: WandbMixin
+    Args:
+        object (WandbMixin): mixin for logging training runs, params, and metrics to Weights and Biases
     """
 
     def __init__(self):
@@ -80,16 +77,16 @@ class WandbMixin(object):
         """initialises a weights and biases run for each training run or sweep, stores the
         current run as the `self.run` attribute in the app instance.
 
-        :param output_dir: output directory of model and other artifacts
-        :type output_dir: Union[Path, str]
-        :param project_name: name of project, defaults to None, and uses name of App class
-        :type project_name: Optional[str], optional
-        :param config: dictionary of config params to log for the wandb run, defaults to {}
-        :type config: dict, optional
-        :param upload_model: If true, will upload model to Weights and Biases, else, it logs a file reference to output_dir, defaults to Param( default=False, help="If true, logs model to WandB project" )
-        :type upload_model: Union[Param, bool], optional
-        :param kwargs: additional kwargs for `wandb.init`
+        Args:
+            run_name (str): specify the name of the run
+            output_dir (Union[Path, str]): output directory of model and other artifacts
+            project_name (Optional[str], optional): name of project. Defaults to None, and uses name of App class
+            config (dict, optional):dictionary of config params to log for the wandb run. Defaults to {}.
+            upload_model (Union[Param, bool], optional): If true, will upload model to Weights and Biases, else, it logs a file reference to output_dir. 
+            Defaults to Param( default=False, help="If true, logs model to WandB project" ).
+            kwargs: additional kwargs for 'wandb.init'
         """
+
         self.upload_model = upload_model
 
         if project_name is None:
@@ -101,9 +98,10 @@ class WandbMixin(object):
     def log(self, param: dict):
         """log a dictionary of metrics to weights and biases, parameters should be logged in the config with init run
 
-        :param param: dictionary of metrics
-        :type param: dict
+        Args:
+            param (dict): dictionary of metrics
         """
+
         wandb.log(param)
 
     def log_artifact(
@@ -117,15 +115,14 @@ class WandbMixin(object):
         """Logs a file artifact to weights and biases run. Can either upload the file, or
         reference the file depending on upload parameter.
 
-        :param artifact_path: path to file to be uploaded
-        :type artifact_path: Union[Path, str]
-        :param artifact_name: artifact name in weights and biases project
-        :type artifact_name: str
-        :param artifact_type: type of artifact
-        :type artifact_type: str
-        :param upload: if True, uploads file to Weights and Biases web app, if False, references the path to the object and tracks changes, defaults to False
-        :type upload: bool, optional
+        Args:
+            artifact_path (Union[Path, str]): path to file to be uploaded
+            artifact_name (str): artifact name in weights and biases project
+            artifact_type (str): type of artifact
+            upload (bool, optional): if True, uploads file to Weights and Biases web app. 
+            If False, references the path to the object and tracks changes. Defaults to False.
         """
+
         artifact = wandb.Artifact(artifact_name, type=artifact_type, **kwargs)
         if upload == True:
             artifact.add_file(artifact_path)
@@ -136,11 +133,14 @@ class WandbMixin(object):
     def logging_callbacks(self, callbacks: list):
         """function that adds weights and biases callbacks to callback list before training
 
-        :param callbacks: list of pregenerated fastai callbacks
-        :type callbacks: list
-        :return: updated list of fastai callbacks including weights and biases logging callbacks
-        :rtype: _type_
+        Args:
+            callbacks (list): list of pregenerated fastai callbacks
+
+        Returns:
+            _type_: updated list of fastai callbacks including weights and biases logging callbacks
+
         """
+
         wandb_callback = WandbCallback(log_preds=False)
         callbacks.extend([wandb_callback, WandbCallbackTime(wandb_callback=wandb_callback)])
         return callbacks
@@ -148,11 +148,12 @@ class WandbMixin(object):
     def save_model(self, learner: Learner, run_name: str):
         """Saves the model after training, and logs it as an artifact or file reference.
 
-        :param learner: fastai learner containing model weights
-        :type learner: Learner
-        :param run_name: name of the run to save the model to
-        :type run_name: str
+        Args:
+            learner (Learner): fastai learner containing model weights
+            run_name (str): name of the run to save the model to
+
         """
+
         super().save_model(learner, run_name)
 
         model_path = learner.path / learner.model_dir / run_name
@@ -170,16 +171,14 @@ class WandbMixin(object):
     ) -> str:
         """This initiates hyperparameter tuning using weights and biases sweeps
 
-        :param id: sweep ID, only necessary if sweep has already been generated for the project, defaults to None
-        :type id: str, optional
-        :param name: name of the sweep run, defaullts to project name, defaults to None
-        :type name: str, optional
-        :param method: hyperparameter sweep method, can be random for random, grid for grid search, and bayes for bayes optimisation defaults to "random"
-        :type method: str, optional
-        :param min_iter: minimun number of iterations, defaults to None
-        :type min_iter: int, optional
-        :return: sweep id
-        :rtype: str
+        Args:
+            id (str, optional): _description_. Defaults to None.
+            name (str, optional): _description_. Defaults to None.
+            method (str, optional): _description_. Defaults to "random".
+            min_iter (int, optional): _description_. Defaults to None.
+
+        Returns:
+            str: _description_
         """
         if not name:
             name = f"{self.project_name()}-tuning"
