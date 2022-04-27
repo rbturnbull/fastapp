@@ -10,6 +10,7 @@ import difflib
 from torch import nn
 from collections import OrderedDict
 from fastai.data.core import DataLoaders
+from fastai.learner import Learner
 from rich.console import Console
 
 from .apps import FastApp
@@ -308,6 +309,9 @@ class FastAppTestCase:
         self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
 
     def test_activation(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
+    def test_pretrained_location(self, interactive: bool):
         self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
 
     def test_cli(self, interactive: bool):

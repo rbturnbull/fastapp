@@ -84,6 +84,19 @@ class FastApp:
         return MethodType(copy_func(method.__func__), self)
 
     def pretrained_location(self) -> Union[str, Path]:
+        """
+        The location of a pretrained model.
+
+        It can be a URL, in which case it will need to be downloaded.
+        Or it can be part of the package bundle in which case,
+        it needs to be a relative path from directory which contains the code which defines the app.
+
+        This function by default returns an empty string.
+        Inherited classes need to override this method to use pretrained models.
+
+        Returns:
+            Union[str, Path]: The location of the pretrained model.
+        """
         return ""
 
     def pretrained_local_path(
@@ -94,19 +107,44 @@ class FastApp:
             help="Should the pretrained model be downloaded again if it is online and already present locally.",
         ),
         **kwargs,
-    ):
+    ) -> Path:
+        """
+        The local path of the pretrained model.
+
+        If it is a URL, then it is downloaded.
+        If it is a relative path, then this method returns the absolute path to it.
+
+        Args:
+            pretrained (str, optional): The location (URL or filepath) of a pretrained model. If it is a relative path, then it is relative to the current working directory. Defaults to using the result of the `pretrained_location` method.
+            reload (bool, optional): . Should the pretrained model be downloaded again if it is online and already present locally. Defaults to False.
+
+        Raises:
+            FileNotFoundError: If the file cannot be located in the local environment.
+
+        Returns:
+            Path: The absolute path to the model on the local filesystem.
+        """
         if pretrained:
             location = pretrained
+            base_dir = Path.cwd()
         else:
             location = str(run_callback(self.pretrained_location, kwargs))
+            module = inspect.getmodule(self)
+            base_dir = Path(module.__file__).parent.resolve()
+
+        if not location:
+            return None
 
         # Check if needs to be downloaded
         if location.startswith("http"):
             # TODO get user cache dir
             cached_download(location, user_cache_dir, reload)
+        else:
+            path = Path(location)
+            if not path.is_absolute():
+                path = base_dir / path
 
-        path = Path(location)
-        if not path.exists() or not path.is_file():
+        if not path.is_file():
             raise FileNotFoundError(f"Cannot find pretrained model at '{path}'")
 
         return path
@@ -141,16 +179,30 @@ class FastApp:
 
     @classmethod
     def main(cls):
+        """
+        Creates an instance of this class and runs the command-line interface.
+        """
         cli = cls.click()
         return cli()
 
     @classmethod
     def click(cls):
+        """
+        Creates an instance of this class and returns the click object for the command-line interface.
+        """
         self = cls()
         cli = self.cli()
         return cli
 
     def assert_initialized(self):
+        """
+        Asserts that this app has been initialized.
+
+        All sub-classes of FastApp need to call super().__init__() if overriding the __init__() function.
+
+        Raises:
+            FastAppInitializationError: If the app has not been properly initialized.
+        """
         if not self.fastapp_initialized:
             raise FastAppInitializationError(
                 """The initialization function for this FastApp has not been called.
@@ -158,6 +210,18 @@ class FastApp:
             )
 
     def version(self, verbose: bool = False):
+        """
+        Prints the version of the package that defines this app.
+
+        Used in the command-line interface.
+
+        Args:
+            verbose (bool, optional): Whether or not to print to stdout. Defaults to False.
+
+        Raises:
+            Exception: If it cannot find the package.
+
+        """
         if verbose:
             from importlib import metadata
 
@@ -292,23 +356,13 @@ class FastApp:
 
         console.print("Building learner", style="bold")
         build_learner_func = self.build_learner_func()
-        if model is not None:
-            learner = build_learner_func(
-                dataloaders,
-                model,
-                loss_func=self.loss_func(),
-                metrics=self.metrics(),
-                path=output_dir,
-            )
-
-        else:
-            learner = build_learner_func(
-                dataloaders,
-                model,
-                loss_func=self.loss_func(),
-                metrics=self.metrics(),
-                path=output_dir,
-            )
+        learner = build_learner_func(
+            dataloaders,
+            model,
+            loss_func=self.loss_func(),
+            metrics=self.metrics(),
+            path=output_dir,
+        )
 
         if fp16:
             console.print("Setting floating-point precision of learner to 16 bit", style="red")
