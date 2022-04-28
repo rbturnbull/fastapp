@@ -84,7 +84,7 @@ Or from the command line, run
 
     logistic tune --runs 10
 
-These commands will connect with W&B and your runs will be visible on the wandb.ai site.
+These commands will commect with W&B and your runs will be visible on the wandb.ai site.
 
 Project Generation
 =======================
