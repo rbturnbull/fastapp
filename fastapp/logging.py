@@ -172,13 +172,14 @@ class WandbMixin(object):
         """This initiates hyperparameter tuning using weights and biases sweeps
 
         Args:
-            id (str, optional): _description_. Defaults to None.
-            name (str, optional): _description_. Defaults to None.
-            method (str, optional): _description_. Defaults to "random".
-            min_iter (int, optional): _description_. Defaults to None.
+            id (str, optional): sweep ID, only necessary if sweep has already been generated for the project. Defaults to None.
+            name (str, optional): name of the sweep run, defaullts to project name. Defaults to None.
+            method (str, optional): hyperparameter sweep method, can be random for random, grid for grid search, 
+            and bayes for bayes optimisation. Defaults to "random".
+            min_iter (int, optional): minimun number of iterations. Defaults to None.
 
         Returns:
-            str: _description_
+            str: sweep id
         """
         if not name:
             name = f"{self.project_name()}-tuning"
@@ -238,18 +239,30 @@ Other optional methods that may be added updated:
 Currently, a mixin for using MLFlow implemented, and includes
 a tuning function for using MLFlow sweeps for hyperparameter tuning
 """
-  
 
 install()
 console = Console()
 
 def assert_dir_exists(path:Union[str, Path]):
+    """check if the directory_path exsits and if not, make directory
+
+    Args:
+        path (Union[str, Path]): specified path (if it doesn't exist, make one)
+    """
     if isinstance(path, (str)):
         path = Path(path)
     if path.exists() == False:
         path.mkdir()
         
 def _experiment_exists(experiment_id):
+    """check if experiment_id exists
+
+    Args:
+        experiment_id (_type_): experiment_id to be examined
+Optional[str]
+    Returns:
+        boolean, str: True if experiment_id or name exists, then return id/name. Otherwise, return False
+    """
     experiments = mlflow.list_experiments()
     if experiment_id in [e.experiment_id for e in experiments]:
         return True, 'id'
@@ -259,10 +272,26 @@ def _experiment_exists(experiment_id):
     else:
         return False, ''
 def create_experiment(experiment_name: Optional[str] = None):
+    """if the experiment does not exist, create an experiment with the specified name
+
+    Args:
+        experiment_name (Optional[str], optional): name of the experiment. Defaults to None.
+
+    Returns:
+        mlflow.experiment: instance of an mlflow experiment named experiment_name
+    """
     if _experiment_exists(experiment_name)[0] ==False:
         return mlflow.create_experiment(name = experiment_name)
     
 def get_experiment_id(experiment_id):
+    """fetch experiment that has experiment_id
+
+    Args:
+        experiment_id (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     e_exists, e_type = _experiment_exists(experiment_id)
     if e_exists:
         if e_type == 'name':
@@ -275,8 +304,9 @@ def get_experiment_id(experiment_id):
     
 class MLFlowMixin(object):
     """app logging mixin for logging to mlflow
-    :param object: mixin for logging training runs, params, and metrics to Weights and Biases
-    :type object: MLFlowMixin
+
+    Args:
+        object (MLFlowMixin): mixin for logging training runs, params, and metrics to Weights and Biases
     """
 
     def __init__(self):
@@ -287,27 +317,19 @@ class MLFlowMixin(object):
     def init_run(
         self,
         run_name: Optional[str] = None,
-        output_dir: Optional[Union[Path, str]] = '', #An HTTP URI like https://my-tracking-server:5000.
+        output_dir: Optional[Union[Path, str]] = '', 
         experiment_id: Optional[str] = None,
-        
-#         config: dict = {},
-#         upload_model: Union[Param, bool] = Param(
-#             default=False, help="If true, logs model to MLFlow project"
-#         ),
-        **kwargs,
-    ):
+        **kwargs,):
         """starts an mlflow run (with a given experiment, optional run name and tracking_uri) and
         initiates mlflow.fastai.autolog(log_models=False)
-        
-        :param run_name: name of run, defaults to None, and uses name of App class
-        :type run_name: Optional[str], optional           
-        :param output_dir: output directory of model and other artifacts
-        :type output_dir: Union[Path, str]
-        :param experiment_id: ID of the experiment under which to create the current run, defaults to
-        None, and uses name of App class
-        :type output_dir: Optional[str], optional
-        :param kwargs: additional kwargs for `mlflow.init`
-        """      
+
+        Args:
+            run_name (Optional[str], optional): name of run. Defaults to None, and uses name of App class. 
+            output_dir (Optional[Union[Path, str]], optional): output directory of model and other artifacts. Defaults to ''.
+            experiment_id (Optional[str], optional): ID of the experiment under which to create the current run. Defaults to None, and uses name of App class.
+
+        """
+  
         #         self.upload_model = upload_model
         # optional 'tracking_uri' can be set
         if len(str(output_dir))> 0:
@@ -338,12 +360,14 @@ class MLFlowMixin(object):
     def log(self, param: dict, parameter_metric: bool=False, step: Optional[int] = None):
         """log (param:dict) as a set of parameters or a set of metrics
         if parameter metric = True, log as a set of metric with an optional argument 'step'
-        
-        :param param: dictionary of parameters to be logged
-        :type param: dict
-        :param parameter_metric: if True, log as a set of metrics
-        :type param: Boolean
+
+
+        Args:
+            param (dict): dictionary of parameters to be logged
+            parameter_metric (bool, optional): if True, log as a set of metricss. Defaults to False.
+            step (Optional[int], optional): an optional argument. Defaults to None.
         """
+
         if parameter_metric == True:
             log_metrics(param, step=step)
         else:
@@ -360,12 +384,12 @@ class MLFlowMixin(object):
         **kwargs,
     ):
         """Input an artifact (padans df/matplotlib/plotly.figure/dict/str/path) to a saved file
-        
-        :param artifact: artifact to be logged
-        :type artifact: padans df/matplotlib/plotly.figure/dict/str/path
-        :param artifact_path: path to file to be uploaded
-        :type artifact_path: Union[Path, str]
+
+        Args:
+            artifact (_type_): artifact to be logged
+            artifact_path (Union[Path, str]): path to file to be uploaded
         """
+
 #         artifacts = mlflow.artifacts.download_artifacts
     
         if isinstance(artifact, pd.DataFrame):
@@ -393,12 +417,12 @@ class MLFlowMixin(object):
 
     def save_model(self, learner: Learner, path):
         """saves model as a pytorch model (input = fastai.learner, output= pytorch version of the model)
-        
-        :param learner: fastai learner containing model weights
-        :type learner: Learner
-        :param path: path to file to be uploaded
-        :type path: str  
+
+        Args:
+            learner (Learner): fastai learner containing model weights
+            path (str): path to file to be uploaded
         """
+
 
         mlflow.pytorch.log_model(learner.model, artifact_path=path)
 
