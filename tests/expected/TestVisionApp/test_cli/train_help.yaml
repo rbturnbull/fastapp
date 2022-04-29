@@ -7,7 +7,6 @@ output:
     Usage: base-callback train [OPTIONS]
 
     Options:
-      --output-dir PATH               [default: outputs]
       --epochs INTEGER                The number of epochs.  [default: 20]
       --lr-max FLOAT                  The max learning rate.  [default: 0.0001]
       --distributed / --no-distributed
@@ -27,4 +26,9 @@ output:
       --wandb-dir PATH                The location for 'Weights and Biases' output.
       --mlflow / --no-mlflow          Whether or not to use MLflow for logging.
                                       [default: no-mlflow]
+      --fp16 / --no-fp16              Whether or not the floating-point precision of
+                                      learner should be set to 16 bit.  [default:
+                                      fp16]
+      --output-dir PATH               The location of the output directory.
+                                      [default: ./outputs]
       --help                          Show this message and exit.

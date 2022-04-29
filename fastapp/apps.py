@@ -45,11 +45,14 @@ class FastApp:
         self.show_batch = self.copy_method(self.show_batch)
         self.tune = self.copy_method(self.tune)
         self.pretrained_local_path = self.copy_method(self.pretrained_local_path)
+        self.learner_kwargs = self.copy_method(self.learner_kwargs)
+        self.learner = self.copy_method(self.learner)
         self.__call__ = self.copy_method(self.__call__)
         self.callbacks = self.copy_method(self.callbacks)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
-        add_kwargs(to_func=self.train, from_funcs=[self.dataloaders, self.model, self.callbacks])
+        add_kwargs(to_func=self.learner, from_funcs=self.learner_kwargs)
+        add_kwargs(to_func=self.train, from_funcs=[self.dataloaders, self.model, self.callbacks, self.learner])
         add_kwargs(to_func=self.show_batch, from_funcs=self.dataloaders)
         add_kwargs(to_func=self.tune, from_funcs=self.train)
         add_kwargs(to_func=self.pretrained_local_path, from_funcs=self.pretrained_location)
@@ -64,6 +67,8 @@ class FastApp:
 
         # Remove params from defaults in methods not used for the cli
         change_typer_to_defaults(self.model)
+        change_typer_to_defaults(self.learner_kwargs)
+        change_typer_to_defaults(self.learner)
         change_typer_to_defaults(self.callbacks)
         change_typer_to_defaults(self.train)
         change_typer_to_defaults(self.show_batch)
@@ -337,31 +342,32 @@ class FastApp:
 
     def learner(
         self,
-        dataloaders,
-        output_dir: Path,
         fp16: bool = Param(
             default=True,
             help="Whether or not the floating-point precision of learner should be set to 16 bit.",
         ),
-        **params,
+        **kwargs,
     ) -> Learner:
         """
         Creates a fastai learner object.
         """
-        output_dir = Path(output_dir)
-        output_dir.mkdir(exist_ok=True, parents=True)
+        console.print("Building dataloaders", style="bold")
+        dataloaders = run_callback(self.dataloaders, kwargs)
+
+        # Allow the dataloaders to go to GPU so long as it hasn't explicitly been set as a different device
+        if dataloaders.device is None:
+            dataloaders.cuda()  # This will revert to CPU if cuda is not available
 
         console.print("Building model", style="bold")
-        model = run_callback(self.model, params)
+        model = run_callback(self.model, kwargs)
 
         console.print("Building learner", style="bold")
+        learner_kwargs = run_callback(self.learner_kwargs, kwargs)
         build_learner_func = self.build_learner_func()
         learner = build_learner_func(
             dataloaders,
             model,
-            loss_func=self.loss_func(),
-            metrics=self.metrics(),
-            path=output_dir,
+            **learner_kwargs,
         )
 
         if fp16:
@@ -369,6 +375,19 @@ class FastApp:
             learner = learner.to_fp16()
 
         return learner
+
+    def learner_kwargs(
+        self,
+        output_dir: Path = Param("./outputs", help="The location of the output directory."),
+    ):
+        output_dir = Path(output_dir)
+        output_dir.mkdir(exist_ok=True, parents=True)
+
+        return dict(
+            loss_func=self.loss_func(),
+            metrics=self.metrics(),
+            path=output_dir,
+        )
 
     def loss_func(self):
         """The loss function. If None, then fastai will use the default loss function if it exists for this model."""
@@ -378,14 +397,14 @@ class FastApp:
         """The activation for the last layer. If None, then fastai will use the default activiation of the loss if it exists."""
         return None
 
-    def metrics(self) -> list:
+    def metrics(self) -> List:
         """
         The list of metrics to use with this app.
 
         By default this list is empty. This method should be subclassed to add metrics in child classes of FastApp.
 
         Returns:
-            list: The list of metrics
+            List: The list of metrics.
         """
         return []
 
@@ -444,7 +463,6 @@ class FastApp:
 
     def train(
         self,
-        output_dir: Path = Path("./outputs"),
         epochs: int = Param(default=20, help="The number of epochs."),
         lr_max: float = Param(default=1e-4, help="The max learning rate."),
         distributed: bool = Param(default=False, help="If the learner is distributed."),
@@ -454,7 +472,6 @@ class FastApp:
         Trains a model for this app.
 
         Args:
-            output_dir (Path, optional): _description_. Defaults to Path("./outputs").
             epochs (int, optional): The number of epochs. Defaults to 20.
             lr_max (float, optional): The max learning rate. Defaults to 1e-4.
             distributed (bool, optional): _description_. Defaults to Param(default=False, help="If the learner is distributed.").
@@ -463,14 +480,7 @@ class FastApp:
         Returns:
             Learner: The fastai Learner object created for training.
         """
-        dataloaders = run_callback(self.dataloaders, kwargs)
-
-        # Allow the dataloaders to go to GPU so long as it hasn't explicitly been set as a different device
-        if dataloaders.device is None:
-            dataloaders.cuda()  # This will revert to CPU if cuda is not available
-
-        learner = self.learner(dataloaders, output_dir=output_dir, **kwargs)
-
+        learner = run_callback(self.learner, kwargs)
         callbacks = run_callback(self.callbacks, kwargs)
 
         with learner.distrib_ctx() if distributed == True else nullcontext():
