@@ -7,15 +7,11 @@ output:
     Usage: base-callback train [OPTIONS]
 
     Options:
-      --output-dir PATH               [default: outputs]
       --epochs INTEGER                The number of epochs.  [default: 20]
       --lr-max FLOAT                  The max learning rate.  [default: 0.0001]
       --distributed / --no-distributed
                                       If the learner is distributed.  [default: no-
                                       distributed]
-      --run-name TEXT                 The name for this run for logging purposes. If
-                                      no name is given then the name of the output
-                                      directory is used.
       --csv PATH                      The path to a CSV file with the data.
       --x TEXT                        The column name of the independent variable.
                                       [default: x]
@@ -25,4 +21,16 @@ output:
                                       validation.  [default: 0.2]
       --batch-size INTEGER            The number of items to use in each batch.
                                       [default: 32]
+      --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
+                                      logging.  [default: no-wandb]
+      --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:
+                                      online]
+      --wandb-dir PATH                The location for 'Weights and Biases' output.
+      --mlflow / --no-mlflow          Whether or not to use MLflow for logging.
+                                      [default: no-mlflow]
+      --fp16 / --no-fp16              Whether or not the floating-point precision of
+                                      learner should be set to 16 bit.  [default:
+                                      fp16]
+      --output-dir PATH               The location of the output directory.
+                                      [default: ./outputs]
       --help                          Show this message and exit.
