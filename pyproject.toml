@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapp"
-version = "0.1.9"
+version = "0.1.10"
 description = "A wrapper for fastai projects to create easy command-line inferfaces and manage hyper-parameter tuning."
 authors = ["Robert Turnbull <robert.turnbull@unimelb.edu.au>"]
 license = "Apache-2.0"
@@ -20,6 +20,7 @@ Pillow = "^9.0.1"
 PyYAML = "^6.0"
 click = "8.0.4"
 torchvision = "0.11.3"
+pybtex = "^0.24.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from pathlib import Path
 import numpy as np
 from fastai.tabular.data import TabularDataLoaders
 from fastai.tabular.all import tabular_learner, accuracy, error_rate
@@ -11,7 +12,7 @@ class IrisApp(fa.FastApp):
     A classification app to predict the type of iris from sepal and petal lengths and widths.
 
     A classic dataset publised in:
-        Fisher, R.A. “The use of multiple measurements in taxonomic problems” Annual Eugenics, 7, Part II, 179-188 (1936).
+        Fisher, R.A. “The Use of Multiple Measurements in Taxonomic Problems” Annals of Eugenics, 7, Part II, 179–188 (1936).
     For more information about the dataset, see:
         https://scikit-learn.org/stable/datasets/toy_dataset.html#iris-plants-dataset
     """
@@ -40,11 +41,11 @@ class IrisApp(fa.FastApp):
     def build_learner_func(self):
         return tabular_learner
 
+    def get_bibtex_files(self):
+        files = super().get_bibtex_files()
+        files.append(Path(__file__).parent / "iris.bib")
+        return files
 
-# class IrisWandbApp(fastapp.logging.WandbMixin, IrisApp):
-#     """
-#     A version of the iris app which also includes logging to 'Weights & Biases' (https://wandb.ai/).
-#     """
 
 if __name__ == "__main__":
     IrisApp.main()

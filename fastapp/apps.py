@@ -21,16 +21,19 @@ from rich.traceback import install
 install()
 console = Console()
 
+from .citations import Citable
 from .util import copy_func, run_callback, change_typer_to_defaults, add_kwargs
 from .params import Param
 from .callbacks import FastAppWandbCallback, FastAppMlflowCallback
+
+bibtex_dir = Path(__file__).parent / "bibtex"
 
 
 class FastAppInitializationError(Exception):
     pass
 
 
-class FastApp:
+class FastApp(Citable):
     fastapp_initialized = False
     extra_params = None
 
@@ -84,6 +87,9 @@ class FastApp:
 
     def __str__(self):
         return self.__class__.__name__
+
+    def get_bibtex_files(self):
+        return [bibtex_dir / "fastai.bib", bibtex_dir / "fastapp.bib"]
 
     def copy_method(self, method):
         return MethodType(copy_func(method.__func__), self)
@@ -312,6 +318,18 @@ class FastApp:
         )
         typer_click_object.add_command(command, "predict")
 
+        command = click.Command(
+            name="bibliography",
+            callback=self.print_bibliography,
+        )
+        typer_click_object.add_command(command, "bibliography")
+
+        command = click.Command(
+            name="bibtex",
+            callback=self.print_bibtex,
+        )
+        typer_click_object.add_command(command, "bibtex")
+
         return typer_click_object
 
     def tuning_params(self):
@@ -451,6 +469,7 @@ class FastApp:
 
         if wandb:
             callbacks.append(FastAppWandbCallback(app=self, mode=wandb_mode, dir=wandb_dir))
+            self.add_bibtex_file(bibtex_dir / "wandb.bib")
 
         if mlflow:
             callbacks.append(FastAppMlflowCallback(app=self))
@@ -474,7 +493,7 @@ class FastApp:
         Args:
             epochs (int, optional): The number of epochs. Defaults to 20.
             lr_max (float, optional): The max learning rate. Defaults to 1e-4.
-            distributed (bool, optional): _description_. Defaults to Param(default=False, help="If the learner is distributed.").
+            distributed (bool, optional): If the learner is distributed. Defaults to Param(default=False, help="If the learner is distributed.").
             run_name (str): The name for this run for logging purposes. If no name is given then the name of the output directory is used.
 
         Returns:
@@ -482,6 +501,8 @@ class FastApp:
         """
         learner = run_callback(self.learner, kwargs)
         callbacks = run_callback(self.callbacks, kwargs)
+
+        self.print_bibliography(verbose=True)
 
         with learner.distrib_ctx() if distributed == True else nullcontext():
             learner.fit_one_cycle(epochs, lr_max=lr_max, cbs=callbacks)
