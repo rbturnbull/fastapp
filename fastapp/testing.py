@@ -93,18 +93,31 @@ def assert_output(file: Path, interactive: bool, params: dict, output, expected,
         output (str): The string representation of the output from the app.
         expected (str): The expected output from the yaml file.
     """
-    if (interactive or regenerate) and expected != output:
+    if expected == output:
+        return
 
+    if isinstance(expected, dict) and isinstance(output, dict):
+        keys = set(expected.keys()) | set(output.keys())
+        diff = {}
+        for key in keys:
+            diff[key] = get_diff(expected.get(key, ""), output.get(key, ""))
+            if diff[key]:
+                console.print(diff[key])
+    else:
+        diff = get_diff(str(expected), str(output))
+        console.print(diff)
+
+    if interactive or regenerate:
         # If we aren't automatically regenerating the expected files, then prompt the user
         if not regenerate:
             prompt_response = input(
-                f"\nExpected file '{file.name}' does not match test output.\n" "Should this file be replaced? (y/N) "
+                f"\nExpected file '{file.name}' does not match test output (see diff above).\n"
+                "Should this file be replaced? (y/N) "
             )
             regenerate = prompt_response.lower() == "y"
 
         if regenerate:
             with open(file, "w") as f:
-                # import pdb; pdb.set_trace()
                 output_for_yaml = literal(output) if isinstance(output, str) and "\n" in output else output
                 # order the params dictionary if necessary
                 if isinstance(params, dict):
@@ -112,20 +125,9 @@ def assert_output(file: Path, interactive: bool, params: dict, output, expected,
 
                 data = OrderedDict(params=params, output=output_for_yaml)
                 yaml.dump(data, f)
-                expected = output
+                return
 
-    if expected != output:
-        if isinstance(expected, dict) and isinstance(output, dict):
-            keys = set(expected.keys()) | set(output.keys())
-            diff = {}
-            for key in keys:
-                diff[key] = get_diff(expected.get(key, ""), output.get(key, ""))
-                if diff[key]:
-                    console.print(diff[key])
-        else:
-            diff = get_diff(str(expected), str(output))
-
-        raise FastAppTestCaseError(diff)
+    raise FastAppTestCaseError(diff)
 
 
 class FastAppTestCase:

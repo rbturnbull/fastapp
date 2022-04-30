@@ -21,6 +21,8 @@ output:
                                       validation.  [default: 0.2]
       --batch-size INTEGER            The number of items to use in each batch.
                                       [default: 32]
+      --project-name TEXT             The name for this project for logging
+                                      purposes.
       --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
                                       logging.  [default: no-wandb]
       --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:

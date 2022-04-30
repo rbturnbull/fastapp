@@ -13,6 +13,8 @@ output:
                                       If the learner is distributed.  [default: no-
                                       distributed]
       --batch-size INTEGER            [default: 32]
+      --project-name TEXT             The name for this project for logging
+                                      purposes.
       --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
                                       logging.  [default: no-wandb]
       --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:

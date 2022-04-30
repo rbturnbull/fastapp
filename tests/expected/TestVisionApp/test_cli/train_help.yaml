@@ -19,6 +19,8 @@ output:
                                       given by `default_model_name`
       --pretrained / --no-pretrained  Whether or not to use the pretrained weights.
                                       [default: pretrained]
+      --project-name TEXT             The name for this project for logging
+                                      purposes.
       --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
                                       logging.  [default: no-wandb]
       --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:
