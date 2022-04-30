@@ -1,5 +1,6 @@
 import enum
 import types
+from pathlib import Path
 from typing import get_type_hints, List
 import torchvision.models as models
 from torch import nn
@@ -52,7 +53,6 @@ class VisionApp(FastApp):
             default="",
             help="The name of a model architecture in torchvision.models (https://pytorch.org/vision/stable/models.html). If not given, then it is given by `default_model_name`",
         ),
-        pretrained: bool = Param(default=True, help="Whether or not to use the pretrained weights."),
     ):
         if not model_name:
             model_name = self.default_model_name()
@@ -60,10 +60,20 @@ class VisionApp(FastApp):
         if not hasattr(models, model_name):
             raise ValueError(f"Model '{model_name}' not recognized.")
 
-        return getattr(models, model_name)(pretrained=pretrained)
+        return getattr(models, model_name)
 
     def build_learner_func(self):
         return cnn_learner
+
+    def learner_kwargs(
+        self,
+        output_dir: Path = Param("./outputs", help="The location of the output directory."),
+        pretrained: bool = Param(default=True, help="Whether or not to use the pretrained weights."),
+    ):
+        kwargs = super().learner_kwargs(output_dir=output_dir)
+        kwargs['pretrained'] = pretrained
+        self.fine_tune = pretrained
+        return kwargs
 
 
 class UNetApp(VisionApp):

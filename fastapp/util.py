@@ -25,11 +25,20 @@ def copy_func(f, name=None):
     return fn
 
 
-def run_callback(callback, params):
-    allowed_params, _, _ = get_params_convertors_ctx_param_name_from_function(callback)
+def call_func(func, *args, **kwargs):
+    """
+    Calls a function while filtering the kwargs for only ones in the signature.
+
+    Args:
+        func (Callable): The function to call
+
+    Returns:
+        The result of the function call.
+    """
+    allowed_params, _, _ = get_params_convertors_ctx_param_name_from_function(func)
     allowed_param_names = [p.name for p in allowed_params]
-    kwargs = {key: value for key, value in params.items() if key in allowed_param_names}
-    return callback(**kwargs)
+    kwargs = {key: value for key, value in kwargs.items() if key in allowed_param_names}
+    return func(*args, **kwargs)
 
 
 def change_typer_to_defaults(func):

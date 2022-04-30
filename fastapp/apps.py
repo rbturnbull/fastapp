@@ -22,7 +22,7 @@ install()
 console = Console()
 
 from .citations import Citable
-from .util import copy_func, run_callback, change_typer_to_defaults, add_kwargs
+from .util import copy_func, call_func, change_typer_to_defaults, add_kwargs
 from .params import Param
 from .callbacks import FastAppWandbCallback, FastAppMlflowCallback
 
@@ -36,11 +36,13 @@ class FastAppInitializationError(Exception):
 class FastApp(Citable):
     fastapp_initialized = False
     extra_params = None
+    fine_tune = False
 
     def __init__(self):
         super().__init__()
 
         # Make deep copies of methods so that we can change the function signatures dynamically
+        self.fit = self.copy_method(self.fit)
         self.train = self.copy_method(self.train)
         self.dataloaders = self.copy_method(self.dataloaders)
         self.model = self.copy_method(self.model)
@@ -54,8 +56,9 @@ class FastApp(Citable):
         self.callbacks = self.copy_method(self.callbacks)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
+        add_kwargs(to_func=self.learner_kwargs, from_funcs=self.callbacks)
         add_kwargs(to_func=self.learner, from_funcs=[self.learner_kwargs, self.dataloaders, self.model])
-        add_kwargs(to_func=self.train, from_funcs=[self.callbacks, self.learner])
+        add_kwargs(to_func=self.train, from_funcs=[self.learner, self.fit])
         add_kwargs(to_func=self.show_batch, from_funcs=self.dataloaders)
         add_kwargs(to_func=self.tune, from_funcs=self.train)
         add_kwargs(to_func=self.pretrained_local_path, from_funcs=self.pretrained_location)
@@ -69,6 +72,7 @@ class FastApp(Citable):
         self.call_cli = self.copy_method(self.__call__)
 
         # Remove params from defaults in methods not used for the cli
+        change_typer_to_defaults(self.fit)
         change_typer_to_defaults(self.model)
         change_typer_to_defaults(self.learner_kwargs)
         change_typer_to_defaults(self.learner)
@@ -139,7 +143,7 @@ class FastApp(Citable):
             location = pretrained
             base_dir = Path.cwd()
         else:
-            location = str(run_callback(self.pretrained_location, kwargs))
+            location = str(call_func(self.pretrained_location, **kwargs))
             module = inspect.getmodule(self)
             base_dir = Path(module.__file__).parent.resolve()
 
@@ -174,7 +178,7 @@ class FastApp(Citable):
         return dataloader
 
     def __call__(self, data, output: str = "", **kwargs):
-        path = run_callback(self.pretrained_local_path, kwargs)
+        path = call_func(self.pretrained_local_path, **kwargs)
 
         # open learner from pickled file
         learner = load_learner(path)
@@ -370,17 +374,17 @@ class FastApp(Citable):
         Creates a fastai learner object.
         """
         console.print("Building dataloaders", style="bold")
-        dataloaders = run_callback(self.dataloaders, kwargs)
+        dataloaders = call_func(self.dataloaders, **kwargs)
 
         # Allow the dataloaders to go to GPU so long as it hasn't explicitly been set as a different device
         if dataloaders.device is None:
             dataloaders.cuda()  # This will revert to CPU if cuda is not available
 
         console.print("Building model", style="bold")
-        model = run_callback(self.model, kwargs)
+        model = call_func(self.model, **kwargs)
 
         console.print("Building learner", style="bold")
-        learner_kwargs = run_callback(self.learner_kwargs, kwargs)
+        learner_kwargs = call_func(self.learner_kwargs, **kwargs)
         build_learner_func = self.build_learner_func()
         learner = build_learner_func(
             dataloaders,
@@ -397,14 +401,17 @@ class FastApp(Citable):
     def learner_kwargs(
         self,
         output_dir: Path = Param("./outputs", help="The location of the output directory."),
+        **kwargs,
     ):
         output_dir = Path(output_dir)
         output_dir.mkdir(exist_ok=True, parents=True)
+        callbacks = call_func(self.callbacks, **kwargs)
 
         return dict(
             loss_func=self.loss_func(),
             metrics=self.metrics(),
             path=output_dir,
+            cbs=callbacks,
         )
 
     def loss_func(self):
@@ -482,13 +489,11 @@ class FastApp(Citable):
         return callbacks
 
     def show_batch(self, **kwargs):
-        dataloaders = run_callback(self.dataloaders, kwargs)
+        dataloaders = call_func(self.dataloaders, **kwargs)
         dataloaders.show_batch()
 
     def train(
         self,
-        epochs: int = Param(default=20, help="The number of epochs."),
-        lr_max: float = Param(default=1e-4, help="The max learning rate."),
         distributed: bool = Param(default=False, help="If the learner is distributed."),
         **kwargs,
     ) -> Learner:
@@ -503,16 +508,29 @@ class FastApp(Citable):
         Returns:
             Learner: The fastai Learner object created for training.
         """
-        learner = run_callback(self.learner, kwargs)
-        callbacks = run_callback(self.callbacks, kwargs)
-
+        learner = call_func(self.learner, **kwargs)
         self.print_bibliography(verbose=True)
 
         with learner.distrib_ctx() if distributed == True else nullcontext():
-            learner.fit_one_cycle(epochs, lr_max=lr_max, cbs=callbacks)
-            # more flexibility needs to be added here for other types of training loops
+            call_func(self.fit, learner, **kwargs)
 
         return learner
+
+    def fit(
+        self,
+        learner,
+        epochs: int = Param(default=20, help="The number of epochs."),
+        freeze_epochs: int = Param(
+            default=3,
+            help="The number of epochs to train when the learner is frozen and the last layer is trained by itself. Only if `fine_tune` is set on the app.",
+        ),
+        lr_max: float = Param(default=1e-4, help="The max learning rate."),
+        **kwargs,
+    ):
+        if self.fine_tune:
+            return learner.fine_tune(epochs, freeze_epochs=freeze_epochs, lr_max=lr_max, **kwargs)
+
+        return learner.fit_one_cycle(epochs, lr_max=lr_max, **kwargs)
 
     def project_name(self) -> str:
         """
