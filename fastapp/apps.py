@@ -451,6 +451,7 @@ class FastApp(Citable):
 
     def callbacks(
         self,
+        project_name: str = Param(default=None, help="The name for this project for logging purposes."),
         wandb: bool = Param(default=False, help="Whether or not to use 'Weights and Biases' for logging."),
         wandb_mode: str = Param(default="online", help="The mode for 'Weights and Biases'."),
         wandb_dir: Path = Param(None, help="The location for 'Weights and Biases' output."),
@@ -458,6 +459,9 @@ class FastApp(Citable):
     ) -> List:
         """
         The list of callbacks to use with this app in the fastai training loop.
+
+        Args:
+            project_name (str): The name for this project for logging purposes. If no name is given then the name of the app is used.
 
         Returns:
             list: The list of callbacks.
@@ -468,11 +472,12 @@ class FastApp(Citable):
             callbacks.append(SaveModelCallback(monitor=monitor))
 
         if wandb:
-            callbacks.append(FastAppWandbCallback(app=self, mode=wandb_mode, dir=wandb_dir))
-            self.add_bibtex_file(bibtex_dir / "wandb.bib")
+            callbacks.append(FastAppWandbCallback(app=self, project_name=project_name, mode=wandb_mode, dir=wandb_dir))
+            self.add_bibtex_file(bibtex_dir / "wandb.bib")  # this should be in the callback
 
         if mlflow:
-            callbacks.append(FastAppMlflowCallback(app=self))
+            callbacks.append(FastAppMlflowCallback(app=self, experiment_name=project_name))
+            self.add_bibtex_file(bibtex_dir / "mlflow.bib")  # this should be in the callback
 
         return callbacks
 
@@ -494,7 +499,6 @@ class FastApp(Citable):
             epochs (int, optional): The number of epochs. Defaults to 20.
             lr_max (float, optional): The max learning rate. Defaults to 1e-4.
             distributed (bool, optional): If the learner is distributed. Defaults to Param(default=False, help="If the learner is distributed.").
-            run_name (str): The name for this run for logging purposes. If no name is given then the name of the output directory is used.
 
         Returns:
             Learner: The fastai Learner object created for training.
