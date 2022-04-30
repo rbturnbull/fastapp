@@ -54,8 +54,8 @@ class FastApp(Citable):
         self.callbacks = self.copy_method(self.callbacks)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
-        add_kwargs(to_func=self.learner, from_funcs=self.learner_kwargs)
-        add_kwargs(to_func=self.train, from_funcs=[self.dataloaders, self.model, self.callbacks, self.learner])
+        add_kwargs(to_func=self.learner, from_funcs=[self.learner_kwargs, self.dataloaders, self.model])
+        add_kwargs(to_func=self.train, from_funcs=[self.callbacks, self.learner])
         add_kwargs(to_func=self.show_batch, from_funcs=self.dataloaders)
         add_kwargs(to_func=self.tune, from_funcs=self.train)
         add_kwargs(to_func=self.pretrained_local_path, from_funcs=self.pretrained_location)
