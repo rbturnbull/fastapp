@@ -524,13 +524,15 @@ class FastApp(Citable):
             default=3,
             help="The number of epochs to train when the learner is frozen and the last layer is trained by itself. Only if `fine_tune` is set on the app.",
         ),
-        lr_max: float = Param(default=1e-4, help="The max learning rate."),
+        learning_rate: float = Param(
+            default=1e-4, help="The base learning rate (when fine tuning) or the max learning rate otherwise."
+        ),
         **kwargs,
     ):
         if self.fine_tune:
-            return learner.fine_tune(epochs, freeze_epochs=freeze_epochs, lr_max=lr_max, **kwargs)
+            return learner.fine_tune(epochs, freeze_epochs=freeze_epochs, base_lr=learning_rate, **kwargs)  # hack
 
-        return learner.fit_one_cycle(epochs, lr_max=lr_max, **kwargs)
+        return learner.fit_one_cycle(epochs, lr_max=learning_rate, **kwargs)
 
     def project_name(self) -> str:
         """

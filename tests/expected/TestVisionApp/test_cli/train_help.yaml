@@ -36,5 +36,7 @@ output:
                                       is frozen and the last layer is trained by
                                       itself. Only if `fine_tune` is set on the app.
                                       [default: 3]
-      --lr-max FLOAT                  The max learning rate.  [default: 0.0001]
+      --learning-rate FLOAT           The base learning rate (when fine tuning) or
+                                      the max learning rate otherwise.  [default:
+                                      0.0001]
       --help                          Show this message and exit.
