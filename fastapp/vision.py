@@ -69,8 +69,9 @@ class VisionApp(FastApp):
         self,
         output_dir: Path = Param("./outputs", help="The location of the output directory."),
         pretrained: bool = Param(default=True, help="Whether or not to use the pretrained weights."),
+        **kwargs,
     ):
-        kwargs = super().learner_kwargs(output_dir=output_dir)
+        kwargs = super().learner_kwargs(output_dir=output_dir, **kwargs)
         kwargs['pretrained'] = pretrained
         self.fine_tune = pretrained
         return kwargs
