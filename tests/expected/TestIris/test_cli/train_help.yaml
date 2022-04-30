@@ -12,7 +12,6 @@ output:
       --distributed / --no-distributed
                                       If the learner is distributed.  [default: no-
                                       distributed]
-      --batch-size INTEGER            [default: 32]
       --project-name TEXT             The name for this project for logging
                                       purposes.
       --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
@@ -27,4 +26,5 @@ output:
                                       fp16]
       --output-dir PATH               The location of the output directory.
                                       [default: ./outputs]
+      --batch-size INTEGER            [default: 32]
       --help                          Show this message and exit.
