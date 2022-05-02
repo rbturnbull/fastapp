@@ -38,3 +38,25 @@ def test_wandb_after_epoch():
         app.train(wandb=True, wandb_mode="offline", wandb_dir=tmpdir, epochs=1)
         assert isinstance(wandb.summary['time'], float)
         wandb.finish()  # needs to be called before deleting tmpdir
+
+
+def test_wandb_kwargs():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        IrisApp().callbacks(
+            wandb=True,
+            wandb_mode="offline",
+            wandb_dir=tmpdir,
+            tag=["Tag1", "Tag2"],
+            run_name="Run",
+            wandb_group="Group",
+            notes="Notes",
+            wandb_entity="Entity",
+            wandb_job_type="JobType",
+        )
+        assert wandb.run.tags == ("Tag1", "Tag2")
+        assert wandb.run.group == "Group"
+        assert wandb.run.name == "Run"
+        assert wandb.run.entity == "Entity"
+        assert wandb.run.notes == "Notes"
+        assert wandb.run.job_type == "JobType"
+        wandb.finish()

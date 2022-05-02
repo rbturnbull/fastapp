@@ -459,9 +459,20 @@ class FastApp(Citable):
     def callbacks(
         self,
         project_name: str = Param(default=None, help="The name for this project for logging purposes."),
+        run_name: str = Param(default=None, help="The name for this particular run for logging purposes."),
+        notes: str = Param(None, help="A longer description of the run for logging purposes."),
+        tag: List[str] = Param(
+            None, help="A tag for logging purposes. Multiple tags can be added each introduced with --tag."
+        ),
         wandb: bool = Param(default=False, help="Whether or not to use 'Weights and Biases' for logging."),
         wandb_mode: str = Param(default="online", help="The mode for 'Weights and Biases'."),
         wandb_dir: Path = Param(None, help="The location for 'Weights and Biases' output."),
+        wandb_entity: str = Param(None, help="An entity is a username or team name where you're sending runs."),
+        wandb_group: str = Param(None, help="Specify a group to organize individual runs into a larger experiment."),
+        wandb_job_type: str = Param(
+            None,
+            help="Specify the type of run, which is useful when you're grouping runs together into larger experiments using group.",
+        ),
         mlflow: bool = Param(default=False, help="Whether or not to use MLflow for logging."),
     ) -> List:
         """
@@ -479,7 +490,19 @@ class FastApp(Citable):
             callbacks.append(SaveModelCallback(monitor=monitor))
 
         if wandb:
-            callbacks.append(FastAppWandbCallback(app=self, project_name=project_name, mode=wandb_mode, dir=wandb_dir))
+            callback = FastAppWandbCallback(
+                app=self,
+                project_name=project_name,
+                name=run_name,
+                mode=wandb_mode,
+                dir=wandb_dir,
+                entity=wandb_entity,
+                group=wandb_group,
+                job_type=wandb_job_type,
+                notes=notes,
+                tags=tag,
+            )
+            callbacks.append(callback)
             self.add_bibtex_file(bibtex_dir / "wandb.bib")  # this should be in the callback
 
         if mlflow:

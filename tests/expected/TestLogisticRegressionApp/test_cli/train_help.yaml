@@ -17,11 +17,24 @@ output:
                                       [default: ./outputs]
       --project-name TEXT             The name for this project for logging
                                       purposes.
+      --run-name TEXT                 The name for this particular run for logging
+                                      purposes.
+      --notes TEXT                    A longer description of the run for logging
+                                      purposes.
+      --tag TEXT                      A tag for logging purposes. Multiple tags can
+                                      be added each introduced with --tag.
       --wandb / --no-wandb            Whether or not to use 'Weights and Biases' for
                                       logging.  [default: no-wandb]
       --wandb-mode TEXT               The mode for 'Weights and Biases'.  [default:
                                       online]
       --wandb-dir PATH                The location for 'Weights and Biases' output.
+      --wandb-entity TEXT             An entity is a username or team name where
+                                      you're sending runs.
+      --wandb-group TEXT              Specify a group to organize individual runs
+                                      into a larger experiment.
+      --wandb-job-type TEXT           Specify the type of run, which is useful when
+                                      you're grouping runs together into larger
+                                      experiments using group.
       --mlflow / --no-mlflow          Whether or not to use MLflow for logging.
                                       [default: no-mlflow]
       --csv PATH                      The path to a CSV file with the data.
