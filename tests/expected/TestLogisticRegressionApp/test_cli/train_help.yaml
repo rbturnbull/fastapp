@@ -15,6 +15,23 @@ output:
                                       fp16]
       --output-dir PATH               The location of the output directory.
                                       [default: ./outputs]
+      --csv PATH                      The path to a CSV file with the data.
+      --x TEXT                        The column name of the independent variable.
+                                      [default: x]
+      --y TEXT                        The column name of the dependent variable.
+                                      [default: y]
+      --validation-proportion FLOAT   The proportion of the dataset to use for
+                                      validation.  [default: 0.2]
+      --batch-size INTEGER            The number of items to use in each batch.
+                                      [default: 32]
+      --epochs INTEGER                The number of epochs.  [default: 20]
+      --freeze-epochs INTEGER         The number of epochs to train when the learner
+                                      is frozen and the last layer is trained by
+                                      itself. Only if `fine_tune` is set on the app.
+                                      [default: 3]
+      --learning-rate FLOAT           The base learning rate (when fine tuning) or
+                                      the max learning rate otherwise.  [default:
+                                      0.0001]
       --project-name TEXT             The name for this project for logging
                                       purposes.
       --run-name TEXT                 The name for this particular run for logging
@@ -37,21 +54,4 @@ output:
                                       experiments using group.
       --mlflow / --no-mlflow          Whether or not to use MLflow for logging.
                                       [default: no-mlflow]
-      --csv PATH                      The path to a CSV file with the data.
-      --x TEXT                        The column name of the independent variable.
-                                      [default: x]
-      --y TEXT                        The column name of the dependent variable.
-                                      [default: y]
-      --validation-proportion FLOAT   The proportion of the dataset to use for
-                                      validation.  [default: 0.2]
-      --batch-size INTEGER            The number of items to use in each batch.
-                                      [default: 32]
-      --epochs INTEGER                The number of epochs.  [default: 20]
-      --freeze-epochs INTEGER         The number of epochs to train when the learner
-                                      is frozen and the last layer is trained by
-                                      itself. Only if `fine_tune` is set on the app.
-                                      [default: 3]
-      --learning-rate FLOAT           The base learning rate (when fine tuning) or
-                                      the max learning rate otherwise.  [default:
-                                      0.0001]
       --help                          Show this message and exit.

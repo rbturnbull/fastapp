@@ -17,7 +17,8 @@ output:
     Commands:
       bibliography
       bibtex
-      predict
+      infer
       show-batch
       train
       tune
+      validate

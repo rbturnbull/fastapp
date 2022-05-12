@@ -51,7 +51,8 @@ def test_str():
 
 
 def test_pretrained_local_path_default():
-    assert fa.FastApp().pretrained_local_path() == None
+    with pytest.raises(FileNotFoundError):
+        fa.FastApp().pretrained_local_path()
 
 
 @patch.object(Path, 'is_file', lambda x: True)

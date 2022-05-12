@@ -13,7 +13,6 @@ These practices are subject to change based on the decisions of the team.
 Testing
 -------
 
-- Tests must be added for any new rules before merging to the ``main`` branch. 
 - All tests must be passing before merging with the ``main`` branch.
 - Tests are automatically included in the CI/CD pipeline using Github actions.
 

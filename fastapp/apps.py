@@ -53,23 +53,27 @@ class FastApp(Citable):
         self.learner_kwargs = self.copy_method(self.learner_kwargs)
         self.learner = self.copy_method(self.learner)
         self.__call__ = self.copy_method(self.__call__)
+        self.validate = self.copy_method(self.validate)
         self.callbacks = self.copy_method(self.callbacks)
+        self.prepare_inference = self.copy_method(self.prepare_inference)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
-        add_kwargs(to_func=self.learner_kwargs, from_funcs=self.callbacks)
         add_kwargs(to_func=self.learner, from_funcs=[self.learner_kwargs, self.dataloaders, self.model])
-        add_kwargs(to_func=self.train, from_funcs=[self.learner, self.fit])
+        add_kwargs(to_func=self.train, from_funcs=[self.learner, self.fit, self.callbacks])
         add_kwargs(to_func=self.show_batch, from_funcs=self.dataloaders)
         add_kwargs(to_func=self.tune, from_funcs=self.train)
         add_kwargs(to_func=self.pretrained_local_path, from_funcs=self.pretrained_location)
-        add_kwargs(to_func=self.__call__, from_funcs=self.pretrained_local_path)
+        add_kwargs(to_func=self.prepare_inference, from_funcs=[self.pretrained_local_path, self.inference_dataloader])
+        add_kwargs(to_func=self.__call__, from_funcs=self.prepare_inference)
+        add_kwargs(to_func=self.validate, from_funcs=self.prepare_inference)
 
         # Make copies of methods to use just for the CLI
         self.train_cli = self.copy_method(self.train)
         self.show_batch_cli = self.copy_method(self.show_batch)
         self.tune_cli = self.copy_method(self.tune)
         self.pretrained_local_path_cli = self.copy_method(self.pretrained_local_path)
-        self.call_cli = self.copy_method(self.__call__)
+        self.infer_cli = self.copy_method(self.__call__)
+        self.validate_cli = self.copy_method(self.validate)
 
         # Remove params from defaults in methods not used for the cli
         change_typer_to_defaults(self.fit)
@@ -82,6 +86,7 @@ class FastApp(Citable):
         change_typer_to_defaults(self.tune)
         change_typer_to_defaults(self.pretrained_local_path)
         change_typer_to_defaults(self.__call__)
+        change_typer_to_defaults(self.validate)
         change_typer_to_defaults(self.dataloaders)
         change_typer_to_defaults(self.pretrained_location)
 
@@ -131,7 +136,7 @@ class FastApp(Citable):
 
         Args:
             pretrained (str, optional): The location (URL or filepath) of a pretrained model. If it is a relative path, then it is relative to the current working directory. Defaults to using the result of the `pretrained_location` method.
-            reload (bool, optional): . Should the pretrained model be downloaded again if it is online and already present locally. Defaults to False.
+            reload (bool, optional): Should the pretrained model be downloaded again if it is online and already present locally. Defaults to False.
 
         Raises:
             FileNotFoundError: If the file cannot be located in the local environment.
@@ -148,7 +153,7 @@ class FastApp(Citable):
             base_dir = Path(module.__file__).parent.resolve()
 
         if not location:
-            return None
+            raise FileNotFoundError(f"Please pass in a pretrained model.")
 
         # Check if needs to be downloaded
         if location.startswith("http"):
@@ -159,7 +164,7 @@ class FastApp(Citable):
             if not path.is_absolute():
                 path = base_dir / path
 
-        if not path.is_file():
+        if not path or not path.is_file():
             raise FileNotFoundError(f"Cannot find pretrained model at '{path}'")
 
         return path
@@ -167,28 +172,41 @@ class FastApp(Citable):
     def prepare_source(self, data):
         return data
 
-    def output_results(self, results, data, prepared_data, output):
+    def output_results(self, results, **kwargs):
         print(results)
-        if output:
-            with open(output, "w") as f:
-                f.write(results)
 
-    def test_dataloader(self, learner, prepared_data):
-        dataloader = learner.dls.test_dl(prepared_data)
+    def inference_dataloader(self, learner, **kwargs):
+        dataloader = learner.dls.test_dl(**kwargs)
         return dataloader
 
-    def __call__(self, data, output: str = "", **kwargs):
+    def prepare_inference(self, **kwargs):
+        # Open the exported learner from a pickle file
         path = call_func(self.pretrained_local_path, **kwargs)
-
-        # open learner from pickled file
         learner = load_learner(path)
 
-        # Classify results
-        prepared_data = self.prepare_source(data)
-        dataloader = self.test_dataloader(learner, prepared_data)
+        # Create a dataloader for inference
+        dataloader = call_func(self.inference_dataloader, learner, **kwargs)
+
+        return learner, dataloader
+
+    def validate(self, **kwargs):
+        learner, dataloader = call_func(self.prepare_inference, **kwargs)
+
+        with learner.validation_context():
+            learner._do_epoch_validate(1, dataloader)
+            result = learner.final_record
+
+        print(result)
+
+        return result
+
+    def __call__(self, **kwargs):
+
+        learner, dataloader = call_func(self.prepare_inference, **kwargs)
         results = learner.get_preds(dl=dataloader, reorder=False, with_decoded=False, act=self.activation())
 
-        results = self.output_results(results, data, prepared_data, output)
+        # Output results
+        call_func(self.output_results, results, **kwargs)
 
         return results
 
@@ -314,13 +332,21 @@ class FastApp(Citable):
         )
         typer_click_object.add_command(command, "tune")
 
-        params, _, _ = get_params_convertors_ctx_param_name_from_function(self.call_cli)
+        params, _, _ = get_params_convertors_ctx_param_name_from_function(self.validate_cli)
         command = click.Command(
-            name="predict",
-            callback=self.call_cli,
+            name="validate",
+            callback=self.validate_cli,
             params=params,
         )
-        typer_click_object.add_command(command, "predict")
+        typer_click_object.add_command(command, "validate")
+
+        params, _, _ = get_params_convertors_ctx_param_name_from_function(self.infer_cli)
+        command = click.Command(
+            name="infer",
+            callback=self.infer_cli,
+            params=params,
+        )
+        typer_click_object.add_command(command, "infer")
 
         command = click.Command(
             name="bibliography",
@@ -405,13 +431,13 @@ class FastApp(Citable):
     ):
         output_dir = Path(output_dir)
         output_dir.mkdir(exist_ok=True, parents=True)
-        callbacks = call_func(self.callbacks, **kwargs)
+        # callbacks = call_func(self.callbacks, **kwargs)
 
         return dict(
             loss_func=self.loss_func(),
             metrics=self.metrics(),
             path=output_dir,
-            cbs=callbacks,
+            # cbs=callbacks,
         )
 
     def loss_func(self):
@@ -532,16 +558,21 @@ class FastApp(Citable):
             Learner: The fastai Learner object created for training.
         """
         learner = call_func(self.learner, **kwargs)
+        callbacks = call_func(self.callbacks, **kwargs)
+
         self.print_bibliography(verbose=True)
 
         with learner.distrib_ctx() if distributed == True else nullcontext():
-            call_func(self.fit, learner, **kwargs)
+            call_func(self.fit, learner, callbacks, **kwargs)
+
+        learner.export()
 
         return learner
 
     def fit(
         self,
         learner,
+        callbacks,
         epochs: int = Param(default=20, help="The number of epochs."),
         freeze_epochs: int = Param(
             default=3,
@@ -553,9 +584,11 @@ class FastApp(Citable):
         **kwargs,
     ):
         if self.fine_tune:
-            return learner.fine_tune(epochs, freeze_epochs=freeze_epochs, base_lr=learning_rate, **kwargs)  # hack
+            return learner.fine_tune(
+                epochs, freeze_epochs=freeze_epochs, base_lr=learning_rate, cbs=callbacks, **kwargs
+            )  # hack
 
-        return learner.fit_one_cycle(epochs, lr_max=learning_rate, **kwargs)
+        return learner.fit_one_cycle(epochs, lr_max=learning_rate, cbs=callbacks, **kwargs)
 
     def project_name(self) -> str:
         """
