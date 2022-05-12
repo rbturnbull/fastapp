@@ -1,6 +1,6 @@
 import math
 from typer.models import OptionInfo
-from typing import NamedTuple
+from typing import NamedTuple, List
 from numbers import Number
 
 
@@ -8,6 +8,7 @@ class ParamConfig(NamedTuple):
     distribution: str
     min: Number
     max: Number
+    values: List = None
 
 
 class Param(OptionInfo):
@@ -17,6 +18,7 @@ class Param(OptionInfo):
         tune=False,
         tune_min=None,
         tune_max=None,
+        tune_choices=None,
         log=False,
         distribution=None,
         annotation=None,
@@ -29,10 +31,19 @@ class Param(OptionInfo):
         self.tune_max = tune_max if tune_max is not None else self.max
         self.annotation = annotation
         self.distribution = distribution
+        self.tune_choices = tune_choices
         if distribution:
             raise NotImplementedError("Distribution for parameters not implemented yet")
 
     def config(self) -> ParamConfig:
+        if self.tune_choices:
+            return ParamConfig(
+                distribution="categorical",
+                values=self.tune_choices,
+            )
+
+        # if isinstanceself.annotation in
+
         if self.annotation in [int, float]:
             assert self.tune_min is not None
             assert self.tune_max is not None
@@ -46,6 +57,7 @@ class Param(OptionInfo):
                     distribution=distribution,
                     min=math.log(self.tune_min),
                     max=math.log(self.tune_max),
+                    values=None,
                 )
 
             return ParamConfig(
