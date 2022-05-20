@@ -1,0 +1,21 @@
+params:
+- show-batch
+- --help
+output:
+  exit_code: 0
+  stdout: |
+    Usage: base-callback show-batch [OPTIONS]
+
+    Options:
+      --csv PATH                     A CSV with image paths and categories.
+      --image-column TEXT            The name of the column with the image paths.
+                                     [default: image]
+      --category-column TEXT         The name of the column with the category of the
+                                     image.  [default: category]
+      --base-dir PATH                The base directory for images with relative
+                                     paths.  [default: ./]
+      --validation-proportion FLOAT  The proportion of the dataset to keep for
+                                     validation  [default: 0.2]
+      --batch-size INTEGER           The number of items to use in each batch.
+                                     [default: 16]
+      --help                         Show this message and exit.
