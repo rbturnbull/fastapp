@@ -58,3 +58,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 fastapp = "fastapp.main:app"
 fastapp-iris = "fastapp.examples.iris:IrisApp.main"
+fastapp-imageclassifier = "fastapp.examples.image_classifier:ImageClassifier.main"

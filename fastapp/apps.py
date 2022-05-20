@@ -17,6 +17,8 @@ from typer.main import get_params_convertors_ctx_param_name_from_function
 from rich.pretty import pprint
 from rich.console import Console
 from rich.traceback import install
+from rich.table import Table
+from rich.box import SIMPLE
 
 install()
 console = Console()
@@ -192,11 +194,19 @@ class FastApp(Citable):
     def validate(self, **kwargs):
         learner, dataloader = call_func(self.prepare_inference, **kwargs)
 
-        with learner.validation_context():
-            learner._do_epoch_validate(1, dataloader)
-            result = learner.final_record
+        table = Table(title="Validation", box=SIMPLE)
 
-        print(result)
+        values = learner.validate(dl=dataloader)
+        names = [learner.recorder.loss.name] + [metric.name for metric in learner.metrics]
+        result = {name: value for name, value in zip(names, values)}
+
+        table.add_column("Metric", justify="right", style="cyan", no_wrap=True)
+        table.add_column("Value", style="magenta")
+
+        for name, value in result.items():
+            table.add_row(name, str(value))
+
+        console.print(table)
 
         return result
 

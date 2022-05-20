@@ -89,7 +89,6 @@ class UNetApp(VisionApp):
     U-Net: Convolutional Networks for Biomedical Image Segmentation,
     https://arxiv.org/abs/1505.04597
     https://github.com/fastai/fastbook/blob/master/15_arch_details.ipynb
-
     """
 
     def build_learner_func(self):
