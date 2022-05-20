@@ -18,4 +18,9 @@ output:
                                      validation  [default: 0.2]
       --batch-size INTEGER           The number of items to use in each batch.
                                      [default: 16]
+      --width INTEGER                The width to resize all the images to.
+                                     [default: 224]
+      --height INTEGER               The height to resize all the images to.
+                                     [default: 224]
+      --resize-method TEXT           The method to resize images.  [default: squish]
       --help                         Show this message and exit.
