@@ -35,8 +35,14 @@ class ImageClassifier(VisionApp):
             default="category", help="The name of the column with the category of the image."
         ),
         base_dir: Path = fa.Param(default="./", help="The base directory for images with relative paths."),
+        validation_column: str = fa.Param(
+            default="validation",
+            help="The column in the dataset to use for validation. "
+            "If the column is not in the dataset, then a validation set will be chosen randomly according to `validation_proportion`.",
+        ),
         validation_proportion: float = fa.Param(
-            default=0.2, help="The proportion of the dataset to keep for validation"
+            default=0.2,
+            help="The proportion of the dataset to keep for validation. Used if `validation_column` is not in the dataset.",
         ),
         batch_size: int = fa.Param(default=16, help="The number of items to use in each batch."),
     ):
