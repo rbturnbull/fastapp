@@ -1,2 +1,2 @@
 params: {}
-output: valid_loss
+output: accuracy
