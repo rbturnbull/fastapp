@@ -428,6 +428,8 @@ class FastApp(Citable):
             **learner_kwargs,
         )
 
+        learner.training_kwargs = kwargs
+
         if fp16:
             console.print("Setting floating-point precision of learner to 16 bit", style="red")
             learner = learner.to_fp16()
