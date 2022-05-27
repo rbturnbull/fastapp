@@ -567,8 +567,8 @@ class FastApp(Citable):
         Returns:
             Learner: The fastai Learner object created for training.
         """
-        learner = call_func(self.learner, **kwargs)
         callbacks = call_func(self.callbacks, **kwargs)
+        learner = call_func(self.learner, **kwargs)
 
         self.print_bibliography(verbose=True)
 
