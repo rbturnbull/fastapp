@@ -14,7 +14,7 @@ class FastAppWandbCallback(WandbCallback):
         super().__init__()
 
         if hasattr(app, 'training_kwargs'):
-            wandb.log(app.training_kwargs)
+            wandb.config.update(app.training_kwargs)
 
     def after_epoch(self):
         super().after_epoch()
