@@ -14,8 +14,6 @@ class FastAppWandbCallback(WandbCallback):
         super().__init__()
 
         if hasattr(app, 'training_kwargs'):
-            # pass
-            # breakpoint()
             wandb.log(app.training_kwargs)
 
     def after_epoch(self):
