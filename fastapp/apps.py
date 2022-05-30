@@ -562,13 +562,14 @@ class FastApp(Citable):
         Trains a model for this app.
 
         Args:
-            epochs (int, optional): The number of epochs. Defaults to 20.
-            lr_max (float, optional): The max learning rate. Defaults to 1e-4.
             distributed (bool, optional): If the learner is distributed. Defaults to Param(default=False, help="If the learner is distributed.").
 
         Returns:
             Learner: The fastai Learner object created for training.
         """
+        self.training_kwargs = kwargs
+        self.training_kwargs['distributed'] = distributed
+
         callbacks = call_func(self.callbacks, **kwargs)
         learner = call_func(self.learner, **kwargs)
 

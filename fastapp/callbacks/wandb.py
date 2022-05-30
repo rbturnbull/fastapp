@@ -10,7 +10,13 @@ class FastAppWandbCallback(WandbCallback):
             project_name = app.project_name()
 
         self.run = wandb.init(project=project_name, reinit=True, **kwargs)
+
         super().__init__()
+
+        if hasattr(app, 'training_kwargs'):
+            # pass
+            # breakpoint()
+            wandb.log(app.training_kwargs)
 
     def after_epoch(self):
         super().after_epoch()
