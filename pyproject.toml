@@ -21,7 +21,9 @@ PyYAML = "^6.0"
 click = "8.0.4"
 torchvision = "0.11.3"
 pybtex = "^0.24.0"
+pyjwt = ">=2.4.0"
 mlflow = "^1.25.1"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
