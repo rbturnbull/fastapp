@@ -1,5 +1,9 @@
 name: docs
-on: [push]
+
+on:
+  push:
+    branches: main
+      
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -7,17 +11,42 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
 
-      - name: Install and Build 🔧
+      - name: Dependencies 🔧
         run: |
           sudo apt-get install pandoc
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
-          poetry run sphinx-build -b html docs docs/_build/html
-
+      - name: Testing
+        run: |
+          poetry run coverage run -m pytest
+      - name: Docs
+        run: |
+          poetry run sphinx-build -b html docs gh-pages
+      - name: Coverage
+        run: |
+          echo "COVERAGE=$(poetry run coverage report --precision 2 | grep TOTAL | tr -s ' ' | cut -f 4 -d " ")" >> $GITHUB_ENV
+          poetry run coverage html --directory gh-pages/coverage
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          # This should be the path to the paper within your repo.
+          paper-path: paper.md
+      - name: Move PDF
+        run: |
+          mv paper.pdf gh-pages/joss-draft.pdf
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: gh-pages # The branch the action should deploy to.
-          folder: docs/_build/html # The folder the action should deploy.
-
+          folder: gh-pages # The folder the action should deploy.
+      - name: Create Coverage Badge
+        uses: schneegans/dynamic-badges-action@v1.1.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: 506563cd9b49c8126284e34864c862d0
+          filename: coverage-badge.json
+          label: coverage
+          message: ${{ env.COVERAGE }}
+          color: green
