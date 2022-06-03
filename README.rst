@@ -4,9 +4,9 @@ fastapp
 
 .. start-badges
 
-|pipline badge| |coverage badge| |docs badge| |black badge| |git3moji badge|
+|testing badge| |coverage badge| |docs badge| |black badge| |git3moji badge|
 
-.. |pipline badge| image:: https://github.com/rbturnbull/fastapp/actions/workflows/coverage.yml/badge.svg
+.. |testing badge| image:: https://github.com/rbturnbull/fastapp/actions/workflows/testing.yml/badge.svg
     :target: https://github.com/rbturnbull/fastapp/actions
 
 .. |docs badge| image:: https://github.com/rbturnbull/fastapp/actions/workflows/docs.yml/badge.svg
