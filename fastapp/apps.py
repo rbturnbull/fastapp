@@ -615,15 +615,22 @@ class FastApp(Citable):
         self,
         runs: int = Param(default=1, help="The number of runs to attempt to train the model."),
         engine: str = Param(
-            default="wandb", help="The optimizer to use to perform the hyperparameter tuning."
+            default="wandb",
+            help="The optimizer to use to perform the hyperparameter tuning. Options: wandb, optuna, skopt.",
         ),  # should be enum
-        id: str = Param(default="", help="The ID of this hyperparameter tuning job if being used by multiple agents."),
+        id: str = Param(
+            default="",
+            help="The ID of this hyperparameter tuning job. "
+            "If using wandb, then this is the sweep id. "
+            "If using optuna, then this is the storage. "
+            "If using skopt, then this is the file to store the results. ",
+        ),
         name: str = Param(
             default="",
             help="An informative name for this hyperparameter tuning job. If empty, then it creates a name from the project name.",
         ),
-        wandb_method: str = Param(
-            default="random", help="The optimizer to use to perform the hyperparameter tuning."
+        method: str = Param(
+            default="random", help="The sampling method to use to perform the hyperparameter tuning."
         ),  # should be enum
         min_iter: int = Param(
             default=None,
@@ -642,8 +649,30 @@ class FastApp(Citable):
                 runs=runs,
                 sweep_id=id,
                 name=name,
-                method=wandb_method,
+                method=method,
                 min_iter=min_iter,
+                **kwargs,
+            )
+        elif engine == "optuna":
+            from .tuning.optuna import optuna_tune
+
+            return optuna_tune(
+                self,
+                runs=runs,
+                storage=id,
+                name=name,
+                method=method,
+                **kwargs,
+            )
+        elif engine in ["skopt", "scikit-optimize"]:
+            from .tuning.skopt import skopt_tune
+
+            return skopt_tune(
+                self,
+                runs=runs,
+                file=id,
+                name=name,
+                method=method,
                 **kwargs,
             )
         else:

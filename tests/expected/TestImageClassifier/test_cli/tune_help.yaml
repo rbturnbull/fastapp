@@ -10,13 +10,17 @@ output:
       --runs INTEGER                  The number of runs to attempt to train the
                                       model.  [default: 1]
       --engine TEXT                   The optimizer to use to perform the
-                                      hyperparameter tuning.  [default: wandb]
-      --id TEXT                       The ID of this hyperparameter tuning job if
-                                      being used by multiple agents.
+                                      hyperparameter tuning. Options: wandb, optuna,
+                                      skopt.  [default: wandb]
+      --id TEXT                       The ID of this hyperparameter tuning job. If
+                                      using wandb, then this is the sweep id. If
+                                      using optuna, then this is the storage. If
+                                      using skopt, then this is the file to store
+                                      the results.
       --name TEXT                     An informative name for this hyperparameter
                                       tuning job. If empty, then it creates a name
                                       from the project name.
-      --wandb-method TEXT             The optimizer to use to perform the
+      --method TEXT                   The sampling method to use to perform the
                                       hyperparameter tuning.  [default: random]
       --min-iter INTEGER              The minimum number of iterations if using
                                       early termination. If left empty, then early
