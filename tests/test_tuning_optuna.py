@@ -6,10 +6,11 @@ from .tuning_test_app import TuningTestApp
 
 def test_optuna_tune_default():
     app = TuningTestApp()
-    result = app.tune(engine="optuna", runs=10, seed=42)
-    assert len(result.trials) == 10
-    assert result.best_value > 0.9
-    assert result.best_trial.number == 6
+    runs = 120
+    result = app.tune(engine="optuna", runs=runs, seed=42)
+    assert len(result.trials) == runs
+    assert result.best_value > 9.93
+    assert result.best_trial.number == 104
     assert isinstance(result.sampler, samplers.RandomSampler)
     df = result.trials_dataframe()
     assert "params_a" in df.columns
@@ -35,8 +36,8 @@ def test_optuna_tune_tpe():
     runs = 100
     result = app.tune(engine="optuna", method="tpe", runs=runs, seed=42)
     assert len(result.trials) == runs
-    assert result.best_value > 8.6
-    assert result.best_trial.number == 29
+    assert result.best_value > 9.9999
+    assert result.best_trial.number == 72
     assert isinstance(result.sampler, samplers.TPESampler)
     df = result.trials_dataframe()
     assert "params_a" in df.columns
