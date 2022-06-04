@@ -12,19 +12,18 @@ except:
 from ..util import call_func
 
 
-def get_sampler(method):
+def get_sampler(method, seed=0):
     method = method.lower()
     if method.startswith("tpe"):
-        sampler = samplers.TPESampler()
+        return samplers.TPESampler(seed=seed)
     elif method.startswith("cma"):
-        sampler = samplers.CmaEsSampler()
-    elif method.startswith("grid"):
-        sampler = samplers.GridSampler()
+        return samplers.CmaEsSampler(seed=seed)
+    # elif method.startswith("grid"):
+    #     return samplers.GridSampler()
     elif method.startswith("random"):
-        sampler = samplers.RandomSampler()
-    else:
-        raise Exception(f"Cannot interpret sampling method '{method}' using Optuna.")
-    return sampler
+        return samplers.RandomSampler(seed=seed)
+
+    raise NotImplementedError(f"Cannot interpret sampling method '{method}' using Optuna.")
 
 
 def suggest(trial, name, param):
@@ -42,8 +41,9 @@ def optuna_tune(
     app,
     storage: str = "",
     name: str = None,
-    method: str = "random",  # Should be enum
+    method: str = "tpe",  # Should be enum
     runs: int = 1,
+    seed: int = None,
     **kwargs,
 ):
     def objective(trial: optuna.Trial):
@@ -66,14 +66,16 @@ def optuna_tune(
         learner = call_func(app.train, **run_kwargs)
 
         # Return metric from recorder
-        # The slice is there because 'epoch' is prepended to the list but it isn't included in the values
-        metric_index = learner.recorder.metric_names[1:].index(app.monitor())
-        metric_values = map(lambda row: row[metric_index], learner.recorder.values)
-        metric_function = min if app.goal()[:3] == "min" else max
-        metric_value = metric_function(metric_values)
-        return metric_value
+        return app.get_best_metric(learner)
 
+    if not storage:
+        storage = None
     study = optuna.create_study(
-        study_name=name, storage=storage, sampler=get_sampler(method), load_if_exists=True, direction=app.goal()
+        study_name=name,
+        storage=storage,
+        sampler=get_sampler(method, seed=seed),
+        load_if_exists=True,
+        direction=app.goal(),
     )
     study.optimize(objective, n_trials=runs)
+    return study

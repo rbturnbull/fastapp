@@ -374,7 +374,7 @@ class FastApp(Citable):
 
     def tuning_params(self):
         tuning_params = {}
-        signature = inspect.signature(self.tune)
+        signature = inspect.signature(self.tune_cli)
 
         for key, value in signature.parameters.items():
             default_value = value.default
@@ -636,6 +636,10 @@ class FastApp(Citable):
             default=None,
             help="The minimum number of iterations if using early termination. If left empty, then early termination is not used.",
         ),
+        seed: int = Param(
+            default=None,
+            help="A seed for the random number generator.",
+        ),
         **kwargs,
     ):
         if not name:
@@ -662,6 +666,7 @@ class FastApp(Citable):
                 storage=id,
                 name=name,
                 method=method,
+                seed=seed,
                 **kwargs,
             )
         elif engine in ["skopt", "scikit-optimize"]:
@@ -677,3 +682,11 @@ class FastApp(Citable):
             )
         else:
             raise NotImplementedError(f"Optimizer engine {engine} not implemented.")
+
+    def get_best_metric(self, learner):
+        # The slice is there because 'epoch' is prepended to the list but it isn't included in the values
+        metric_index = learner.recorder.metric_names[1:].index(self.monitor())
+        metric_values = list(map(lambda row: row[metric_index], learner.recorder.values))
+        metric_function = min if self.goal()[:3] == "min" else max
+        metric_value = metric_function(metric_values)
+        return metric_value

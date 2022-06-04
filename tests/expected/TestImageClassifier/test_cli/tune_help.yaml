@@ -25,6 +25,7 @@ output:
       --min-iter INTEGER              The minimum number of iterations if using
                                       early termination. If left empty, then early
                                       termination is not used.
+      --seed INTEGER                  A seed for the random number generator.
       --distributed / --no-distributed
                                       If the learner is distributed.  [default: no-
                                       distributed]

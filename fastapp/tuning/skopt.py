@@ -93,3 +93,5 @@ def skopt_tune(
     results = optimizer(objective, search_space, n_calls=runs)
     if file:
         skopt.dump(results, str(file))
+
+    return results
