@@ -32,7 +32,7 @@ def test_optuna_tune_cmaes():
 
 def test_optuna_tune_tpe():
     app = TuningTestApp()
-    runs = 30
+    runs = 100
     result = app.tune(engine="optuna", method="tpe", runs=runs, seed=42)
     assert len(result.trials) == runs
     assert result.best_value > 8.6
