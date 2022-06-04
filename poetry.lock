@@ -114,7 +114,7 @@ name = "autopage"
 version = "0.5.1"
 description = "A library to provide automatic paging for console output"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [[package]]
@@ -297,7 +297,7 @@ name = "cliff"
 version = "3.10.1"
 description = "Command Line Interface Formulation Framework"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -322,7 +322,7 @@ name = "cmaes"
 version = "0.8.2"
 description = "Lightweight Covariance Matrix Adaptation Evolution Strategy (CMA-ES) implementation for Python 3."
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -333,7 +333,7 @@ name = "cmd2"
 version = "2.4.1"
 description = "cmd2 - quickly build feature-rich and user-friendly interactive command line applications in Python"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -360,7 +360,7 @@ name = "colorlog"
 version = "6.6.0"
 description = "Add colours to the output of Python's logging module."
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -1380,7 +1380,7 @@ name = "optuna"
 version = "2.10.0"
 description = "A hyperparameter optimization framework"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -1498,7 +1498,7 @@ name = "pbr"
 version = "5.9.0"
 description = "Python Build Reasonableness"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=2.6"
 
 [[package]]
@@ -1597,7 +1597,7 @@ name = "prettytable"
 version = "3.3.0"
 description = "A simple Python library for easily displaying tabular data in a visually appealing ASCII table format"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -1705,7 +1705,7 @@ name = "pyaml"
 version = "21.10.1"
 description = "PyYAML-based module to produce pretty and readable YAML-serialized data"
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
 
 [package.dependencies]
@@ -1827,7 +1827,7 @@ name = "pyperclip"
 version = "1.8.2"
 description = "A cross-platform clipboard module for Python. (Only handles plain text for now.)"
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
 
 [[package]]
@@ -1835,7 +1835,7 @@ name = "pyreadline3"
 version = "3.4.1"
 description = "A python implementation of GNU readline."
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
 
 [[package]]
@@ -2042,7 +2042,7 @@ name = "scikit-optimize"
 version = "0.9.0"
 description = "Sequential model-based optimization toolbox."
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
 
 [package.dependencies]
@@ -2506,7 +2506,7 @@ name = "stevedore"
 version = "3.5.0"
 description = "Manage dynamic plugins for Python applications"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -2861,13 +2861,10 @@ python-versions = ">=3.7"
 docs = ["sphinx", "jaraco.packaging (>=9)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
 
-[extras]
-optuna = ["optuna"]
-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "972ad55bb814b04314dd27caa5c05788675bfb5c24177c3cc509bef01a247a9a"
+content-hash = "6b76ec4f64a345aed5fc21a201c746b275f28150e3060d57c2b356c14010a6c5"
 
 [metadata.files]
 alabaster = [

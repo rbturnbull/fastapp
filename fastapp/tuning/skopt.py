@@ -21,7 +21,7 @@ def get_optimizer(method):
         return skopt.forest_minimize
     elif method.startswith("gbrt") or method.startswith("gradientboost"):
         return skopt.gbrt_minimize
-    raise Exception(f"Cannot interpret sampling method '{method}' using scikit-optimize.")
+    raise NotImplementedError(f"Cannot interpret sampling method '{method}' using scikit-optimize.")
 
 
 def get_param_search_space(param):
@@ -44,6 +44,7 @@ def skopt_tune(
     name: str = None,
     method: str = "bayes",  # Should be enum
     runs: int = 1,
+    seed: int = None,
     **kwargs,
 ):
 
@@ -81,16 +82,17 @@ def skopt_tune(
 
         # Train
         learner = call_func(app.train, **run_kwargs)
+        metric = app.get_best_metric(learner)
 
-        # Return metric from recorder
-        # The slice is there because 'epoch' is prepended to the list but it isn't included in the values
-        metric_index = learner.recorder.metric_names[1:].index(app.monitor())
-        metric_values = map(lambda row: row[metric_index], learner.recorder.values)
-        metric_function = min if app.goal()[:3] == "min" else max
-        metric_value = metric_function(metric_values)
-        return metric_value
+        # make negative if the goal is to maximize this metric
+        if app.goal()[:3] != "min":
+            metric = -metric
 
-    results = optimizer(objective, search_space, n_calls=runs)
+        return metric
+
+    # TODO Read file if present
+
+    results = optimizer(objective, search_space, n_calls=runs, random_state=seed)
     if file:
         skopt.dump(results, str(file))
 

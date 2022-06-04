@@ -1,4 +1,5 @@
 import fastapp as fa
+import numpy as np
 
 MOCK_METRIC = "metric"
 
@@ -36,7 +37,7 @@ class TuningTestApp(fa.FastApp):
     ):
         assert isinstance(x, float)
         assert -10.0 <= x <= 10.0
-        assert isinstance(a, int)
+        assert isinstance(a, int) or isinstance(a, np.integer)
         assert 1 <= a <= 12
         assert isinstance(string, str)
         assert string in categorical_choices

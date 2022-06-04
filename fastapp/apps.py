@@ -678,6 +678,7 @@ class FastApp(Citable):
                 file=id,
                 name=name,
                 method=method,
+                seed=seed,
                 **kwargs,
             )
         else:
