@@ -1,5 +1,3 @@
-from pathlib import Path
-from unittest.mock import patch
 from fastapp.callbacks.wandb import FastAppWandbCallback, wandb
 from fastapp.examples.iris import IrisApp
 import tempfile
