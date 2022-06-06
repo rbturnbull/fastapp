@@ -37,7 +37,6 @@ class FastAppInitializationError(Exception):
 
 class FastApp(Citable):
     fastapp_initialized = False
-    extra_params = None
     fine_tune = False
 
     def __init__(self):
@@ -57,7 +56,6 @@ class FastApp(Citable):
         self.__call__ = self.copy_method(self.__call__)
         self.validate = self.copy_method(self.validate)
         self.callbacks = self.copy_method(self.callbacks)
-        self.prepare_inference = self.copy_method(self.prepare_inference)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
         add_kwargs(to_func=self.learner, from_funcs=[self.learner_kwargs, self.dataloaders, self.model])
@@ -65,9 +63,11 @@ class FastApp(Citable):
         add_kwargs(to_func=self.show_batch, from_funcs=self.dataloaders)
         add_kwargs(to_func=self.tune, from_funcs=self.train)
         add_kwargs(to_func=self.pretrained_local_path, from_funcs=self.pretrained_location)
-        add_kwargs(to_func=self.prepare_inference, from_funcs=[self.pretrained_local_path, self.inference_dataloader])
-        add_kwargs(to_func=self.__call__, from_funcs=self.prepare_inference)
-        add_kwargs(to_func=self.validate, from_funcs=self.prepare_inference)
+        add_kwargs(
+            to_func=self.__call__,
+            from_funcs=[self.pretrained_local_path, self.inference_dataloader, self.output_results],
+        )
+        add_kwargs(to_func=self.validate, from_funcs=[self.pretrained_local_path, self.dataloaders])
 
         # Make copies of methods to use just for the CLI
         self.train_cli = self.copy_method(self.train)
@@ -181,22 +181,16 @@ class FastApp(Citable):
         dataloader = learner.dls.test_dl(**kwargs)
         return dataloader
 
-    def prepare_inference(self, **kwargs):
-        # Open the exported learner from a pickle file
+    def validate(self, **kwargs):
         path = call_func(self.pretrained_local_path, **kwargs)
         learner = load_learner(path)
 
         # Create a dataloader for inference
-        dataloader = call_func(self.inference_dataloader, learner, **kwargs)
-
-        return learner, dataloader
-
-    def validate(self, **kwargs):
-        learner, dataloader = call_func(self.prepare_inference, **kwargs)
+        dataloaders = call_func(self.dataloaders, **kwargs)
 
         table = Table(title="Validation", box=SIMPLE)
 
-        values = learner.validate(dl=dataloader)
+        values = learner.validate(dl=dataloaders.valid)
         names = [learner.recorder.loss.name] + [metric.name for metric in learner.metrics]
         result = {name: value for name, value in zip(names, values)}
 
@@ -211,8 +205,13 @@ class FastApp(Citable):
         return result
 
     def __call__(self, **kwargs):
+        # Open the exported learner from a pickle file
+        path = call_func(self.pretrained_local_path, **kwargs)
+        learner = load_learner(path)
 
-        learner, dataloader = call_func(self.prepare_inference, **kwargs)
+        # Create a dataloader for inference
+        dataloader = call_func(self.inference_dataloader, learner, **kwargs)
+
         results = learner.get_preds(dl=dataloader, reorder=False, with_decoded=False, act=self.activation())
 
         # Output results
