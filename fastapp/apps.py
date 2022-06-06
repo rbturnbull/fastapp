@@ -648,6 +648,8 @@ class FastApp(Citable):
         if engine == "wandb":
             from .tuning.wandb import wandb_tune
 
+            self.add_bibtex_file(bibtex_dir / "wandb.bib")
+
             return wandb_tune(
                 self,
                 runs=runs,
@@ -660,6 +662,8 @@ class FastApp(Citable):
         elif engine == "optuna":
             from .tuning.optuna import optuna_tune
 
+            self.add_bibtex_file(bibtex_dir / "optuna.bib")
+
             return optuna_tune(
                 self,
                 runs=runs,
@@ -671,6 +675,8 @@ class FastApp(Citable):
             )
         elif engine in ["skopt", "scikit-optimize"]:
             from .tuning.skopt import skopt_tune
+
+            self.add_bibtex_file(bibtex_dir / "skopt.bib")
 
             return skopt_tune(
                 self,
