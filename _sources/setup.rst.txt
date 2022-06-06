@@ -97,3 +97,20 @@ For example, if the name of the executable was going to be ``logistic`` and the 
 
     [tool.poetry.scripts]
     logistic = "logistic.apps:LogisticApp.main"
+
+
+Pre-commit Hooks
+=======================
+
+To set up black code formatting with a pre-commit hook, run:
+
+.. code:: bash
+
+    pre-commit install
+    
+Coverage Badge
+=======================
+
+To set up the automatic coverage badge on Github, you need to create a Github authorization token (https://github.com/settings/tokens/new)
+and give it permission to modify gists. Then add this token as the secret in ``Settings/Secrets/Actions`` with the variable name:  ``GIST_SECRET``.
+

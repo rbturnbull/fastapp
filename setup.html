@@ -53,6 +53,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#manual-setup">Manual Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-commit-hooks">Pre-commit Hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coverage-badge">Coverage Badge</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
@@ -307,6 +309,18 @@ Then to install the dependencies, run:</p>
 <span class="n">logistic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;logistic.apps:LogisticApp.main&quot;</span><span class="w"></span>
 </pre></div>
 </div>
+</section>
+<section id="pre-commit-hooks">
+<h2>Pre-commit Hooks<a class="headerlink" href="#pre-commit-hooks" title="Permalink to this headline"></a></h2>
+<p>To set up black code formatting with a pre-commit hook, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit install
+</pre></div>
+</div>
+</section>
+<section id="coverage-badge">
+<h2>Coverage Badge<a class="headerlink" href="#coverage-badge" title="Permalink to this headline"></a></h2>
+<p>To set up the automatic coverage badge on Github, you need to create a Github authorization token (<a class="reference external" href="https://github.com/settings/tokens/new">https://github.com/settings/tokens/new</a>)
+and give it permission to modify gists. Then add this token as the secret in <code class="docutils literal notranslate"><span class="pre">Settings/Secrets/Actions</span></code> with the variable name:  <code class="docutils literal notranslate"><span class="pre">GIST_SECRET</span></code>.</p>
 </section>
 </section>
 
