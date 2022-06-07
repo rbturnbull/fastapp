@@ -548,9 +548,42 @@ class FastApp(Citable):
 
         return callbacks
 
-    def show_batch(self, **kwargs):
+    def show_batch(
+        self, 
+        output_path:Path = Param(None, help="A location to save the HTML which summarizes the batch."),
+        **kwargs
+    ):
         dataloaders = call_func(self.dataloaders, **kwargs)
+        
+        # patch the display function of ipython so we can capture the HTML
+        def mock_display(html_object):
+            self.batch_html = html_object
+                    
+        import IPython.display
+        ipython_display = IPython.display.display
+        IPython.display.display = mock_display
+
         dataloaders.show_batch()
+        batch_html = getattr(self, batch_html, None)
+
+        if not batch_html:
+            console.print(f"Cannot display batch as HTML")
+            return
+
+        html = batch_html.data
+
+        # Write output
+        if output_path:
+            console.print(f"Writing batch HTML to '{output_path}'")
+            with open(output_path, 'w') as f:
+                f.write(html)
+        else:
+            console.print(html)
+            console.print(f"To write this HTML output to a file, give an output path.")
+
+        # restore the ipython display function
+        IPython.display.display = ipython_display
+        return self.batch_html
 
     def train(
         self,
