@@ -7,4 +7,5 @@ output:
     Usage: base-callback show-batch [OPTIONS]
 
     Options:
-      --help  Show this message and exit.
+      --output-path PATH  A location to save the HTML which summarizes the batch.
+      --help              Show this message and exit.
