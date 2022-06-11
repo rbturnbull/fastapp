@@ -1,9 +1,9 @@
-import sys
 from contextlib import nullcontext
 from pathlib import Path
 from types import MethodType
-import inspect
 from typing import List, Optional, Union, Dict
+import inspect
+import torch
 from torch import nn
 from fastai.learner import Learner, load_learner
 from fastai.data.core import DataLoaders
@@ -14,7 +14,6 @@ from fastai.callback.progress import CSVLogger
 import click
 import typer
 from typer.main import get_params_convertors_ctx_param_name_from_function
-from rich.pretty import pprint
 from rich.console import Console
 from rich.traceback import install
 from rich.table import Table
@@ -56,6 +55,8 @@ class FastApp(Citable):
         self.__call__ = self.copy_method(self.__call__)
         self.validate = self.copy_method(self.validate)
         self.callbacks = self.copy_method(self.callbacks)
+        self.one_batch_output = self.copy_method(self.one_batch_output)
+        self.one_batch_output_size = self.copy_method(self.one_batch_output_size)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
         add_kwargs(to_func=self.learner, from_funcs=[self.learner_kwargs, self.dataloaders, self.model])
@@ -68,6 +69,8 @@ class FastApp(Citable):
             from_funcs=[self.pretrained_local_path, self.inference_dataloader, self.output_results],
         )
         add_kwargs(to_func=self.validate, from_funcs=[self.pretrained_local_path, self.dataloaders])
+        add_kwargs(to_func=self.one_batch_output, from_funcs=self.learner)
+        add_kwargs(to_func=self.one_batch_output_size, from_funcs=self.one_batch_output)
 
         # Make copies of methods to use just for the CLI
         self.train_cli = self.copy_method(self.train)
@@ -91,6 +94,8 @@ class FastApp(Citable):
         change_typer_to_defaults(self.validate)
         change_typer_to_defaults(self.dataloaders)
         change_typer_to_defaults(self.pretrained_location)
+        change_typer_to_defaults(self.one_batch_output_size)
+        change_typer_to_defaults(self.one_batch_output)
 
         # Store a bool to let the app know later on (in self.assert_initialized)
         # that __init__ has been called on this parent class
@@ -549,17 +554,16 @@ class FastApp(Citable):
         return callbacks
 
     def show_batch(
-        self, 
-        output_path:Path = Param(None, help="A location to save the HTML which summarizes the batch."),
-        **kwargs
+        self, output_path: Path = Param(None, help="A location to save the HTML which summarizes the batch."), **kwargs
     ):
         dataloaders = call_func(self.dataloaders, **kwargs)
-        
+
         # patch the display function of ipython so we can capture the HTML
         def mock_display(html_object):
             self.batch_html = html_object
-                    
+
         import IPython.display
+
         ipython_display = IPython.display.display
         IPython.display.display = mock_display
 
@@ -729,3 +733,14 @@ class FastApp(Citable):
         metric_function = min if self.goal()[:3] == "min" else max
         metric_value = metric_function(metric_values)
         return metric_value
+
+    def one_batch_output(self, **kwargs):
+        learner = call_func(self.learner, **kwargs)
+        batch = learner.dls.train.one_batch()
+        with torch.no_grad():
+            output = learner.model(batch[0])
+        return output
+
+    def one_batch_output_size(self, **kwargs):
+        output = self.one_batch_output(**kwargs)
+        return output.size()
