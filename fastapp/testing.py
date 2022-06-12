@@ -3,6 +3,7 @@ import sys
 import yaml
 import importlib
 import pytest
+import torch
 from typing import get_type_hints
 from click.testing import CliRunner
 from pathlib import Path
@@ -12,6 +13,7 @@ from collections import OrderedDict
 from fastai.data.core import DataLoaders
 from fastai.learner import Learner
 from rich.console import Console
+from fastai.torch_core import TensorBase
 
 from .apps import FastApp
 
@@ -73,10 +75,12 @@ def get_diff(a, b):
 
     diff = difflib.unified_diff(a, b)
 
-    return "".join(diff)
+    return "\n".join(diff)
 
 
 def clean_output(output):
+    if isinstance(output, (TensorBase, torch.Tensor)):
+        output = f"{type(output)} {tuple(output.shape)}"
     output = str(output)
     output = re.sub(r"0[xX][0-9a-fA-F]+", "<HEX>", output)
     return output
@@ -335,6 +339,9 @@ class FastAppTestCase:
     def test_one_batch_output_size(self, interactive: bool):
         self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
 
+    def test_one_batch_loss(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
     def test_cli(self, interactive: bool):
         app = self.get_app()
         regenerate = False
@@ -369,5 +376,5 @@ class FastAppTestCase:
                 stdout=literal(result.stdout),
                 exit_code=result.exit_code,
             )
-            # import pdb; pdb.set_trace()
+
             assert_output(file, interactive, params, output, expected_output, regenerate=regenerate)

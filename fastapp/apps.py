@@ -57,6 +57,7 @@ class FastApp(Citable):
         self.callbacks = self.copy_method(self.callbacks)
         self.one_batch_output = self.copy_method(self.one_batch_output)
         self.one_batch_output_size = self.copy_method(self.one_batch_output_size)
+        self.one_batch_loss = self.copy_method(self.one_batch_loss)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
         add_kwargs(to_func=self.learner, from_funcs=[self.learner_kwargs, self.dataloaders, self.model])
@@ -70,6 +71,7 @@ class FastApp(Citable):
         )
         add_kwargs(to_func=self.validate, from_funcs=[self.pretrained_local_path, self.dataloaders])
         add_kwargs(to_func=self.one_batch_output, from_funcs=self.learner)
+        add_kwargs(to_func=self.one_batch_loss, from_funcs=self.learner)
         add_kwargs(to_func=self.one_batch_output_size, from_funcs=self.one_batch_output)
 
         # Make copies of methods to use just for the CLI
@@ -96,6 +98,7 @@ class FastApp(Citable):
         change_typer_to_defaults(self.pretrained_location)
         change_typer_to_defaults(self.one_batch_output_size)
         change_typer_to_defaults(self.one_batch_output)
+        change_typer_to_defaults(self.one_batch_loss)
 
         # Store a bool to let the app know later on (in self.assert_initialized)
         # that __init__ has been called on this parent class
@@ -737,10 +740,24 @@ class FastApp(Citable):
     def one_batch_output(self, **kwargs):
         learner = call_func(self.learner, **kwargs)
         batch = learner.dls.train.one_batch()
+        n_inputs = getattr(learner.dls, 'n_inp', 1 if len(batch) == 1 else len(batch) - 1)
+        batch_x = batch[:n_inputs]
         with torch.no_grad():
-            output = learner.model(batch[0])
+            output = learner.model(*batch_x)
         return output
 
     def one_batch_output_size(self, **kwargs):
         output = self.one_batch_output(**kwargs)
         return output.size()
+
+    def one_batch_loss(self, **kwargs):
+        learner = call_func(self.learner, **kwargs)
+        batch = learner.dls.train.one_batch()
+        n_inputs = getattr(learner.dls, 'n_inp', 1 if len(batch) == 1 else len(batch) - 1)
+        batch_x = batch[:n_inputs]
+        batch_y = batch[n_inputs:]
+        with torch.no_grad():
+            output = learner.model(*batch_x)
+            loss = learner.loss_func(output, *batch_y)
+
+        return loss

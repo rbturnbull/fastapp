@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapp"
-version = "0.1.22"
+version = "0.1.24"
 description = "A wrapper for fastai projects to create easy command-line inferfaces and manage hyper-parameter tuning."
 authors = ["Robert Turnbull <robert.turnbull@unimelb.edu.au>"]
 license = "Apache-2.0"
@@ -45,6 +45,7 @@ black = "^21.10b0"
 sphinx-click = {git = "https://github.com/rbturnbull/sphinx-click.git"}
 jupyter = "^1.0.0"
 pyment = "^0.3.3"
+plotly = "^5.8.2"
 
 [tool.black]
 line-length = 120
