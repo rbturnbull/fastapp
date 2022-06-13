@@ -1,6 +1,6 @@
 from pathlib import Path
 from fastai.data.block import DataBlock, CategoryBlock
-from fastai.data.transforms import ColReader, RandomSplitter, DisplayedTransform
+from fastai.data.transforms import ColReader, RandomSplitter, DisplayedTransform, ColSplitter
 from fastai.metrics import accuracy
 from fastai.vision.data import ImageBlock
 from fastai.vision.augment import Resize, ResizeMethod
@@ -8,6 +8,7 @@ import pandas as pd
 import fastapp as fa
 
 from fastapp.vision import VisionApp
+
 
 class PathColReader(DisplayedTransform):
     def __init__(self, column_name: str, base_dir: Path):
@@ -48,16 +49,23 @@ class ImageClassifier(VisionApp):
         batch_size: int = fa.Param(default=16, help="The number of items to use in each batch."),
         width: int = fa.Param(default=224, help="The width to resize all the images to."),
         height: int = fa.Param(default=224, help="The height to resize all the images to."),
-        resize_method:str = fa.Param(default="squish", help="The method to resize images."),
+        resize_method: str = fa.Param(default="squish", help="The method to resize images."),
     ):
+        df = pd.read_csv(csv)
+
+        # Create splitter for training/validation images
+        if validation_column and validation_column in df:
+            splitter = ColSplitter(validation_column)
+        else:
+            splitter = RandomSplitter(validation_proportion)
+
         datablock = DataBlock(
             blocks=[ImageBlock, CategoryBlock],
             get_x=PathColReader(column_name=image_column, base_dir=base_dir),
             get_y=ColReader(category_column),
-            splitter=RandomSplitter(validation_proportion),
-            item_tfms=Resize( (width,height), method=resize_method ),
+            splitter=splitter,
+            item_tfms=Resize((height, width), method=resize_method),
         )
-        df = pd.read_csv(csv)
 
         return datablock.dataloaders(df, bs=batch_size)
 
