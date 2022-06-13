@@ -361,18 +361,18 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.distributions.gamma</span> <span class="kn">import</span> <span class="n">Gamma</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">obese_weights</span> <span class="o">=</span> <span class="n">Gamma</span><span class="p">(</span><span class="n">concentration</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">rsample</span><span class="p">((</span><span class="mi">100</span><span class="p">,))</span>
-<span class="n">non_obese_weights</span> <span class="o">=</span> <span class="n">Gamma</span><span class="p">(</span><span class="n">concentration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">rate</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">rsample</span><span class="p">((</span><span class="mi">200</span><span class="p">,))</span>
+<span class="n">non_obese_weights</span> <span class="o">=</span> <span class="n">Gamma</span><span class="p">(</span><span class="n">concentration</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">rate</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span><span class="o">.</span><span class="n">rsample</span><span class="p">((</span><span class="mi">200</span><span class="p">,))</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">obese_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">obese_weights</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">])</span>
@@ -387,7 +387,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -446,27 +446,27 @@ div.rendered_html tbody tr:hover {
     </tr>
     <tr>
       <th>295</th>
-      <td>10.126618</td>
+      <td>101.598389</td>
       <td>False</td>
     </tr>
     <tr>
       <th>296</th>
-      <td>7.515701</td>
+      <td>82.611061</td>
       <td>False</td>
     </tr>
     <tr>
       <th>297</th>
-      <td>10.469541</td>
+      <td>104.013634</td>
       <td>False</td>
     </tr>
     <tr>
       <th>298</th>
-      <td>10.216485</td>
+      <td>102.232864</td>
       <td>False</td>
     </tr>
     <tr>
       <th>299</th>
-      <td>4.516290</td>
+      <td>58.893036</td>
       <td>False</td>
     </tr>
   </tbody>
@@ -475,7 +475,7 @@ div.rendered_html tbody tr:hover {
 </div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;obese&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;obese&quot;</span><span class="p">,</span> <span class="n">points</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
@@ -496,7 +496,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fastapp.examples.logistic_regression</span> <span class="kn">import</span> <span class="n">LogisticRegressionApp</span>
@@ -505,21 +505,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">std</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
-<span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">std</span>
-</pre></div>
-</div>
-</div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">learner</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">csv</span><span class="o">=</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;obese&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">learner</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">csv</span><span class="o">=</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;obese&quot;</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -610,150 +600,811 @@ div.rendered_html tbody tr:hover {
       <th>epoch</th>
       <th>train_loss</th>
       <th>valid_loss</th>
-      <th>accuracy</th>
+      <th>logit_accuracy</th>
+      <th>logit_f1</th>
       <th>time</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>0</td>
-      <td>28.210493</td>
-      <td>22.445812</td>
-      <td>0.716667</td>
-      <td>00:00</td>
+      <td>1.364746</td>
+      <td>1.187492</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:01</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>28.539541</td>
-      <td>22.956032</td>
-      <td>0.716667</td>
-      <td>00:01</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>29.137754</td>
-      <td>24.540947</td>
-      <td>0.716667</td>
+      <td>1.260636</td>
+      <td>1.060322</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
       <td>00:00</td>
     </tr>
     <tr>
-      <td>3</td>
-      <td>30.057228</td>
-      <td>25.983988</td>
-      <td>0.716667</td>
+      <td>2</td>
+      <td>1.175401</td>
+      <td>0.934218</td>
+      <td>0.616667</td>
+      <td>0.000000</td>
       <td>00:01</td>
     </tr>
     <tr>
+      <td>3</td>
+      <td>1.097060</td>
+      <td>0.850980</td>
+      <td>0.183333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
       <td>4</td>
-      <td>30.497217</td>
-      <td>26.694792</td>
-      <td>0.716667</td>
+      <td>1.038751</td>
+      <td>0.878878</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>5</td>
-      <td>31.022377</td>
-      <td>27.048388</td>
-      <td>0.716667</td>
+      <td>1.007430</td>
+      <td>0.944562</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>6</td>
-      <td>31.479494</td>
-      <td>27.457541</td>
-      <td>0.716667</td>
+      <td>0.989850</td>
+      <td>0.897637</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>7</td>
-      <td>31.802128</td>
-      <td>27.955477</td>
-      <td>0.716667</td>
-      <td>00:00</td>
+      <td>0.964246</td>
+      <td>0.837636</td>
+      <td>0.050000</td>
+      <td>0.034568</td>
+      <td>00:01</td>
     </tr>
     <tr>
       <td>8</td>
-      <td>32.286098</td>
-      <td>27.995213</td>
-      <td>0.716667</td>
+      <td>0.944998</td>
+      <td>0.851590</td>
+      <td>0.333333</td>
+      <td>0.000000</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>9</td>
-      <td>32.726734</td>
-      <td>28.029558</td>
-      <td>0.716667</td>
+      <td>0.930303</td>
+      <td>0.831948</td>
+      <td>0.100000</td>
+      <td>0.156078</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>10</td>
-      <td>32.990574</td>
-      <td>28.058989</td>
-      <td>0.716667</td>
+      <td>0.914980</td>
+      <td>0.846901</td>
+      <td>0.300000</td>
+      <td>0.458947</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>11</td>
-      <td>33.440475</td>
-      <td>28.082388</td>
-      <td>0.716667</td>
+      <td>0.902161</td>
+      <td>0.820698</td>
+      <td>0.033333</td>
+      <td>0.033333</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>12</td>
-      <td>33.359558</td>
-      <td>28.101854</td>
-      <td>0.716667</td>
+      <td>0.889807</td>
+      <td>0.816568</td>
+      <td>0.116667</td>
+      <td>0.184762</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>13</td>
-      <td>33.389854</td>
-      <td>28.116863</td>
-      <td>0.716667</td>
+      <td>0.879176</td>
+      <td>0.810449</td>
+      <td>0.116667</td>
+      <td>0.184762</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>14</td>
-      <td>33.509830</td>
-      <td>28.128279</td>
-      <td>0.716667</td>
-      <td>00:00</td>
+      <td>0.868890</td>
+      <td>0.801315</td>
+      <td>0.133333</td>
+      <td>0.000000</td>
+      <td>00:01</td>
     </tr>
     <tr>
       <td>15</td>
-      <td>33.627445</td>
-      <td>28.136253</td>
-      <td>0.716667</td>
+      <td>0.860608</td>
+      <td>0.806851</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>16</td>
-      <td>33.684845</td>
-      <td>28.141109</td>
-      <td>0.716667</td>
+      <td>0.851906</td>
+      <td>0.786976</td>
+      <td>0.183333</td>
+      <td>0.305185</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>17</td>
-      <td>33.774586</td>
-      <td>28.143829</td>
-      <td>0.716667</td>
+      <td>0.842558</td>
+      <td>0.782473</td>
+      <td>0.300000</td>
+      <td>0.458947</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>18</td>
-      <td>33.698753</td>
-      <td>28.144899</td>
-      <td>0.716667</td>
+      <td>0.835105</td>
+      <td>0.787591</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
       <td>00:00</td>
     </tr>
     <tr>
       <td>19</td>
-      <td>33.822422</td>
-      <td>28.145081</td>
-      <td>0.716667</td>
+      <td>0.826402</td>
+      <td>0.756020</td>
+      <td>0.033333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>0.816558</td>
+      <td>0.746280</td>
+      <td>0.050000</td>
+      <td>0.034568</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>0.809522</td>
+      <td>0.764824</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>0.803643</td>
+      <td>0.804645</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>0.798055</td>
+      <td>0.736619</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>0.793594</td>
+      <td>0.711463</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>0.786284</td>
+      <td>0.711827</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
       <td>00:01</td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>0.781209</td>
+      <td>0.720187</td>
+      <td>0.316667</td>
+      <td>0.479760</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>0.770054</td>
+      <td>0.718675</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>0.762593</td>
+      <td>0.671996</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>0.753070</td>
+      <td>0.668449</td>
+      <td>0.433333</td>
+      <td>0.526126</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>0.740810</td>
+      <td>0.656501</td>
+      <td>0.816667</td>
+      <td>0.782043</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>0.728908</td>
+      <td>0.647102</td>
+      <td>0.916667</td>
+      <td>0.885797</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>0.717478</td>
+      <td>0.640222</td>
+      <td>0.866667</td>
+      <td>0.838974</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>0.707580</td>
+      <td>0.636274</td>
+      <td>0.766667</td>
+      <td>0.733333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>0.696967</td>
+      <td>0.622358</td>
+      <td>0.750000</td>
+      <td>0.349495</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>35</td>
+      <td>0.688268</td>
+      <td>0.624946</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>36</td>
+      <td>0.680084</td>
+      <td>0.608953</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>0.671686</td>
+      <td>0.636552</td>
+      <td>0.450000</td>
+      <td>0.533333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>0.663830</td>
+      <td>0.611092</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>0.659580</td>
+      <td>0.602002</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>40</td>
+      <td>0.651795</td>
+      <td>0.599304</td>
+      <td>0.750000</td>
+      <td>0.717333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>41</td>
+      <td>0.645935</td>
+      <td>0.575552</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>42</td>
+      <td>0.638606</td>
+      <td>0.568467</td>
+      <td>0.900000</td>
+      <td>0.810980</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>43</td>
+      <td>0.629631</td>
+      <td>0.562667</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>44</td>
+      <td>0.620916</td>
+      <td>0.556752</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>45</td>
+      <td>0.615454</td>
+      <td>0.571901</td>
+      <td>0.683333</td>
+      <td>0.000000</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>46</td>
+      <td>0.609370</td>
+      <td>0.580806</td>
+      <td>0.716667</td>
+      <td>0.688889</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>47</td>
+      <td>0.602465</td>
+      <td>0.541007</td>
+      <td>0.883333</td>
+      <td>0.789630</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>48</td>
+      <td>0.595279</td>
+      <td>0.536116</td>
+      <td>0.883333</td>
+      <td>0.789630</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>49</td>
+      <td>0.587128</td>
+      <td>0.540988</td>
+      <td>0.900000</td>
+      <td>0.868889</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>50</td>
+      <td>0.581095</td>
+      <td>0.528691</td>
+      <td>0.866667</td>
+      <td>0.730952</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>51</td>
+      <td>0.574033</td>
+      <td>0.525912</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>52</td>
+      <td>0.567835</td>
+      <td>0.522050</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>53</td>
+      <td>0.560699</td>
+      <td>0.513773</td>
+      <td>0.883333</td>
+      <td>0.789630</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>54</td>
+      <td>0.553978</td>
+      <td>0.514973</td>
+      <td>0.966667</td>
+      <td>0.957576</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>55</td>
+      <td>0.547670</td>
+      <td>0.514324</td>
+      <td>0.766667</td>
+      <td>0.422222</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>56</td>
+      <td>0.543297</td>
+      <td>0.504541</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>57</td>
+      <td>0.537380</td>
+      <td>0.498622</td>
+      <td>0.933333</td>
+      <td>0.894943</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>58</td>
+      <td>0.531806</td>
+      <td>0.496593</td>
+      <td>0.966667</td>
+      <td>0.953333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>59</td>
+      <td>0.526059</td>
+      <td>0.491874</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>60</td>
+      <td>0.522476</td>
+      <td>0.498559</td>
+      <td>0.933333</td>
+      <td>0.904242</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>61</td>
+      <td>0.518110</td>
+      <td>0.486683</td>
+      <td>0.883333</td>
+      <td>0.789630</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>62</td>
+      <td>0.515195</td>
+      <td>0.495900</td>
+      <td>0.916667</td>
+      <td>0.885797</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>63</td>
+      <td>0.511933</td>
+      <td>0.482102</td>
+      <td>0.966667</td>
+      <td>0.953333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>64</td>
+      <td>0.507542</td>
+      <td>0.481215</td>
+      <td>0.900000</td>
+      <td>0.810980</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>65</td>
+      <td>0.503104</td>
+      <td>0.486444</td>
+      <td>0.916667</td>
+      <td>0.885797</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>66</td>
+      <td>0.500279</td>
+      <td>0.472806</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:01</td>
+    </tr>
+    <tr>
+      <td>67</td>
+      <td>0.497118</td>
+      <td>0.470857</td>
+      <td>0.916667</td>
+      <td>0.859649</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>68</td>
+      <td>0.492503</td>
+      <td>0.480565</td>
+      <td>0.916667</td>
+      <td>0.885797</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>69</td>
+      <td>0.489430</td>
+      <td>0.467322</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>70</td>
+      <td>0.486402</td>
+      <td>0.464865</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>71</td>
+      <td>0.483348</td>
+      <td>0.472348</td>
+      <td>0.950000</td>
+      <td>0.929506</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>72</td>
+      <td>0.480119</td>
+      <td>0.461745</td>
+      <td>0.900000</td>
+      <td>0.829630</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>73</td>
+      <td>0.477447</td>
+      <td>0.460403</td>
+      <td>0.883333</td>
+      <td>0.789630</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>74</td>
+      <td>0.474970</td>
+      <td>0.461637</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>75</td>
+      <td>0.473154</td>
+      <td>0.462693</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>76</td>
+      <td>0.471444</td>
+      <td>0.457413</td>
+      <td>0.883333</td>
+      <td>0.789630</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>77</td>
+      <td>0.469494</td>
+      <td>0.455216</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>78</td>
+      <td>0.467218</td>
+      <td>0.458992</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>79</td>
+      <td>0.464943</td>
+      <td>0.455469</td>
+      <td>0.950000</td>
+      <td>0.933333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td>0.462799</td>
+      <td>0.452473</td>
+      <td>0.883333</td>
+      <td>0.789630</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>81</td>
+      <td>0.461688</td>
+      <td>0.451187</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>82</td>
+      <td>0.459752</td>
+      <td>0.452734</td>
+      <td>0.966667</td>
+      <td>0.953333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>83</td>
+      <td>0.458109</td>
+      <td>0.451599</td>
+      <td>0.966667</td>
+      <td>0.953333</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>84</td>
+      <td>0.456832</td>
+      <td>0.449808</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>85</td>
+      <td>0.455387</td>
+      <td>0.449237</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>86</td>
+      <td>0.454201</td>
+      <td>0.448420</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>87</td>
+      <td>0.453154</td>
+      <td>0.448022</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>88</td>
+      <td>0.451290</td>
+      <td>0.447589</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>89</td>
+      <td>0.450536</td>
+      <td>0.447535</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>90</td>
+      <td>0.449615</td>
+      <td>0.447282</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>91</td>
+      <td>0.448836</td>
+      <td>0.447304</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>92</td>
+      <td>0.447389</td>
+      <td>0.446933</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>93</td>
+      <td>0.446593</td>
+      <td>0.446828</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>94</td>
+      <td>0.445610</td>
+      <td>0.446690</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>95</td>
+      <td>0.445793</td>
+      <td>0.446642</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td>0.445367</td>
+      <td>0.446674</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>97</td>
+      <td>0.444747</td>
+      <td>0.446675</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>98</td>
+      <td>0.444389</td>
+      <td>0.446681</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td>99</td>
+      <td>0.443712</td>
+      <td>0.446679</td>
+      <td>0.950000</td>
+      <td>0.921961</td>
+      <td>00:00</td>
     </tr>
   </tbody>
 </table></div>
@@ -763,11 +1414,32 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Better model found at epoch 0 with accuracy value: 0.7166666388511658.
+Better model found at epoch 0 with logit_f1 value: 0.0.
+Better model found at epoch 4 with logit_f1 value: 0.4797603765511339.
+Better model found at epoch 29 with logit_f1 value: 0.5261261261261262.
+Better model found at epoch 30 with logit_f1 value: 0.7820426487093154.
+Better model found at epoch 31 with logit_f1 value: 0.8857971014492755.
+Better model found at epoch 36 with logit_f1 value: 0.9333333333333333.
+Better model found at epoch 54 with logit_f1 value: 0.9575757575757575.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">learner</span><span class="o">.</span><span class="n">recorder</span><span class="o">.</span><span class="n">plot_loss</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebook_examples_logistic_regression_example_6_0.png" src="../_images/notebook_examples_logistic_regression_example_6_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">100</span><span class="p">)</span>
@@ -776,36 +1448,54 @@ Better model found at epoch 0 with accuracy value: 0.7166666388511658.
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-tensor([-0.7446, -0.7088, -0.6730, -0.6372, -0.6014, -0.5656, -0.5298, -0.4939,
-        -0.4581, -0.4223, -0.3865, -0.3507, -0.3149, -0.2791, -0.2433, -0.2075,
-        -0.1717, -0.1359, -0.1001, -0.0643, -0.0285,  0.0073,  0.0431,  0.0789,
-         0.1147,  0.1505,  0.1863,  0.2221,  0.2580,  0.2938,  0.3296,  0.3654,
-         0.4012,  0.4370,  0.4728,  0.5086,  0.5444,  0.5802,  0.6160,  0.6518,
-         0.6876,  0.7234,  0.7592,  0.7950,  0.8308,  0.8666,  0.9024,  0.9382,
-         0.9740,  1.0099,  1.0457,  1.0815,  1.1173,  1.1531,  1.1889,  1.2247,
-         1.2605,  1.2963,  1.3321,  1.3679,  1.4037,  1.4395,  1.4753,  1.5111,
-         1.5469,  1.5827,  1.6185,  1.6543,  1.6901,  1.7259,  1.7618,  1.7976,
-         1.8334,  1.8692,  1.9050,  1.9408,  1.9766,  2.0124,  2.0482,  2.0840,
-         2.1198,  2.1556,  2.1914,  2.2272,  2.2630,  2.2988,  2.3346,  2.3704,
-         2.4062,  2.4420,  2.4778,  2.5137,  2.5495,  2.5853,  2.6211,  2.6569,
-         2.6927,  2.7285,  2.7643,  2.8001])
+tensor([ 48.8466,  51.8481,  54.8495,  57.8510,  60.8524,  63.8538,  66.8553,
+         69.8567,  72.8581,  75.8596,  78.8610,  81.8624,  84.8639,  87.8653,
+         90.8668,  93.8682,  96.8696,  99.8711, 102.8725, 105.8739, 108.8754,
+        111.8768, 114.8782, 117.8797, 120.8811, 123.8825, 126.8840, 129.8854,
+        132.8868, 135.8883, 138.8897, 141.8912, 144.8926, 147.8940, 150.8955,
+        153.8969, 156.8983, 159.8998, 162.9012, 165.9026, 168.9041, 171.9055,
+        174.9070, 177.9084, 180.9098, 183.9113, 186.9127, 189.9141, 192.9156,
+        195.9170, 198.9184, 201.9199, 204.9213, 207.9227, 210.9242, 213.9256,
+        216.9271, 219.9285, 222.9299, 225.9314, 228.9328, 231.9342, 234.9357,
+        237.9371, 240.9385, 243.9400, 246.9414, 249.9428, 252.9443, 255.9457,
+        258.9471, 261.9486, 264.9500, 267.9515, 270.9529, 273.9543, 276.9558,
+        279.9572, 282.9586, 285.9601, 288.9615, 291.9630, 294.9644, 297.9658,
+        300.9673, 303.9687, 306.9701, 309.9716, 312.9730, 315.9745, 318.9759,
+        321.9773, 324.9788, 327.9802, 330.9816, 333.9831, 336.9845, 339.9859,
+        342.9874, 345.9888])
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logits</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()(</span><span class="n">logits</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
@@ -813,46 +1503,41 @@ tensor([-0.7446, -0.7088, -0.6730, -0.6372, -0.6014, -0.5656, -0.5298, -0.4939,
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-tensor([0.6336, 0.6301, 0.6267, 0.6232, 0.6197, 0.6162, 0.6127, 0.6092, 0.6057,
-        0.6021, 0.5986, 0.5950, 0.5915, 0.5879, 0.5843, 0.5807, 0.5771, 0.5735,
-        0.5698, 0.5662, 0.5626, 0.5589, 0.5553, 0.5516, 0.5479, 0.5443, 0.5406,
-        0.5369, 0.5332, 0.5296, 0.5259, 0.5222, 0.5185, 0.5148, 0.5111, 0.5074,
-        0.5037, 0.5000, 0.4963, 0.4926, 0.4889, 0.4852, 0.4815, 0.4778, 0.4741,
-        0.4704, 0.4667, 0.4630, 0.4594, 0.4557, 0.4520, 0.4484, 0.4447, 0.4411,
-        0.4374, 0.4338, 0.4301, 0.4265, 0.4229, 0.4193, 0.4157, 0.4121, 0.4085,
-        0.4049, 0.4014, 0.3978, 0.3943, 0.3908, 0.3872, 0.3837, 0.3802, 0.3768,
-        0.3733, 0.3698, 0.3664, 0.3630, 0.3595, 0.3561, 0.3528, 0.3494, 0.3460,
-        0.3427, 0.3394, 0.3361, 0.3328, 0.3295, 0.3262, 0.3230, 0.3197, 0.3165,
-        0.3133, 0.3102, 0.3070, 0.3039, 0.3007, 0.2976, 0.2946, 0.2915, 0.2884,
-        0.2854], grad_fn=&lt;SqueezeBackward0&gt;)
+tensor([0.3065, 0.3123, 0.3182, 0.3241, 0.3301, 0.3362, 0.3423, 0.3485, 0.3547,
+        0.3609, 0.3672, 0.3736, 0.3800, 0.3864, 0.3929, 0.3995, 0.4060, 0.4126,
+        0.4192, 0.4259, 0.4326, 0.4393, 0.4460, 0.4527, 0.4595, 0.4663, 0.4731,
+        0.4799, 0.4867, 0.4935, 0.5003, 0.5071, 0.5139, 0.5207, 0.5275, 0.5343,
+        0.5411, 0.5479, 0.5546, 0.5613, 0.5680, 0.5747, 0.5814, 0.5880, 0.5946,
+        0.6011, 0.6076, 0.6141, 0.6206, 0.6270, 0.6333, 0.6396, 0.6459, 0.6521,
+        0.6582, 0.6643, 0.6704, 0.6764, 0.6823, 0.6882, 0.6940, 0.6998, 0.7055,
+        0.7111, 0.7167, 0.7222, 0.7276, 0.7330, 0.7383, 0.7435, 0.7487, 0.7538,
+        0.7588, 0.7638, 0.7687, 0.7735, 0.7782, 0.7829, 0.7875, 0.7920, 0.7965,
+        0.8008, 0.8052, 0.8094, 0.8136, 0.8177, 0.8217, 0.8257, 0.8295, 0.8334,
+        0.8371, 0.8408, 0.8444, 0.8480, 0.8514, 0.8549, 0.8582, 0.8615, 0.8647,
+        0.8679], grad_fn=&lt;SqueezeBackward0&gt;)
 </pre></div></div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span>
-</pre></div>
-</div>
-</div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
-    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;obese&quot;</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;obese&quot;</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;markers&#39;</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
     <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 <span class="p">)</span>
-
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+    <span class="n">yaxis_range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">1.1</span><span class="p">],</span>
+<span class="p">)</span>
 <span class="n">fig</span>
 </pre></div>
 </div>
@@ -867,7 +1552,7 @@ tensor([0.6336, 0.6301, 0.6267, 0.6232, 0.6197, 0.6162, 0.6127, 0.6092, 0.6057,
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">learner</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
@@ -881,13 +1566,13 @@ tensor([0.6336, 0.6301, 0.6267, 0.6232, 0.6197, 0.6162, 0.6127, 0.6092, 0.6057,
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Parameter containing:
-tensor([[0.0104]], requires_grad=True)
+tensor([[0.0091]], requires_grad=True)
 Parameter containing:
-tensor([-0.1648], requires_grad=True)
+tensor([-1.2604], requires_grad=True)
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
@@ -895,46 +1580,28 @@ tensor([-0.1648], requires_grad=True)
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">([</span><span class="mf">0.999</span><span class="p">]),</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]))</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-tensor(0.0010)
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">.</span><span class="n">BCEWithLogitsLoss</span><span class="p">()(</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">([</span><span class="o">-</span><span class="mi">20</span><span class="p">]),</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]))</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-tensor(0.)
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -1027,7 +1694,7 @@ tensor(0.)
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">logit_accuracy</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
@@ -1062,7 +1729,7 @@ tensor(0.)
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[59]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
@@ -1074,7 +1741,7 @@ tensor(0.)
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">])</span>
@@ -1082,53 +1749,27 @@ tensor(0.)
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logit_accuracy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span><span class="n">actual</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-tensor(0.7143)
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logit_f1</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span><span class="n">actual</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-0.7499999999999999
-</pre></div></div>
-</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">accuracy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>
