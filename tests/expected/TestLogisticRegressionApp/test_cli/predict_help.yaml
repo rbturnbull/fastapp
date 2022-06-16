@@ -7,6 +7,8 @@ output:
     Usage: base-callback infer [OPTIONS]
 
     Options:
+      --gpu / --no-gpu        Whether or not to use a GPU for processing if
+                              available.  [default: gpu]
       --pretrained TEXT       The location (URL or filepath) of a pretrained model.
       --reload / --no-reload  Should the pretrained model be downloaded again if it
                               is online and already present locally.  [default: no-
