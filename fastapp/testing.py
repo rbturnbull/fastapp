@@ -3,6 +3,7 @@ import sys
 import yaml
 import importlib
 import pytest
+import torch
 from typing import get_type_hints
 from click.testing import CliRunner
 from pathlib import Path
@@ -12,6 +13,7 @@ from collections import OrderedDict
 from fastai.data.core import DataLoaders
 from fastai.learner import Learner
 from rich.console import Console
+from fastai.torch_core import TensorBase
 
 from .apps import FastApp
 
@@ -73,10 +75,12 @@ def get_diff(a, b):
 
     diff = difflib.unified_diff(a, b)
 
-    return "".join(diff)
+    return "\n".join(diff).replace("\n\n", "\n")
 
 
 def clean_output(output):
+    if isinstance(output, (TensorBase, torch.Tensor)):
+        output = f"{type(output)} {tuple(output.shape)}"
     output = str(output)
     output = re.sub(r"0[xX][0-9a-fA-F]+", "<HEX>", output)
     return output
@@ -178,7 +182,7 @@ class FastAppTestCase:
         files = list(directory.glob("*.yaml"))
         return files
 
-    def subtests(self, name: str):
+    def subtests(self, app, name: str):
         files = self.subtest_files(name)
 
         if len(files) == 0:
@@ -191,6 +195,7 @@ class FastAppTestCase:
                 file_dict = yaml.safe_load(f) or {}
                 params = file_dict.get("params", {})
                 output = file_dict.get("output", "")
+
                 yield params, output, file
 
     def test_model(self, interactive: bool):
@@ -221,7 +226,7 @@ class FastAppTestCase:
                         data = OrderedDict(params={}, output="")
                         yaml.dump(data, f)
 
-        for params, expected_output, file in self.subtests(name):
+        for params, expected_output, file in self.subtests(app, name):
             model = app.model(**params)
             if model is None:
                 model_summary = "None"
@@ -233,7 +238,7 @@ class FastAppTestCase:
 
     def test_dataloaders(self, interactive: bool):
         app = self.get_app()
-        for params, expected_output, file in self.subtests(sys._getframe().f_code.co_name):
+        for params, expected_output, file in self.subtests(app, sys._getframe().f_code.co_name):
             # Make all paths relative to the result of get_expected_dir()
             modified_params = dict(params)
             hints = get_type_hints(app.dataloaders)
@@ -294,8 +299,23 @@ class FastAppTestCase:
                         data = OrderedDict(params={}, output="")
                         yaml.dump(data, f)
 
-        for params, expected_output, file in self.subtests(name):
-            output = clean_output(method(**params))
+        for params, expected_output, file in self.subtests(app, name):
+            modified_params = dict(params)
+            hints = get_type_hints(method)
+            for key, value in hints.items():
+                # if this is a union class, then loop over all options
+                if not isinstance(value, type) and hasattr(value, "__args__"):  # This is the case for unions
+                    values = value.__args__
+                else:
+                    values = [value]
+
+                for v in values:
+                    if key in params and Path in v.__mro__:
+                        relative_path = params[key]
+                        modified_params[key] = (self.get_expected_dir() / relative_path).resolve()
+                        break
+
+            output = clean_output(method(**modified_params))
             assert_output(file, interactive, params, output, expected_output, regenerate=regenerate)
 
     def test_goal(self, interactive: bool):
@@ -314,6 +334,12 @@ class FastAppTestCase:
         self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
 
     def test_pretrained_location(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
+    def test_one_batch_output_size(self, interactive: bool):
+        self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
+
+    def test_one_batch_loss(self, interactive: bool):
         self.perform_subtests(interactive=interactive, name=sys._getframe().f_code.co_name)
 
     def test_cli(self, interactive: bool):
@@ -344,11 +370,11 @@ class FastAppTestCase:
                             yaml.dump(data, f)
 
         runner = CliRunner()
-        for params, expected_output, file in self.subtests(name):
+        for params, expected_output, file in self.subtests(app, name):
             result = runner.invoke(app.cli(), params)
             output = dict(
                 stdout=literal(result.stdout),
                 exit_code=result.exit_code,
             )
-            # import pdb; pdb.set_trace()
+
             assert_output(file, interactive, params, output, expected_output, regenerate=regenerate)

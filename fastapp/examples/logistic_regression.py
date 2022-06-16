@@ -2,10 +2,11 @@
 from pathlib import Path
 import pandas as pd
 from torch import nn
-from fastai.data.block import DataBlock, TransformBlock, CategoryBlock
+from fastai.data.block import DataBlock, TransformBlock
 from fastai.data.transforms import ColReader, RandomSplitter
-from fastai.metrics import accuracy
 import fastapp as fa
+from fastapp.blocks import BoolBlock
+from fastapp.metrics import logit_accuracy, logit_f1
 
 
 class LogisticRegressionApp(fa.FastApp):
@@ -30,16 +31,12 @@ class LogisticRegressionApp(fa.FastApp):
             help="The number of items to use in each batch.",
         ),
     ):
-        def unsqueeze(inputs):
-            """This is needed to transform the input with an extra dimension added to the end of the tensor."""
-            return inputs.unsqueeze(dim=-1).float()
 
         datablock = DataBlock(
-            blocks=[TransformBlock, CategoryBlock],
+            blocks=[TransformBlock, BoolBlock],
             get_x=ColReader(x),
             get_y=ColReader(y),
             splitter=RandomSplitter(validation_proportion),
-            batch_tfms=unsqueeze,
         )
         df = pd.read_csv(csv)
 
@@ -47,16 +44,16 @@ class LogisticRegressionApp(fa.FastApp):
 
     def model(self) -> nn.Module:
         """Builds a simple logistic regression model."""
-        return nn.Sequential(
-            nn.Linear(in_features=1, out_features=1, bias=True),
-            nn.Sigmoid(),
-        )
+        return nn.Linear(in_features=1, out_features=1, bias=True)
 
     def loss_func(self):
-        return nn.BCELoss()
+        return nn.BCEWithLogitsLoss()
 
     def metrics(self):
-        return [accuracy]
+        return [logit_accuracy, logit_f1]
+
+    def monitor(self):
+        return "logit_f1"
 
 
 if __name__ == "__main__":

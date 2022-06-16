@@ -1,6 +1,2 @@
 params: {}
-output: |-
-  Sequential(
-    (0): Linear(in_features=1, out_features=1, bias=True)
-    (1): Sigmoid()
-  )
+output: Linear(in_features=1, out_features=1, bias=True)

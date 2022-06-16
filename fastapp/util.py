@@ -97,3 +97,6 @@ def add_kwargs(to_func, from_funcs):
         # Modify function signature with the parameters in this dictionary
         # print('to_func', hex(id(to_func)))
         to_func.__signature__ = to_func_signature.replace(parameters=to_func_parameters.values())
+        for key, value in from_func.__annotations__.items():
+            if key not in to_func.__annotations__:
+                to_func.__annotations__[key] = value

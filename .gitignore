@@ -5,6 +5,7 @@ wandb/*
 wandb*/*
 outputs/*
 fastapp/outputs/*
+docs/notebook_examples/outputs/*
 *.pyc
 
 

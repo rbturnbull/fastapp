@@ -7,6 +7,8 @@ output:
     Usage: base-callback show-batch [OPTIONS]
 
     Options:
+      --output-path PATH             A location to save the HTML which summarizes
+                                     the batch.
       --csv PATH                     A CSV with image paths and categories.
       --image-column TEXT            The name of the column with the image paths.
                                      [default: image]
