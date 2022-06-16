@@ -75,7 +75,7 @@ def get_diff(a, b):
 
     diff = difflib.unified_diff(a, b)
 
-    return "\n".join(diff)
+    return "\n".join(diff).replace("\n\n", "\n")
 
 
 def clean_output(output):
