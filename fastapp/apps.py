@@ -189,9 +189,13 @@ class FastApp(Citable):
         dataloader = learner.dls.test_dl(**kwargs)
         return dataloader
 
-    def validate(self, **kwargs):
+    def validate(
+        self,
+        gpu: bool = Param(True, help="Whether or not to use a GPU for processing if available."),
+        **kwargs,
+    ):
         path = call_func(self.pretrained_local_path, **kwargs)
-        learner = load_learner(path)
+        learner = load_learner(path, cpu=not gpu)
 
         # Create a dataloader for inference
         dataloaders = call_func(self.dataloaders, **kwargs)
@@ -212,10 +216,12 @@ class FastApp(Citable):
 
         return result
 
-    def __call__(self, **kwargs):
+    def __call__(
+        self, gpu: bool = Param(True, help="Whether or not to use a GPU for processing if available."), **kwargs
+    ):
         # Open the exported learner from a pickle file
         path = call_func(self.pretrained_local_path, **kwargs)
-        learner = load_learner(path)
+        learner = load_learner(path, cpu=not gpu)
 
         # Create a dataloader for inference
         dataloader = call_func(self.inference_dataloader, learner, **kwargs)
