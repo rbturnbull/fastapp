@@ -18,4 +18,4 @@ def logit_f1(logits, target):
     """
     predictions = logits > 0.0
     target_binary = target > 0.5
-    return f1_score(predictions.cpu(), target_binary.cpu())
+    return f1_score(target_binary.cpu(), predictions.cpu())
