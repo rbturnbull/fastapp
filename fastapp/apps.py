@@ -564,7 +564,7 @@ class FastApp(Citable):
         IPython.display.display = mock_display
 
         dataloaders.show_batch()
-        batch_html = getattr(self, batch_html, None)
+        batch_html = getattr(self, "batch_html", None)
 
         if not batch_html:
             console.print(f"Cannot display batch as HTML")
