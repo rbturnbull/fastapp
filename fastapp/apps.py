@@ -58,8 +58,11 @@ class FastApp(Citable):
         self.one_batch_output = self.copy_method(self.one_batch_output)
         self.one_batch_output_size = self.copy_method(self.one_batch_output_size)
         self.one_batch_loss = self.copy_method(self.one_batch_loss)
+        self.loss_func = self.copy_method(self.loss_func)
+        self.metrics = self.copy_method(self.metrics)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
+        add_kwargs(to_func=self.learner_kwargs, from_funcs=[self.metrics, self.loss_func])
         add_kwargs(to_func=self.learner, from_funcs=[self.learner_kwargs, self.dataloaders, self.model])
         add_kwargs(to_func=self.train, from_funcs=[self.learner, self.fit, self.callbacks])
         add_kwargs(to_func=self.show_batch, from_funcs=self.dataloaders)
@@ -86,6 +89,8 @@ class FastApp(Citable):
         change_typer_to_defaults(self.fit)
         change_typer_to_defaults(self.model)
         change_typer_to_defaults(self.learner_kwargs)
+        change_typer_to_defaults(self.loss_func)
+        change_typer_to_defaults(self.metrics)
         change_typer_to_defaults(self.learner)
         change_typer_to_defaults(self.callbacks)
         change_typer_to_defaults(self.train)
@@ -459,13 +464,13 @@ class FastApp(Citable):
         # callbacks = call_func(self.callbacks, **kwargs)
 
         return dict(
-            loss_func=self.loss_func(),
-            metrics=self.metrics(),
+            loss_func=call_func(self.loss_func, **kwargs),
+            metrics=call_func(self.metrics, **kwargs),
             path=output_dir,
             # cbs=callbacks,
         )
 
-    def loss_func(self):
+    def loss_func(self, **kwargs):
         """The loss function. If None, then fastai will use the default loss function if it exists for this model."""
         return None
 
