@@ -8,7 +8,8 @@ from torch import nn
 from fastai.learner import Learner, load_learner
 from fastai.data.core import DataLoaders
 from fastai.callback.schedule import fit_one_cycle
-from fastai.distributed import distrib_ctx
+
+# from fastai.distributed import distrib_ctx
 from fastai.callback.tracker import SaveModelCallback
 from fastai.callback.progress import CSVLogger
 import click
@@ -60,6 +61,7 @@ class FastApp(Citable):
         self.one_batch_loss = self.copy_method(self.one_batch_loss)
         self.loss_func = self.copy_method(self.loss_func)
         self.metrics = self.copy_method(self.metrics)
+        self.lr_finder = self.copy_method(self.lr_finder)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
         add_kwargs(to_func=self.learner_kwargs, from_funcs=[self.metrics, self.loss_func])
@@ -75,6 +77,7 @@ class FastApp(Citable):
         add_kwargs(to_func=self.validate, from_funcs=[self.pretrained_local_path, self.dataloaders])
         add_kwargs(to_func=self.one_batch_output, from_funcs=self.learner)
         add_kwargs(to_func=self.one_batch_loss, from_funcs=self.learner)
+        add_kwargs(to_func=self.lr_finder, from_funcs=self.learner)
         add_kwargs(to_func=self.one_batch_output_size, from_funcs=self.one_batch_output)
 
         # Make copies of methods to use just for the CLI
@@ -84,6 +87,7 @@ class FastApp(Citable):
         self.pretrained_local_path_cli = self.copy_method(self.pretrained_local_path)
         self.infer_cli = self.copy_method(self.__call__)
         self.validate_cli = self.copy_method(self.validate)
+        self.lr_finder_cli = self.copy_method(self.lr_finder)
 
         # Remove params from defaults in methods not used for the cli
         change_typer_to_defaults(self.fit)
@@ -104,6 +108,7 @@ class FastApp(Citable):
         change_typer_to_defaults(self.one_batch_output_size)
         change_typer_to_defaults(self.one_batch_output)
         change_typer_to_defaults(self.one_batch_loss)
+        change_typer_to_defaults(self.lr_finder)
 
         # Store a bool to let the app know later on (in self.assert_initialized)
         # that __init__ has been called on this parent class
@@ -368,6 +373,14 @@ class FastApp(Citable):
         )
         typer_click_object.add_command(command, "validate")
 
+        params, _, _ = get_params_convertors_ctx_param_name_from_function(self.lr_finder_cli)
+        command = click.Command(
+            name="lr-finder",
+            callback=self.lr_finder_cli,
+            params=params,
+        )
+        typer_click_object.add_command(command, "lr-finder")
+
         params, _, _ = get_params_convertors_ctx_param_name_from_function(self.infer_cli)
         command = click.Command(
             name="infer",
@@ -625,8 +638,8 @@ class FastApp(Citable):
 
         self.print_bibliography(verbose=True)
 
-        with learner.distrib_ctx() if distributed == True else nullcontext():
-            call_func(self.fit, learner, callbacks, **kwargs)
+        # with learner.distrib_ctx() if distributed == True else nullcontext():
+        call_func(self.fit, learner, callbacks, **kwargs)
 
         learner.export()
 
@@ -772,3 +785,44 @@ class FastApp(Citable):
             loss = learner.loss_func(output, *batch_y)
 
         return loss
+
+    def lr_finder(
+        self, plot_filename: Path = None, start_lr: float = 1e-07, end_lr: float = 10, iterations: int = 100, **kwargs
+    ):
+        learner = call_func(self.learner, **kwargs)
+
+        from matplotlib import pyplot as plt
+        from fastai.callback.schedule import SuggestionMethod
+
+        suggest_funcs = (
+            SuggestionMethod.Valley,
+            SuggestionMethod.Minimum,
+            SuggestionMethod.Slide,
+            SuggestionMethod.Steep,
+        )
+
+        result = learner.lr_find(
+            stop_div=False,
+            num_it=iterations,
+            start_lr=start_lr,
+            end_lr=end_lr,
+            show_plot=plot_filename is not None,
+            suggest_funcs=suggest_funcs,
+        )
+
+        if plot_filename is not None:
+            plt.savefig(str(plot_filename))
+
+        print("\n")
+        table = Table(title="Suggested Learning Rates", box=SIMPLE)
+
+        table.add_column("Method", style="cyan", no_wrap=True)
+        table.add_column("Learning Rate", style="magenta")
+        table.add_column("Explanation")
+
+        for method, value in zip(suggest_funcs, result):
+            table.add_row(method.__name__, str(value), method.__doc__)
+
+        console.print(table)
+
+        return result

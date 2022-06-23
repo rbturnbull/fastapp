@@ -18,6 +18,7 @@ output:
       bibliography
       bibtex
       infer
+      lr-finder
       show-batch
       train
       tune
