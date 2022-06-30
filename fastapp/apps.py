@@ -62,6 +62,8 @@ class FastApp(Citable):
         self.loss_func = self.copy_method(self.loss_func)
         self.metrics = self.copy_method(self.metrics)
         self.lr_finder = self.copy_method(self.lr_finder)
+        self.inference_dataloader = self.copy_method(self.inference_dataloader)
+        self.output_results = self.copy_method(self.output_results)
 
         # Add keyword arguments to the signatures of the methods used in the CLI
         add_kwargs(to_func=self.learner_kwargs, from_funcs=[self.metrics, self.loss_func])
@@ -109,6 +111,8 @@ class FastApp(Citable):
         change_typer_to_defaults(self.one_batch_output)
         change_typer_to_defaults(self.one_batch_loss)
         change_typer_to_defaults(self.lr_finder)
+        change_typer_to_defaults(self.inference_dataloader)
+        change_typer_to_defaults(self.output_results)
 
         # Store a bool to let the app know later on (in self.assert_initialized)
         # that __init__ has been called on this parent class
@@ -239,9 +243,7 @@ class FastApp(Citable):
         results = learner.get_preds(dl=dataloader, reorder=False, with_decoded=False, act=self.activation())
 
         # Output results
-        call_func(self.output_results, results, **kwargs)
-
-        return results
+        return call_func(self.output_results, results, **kwargs) or results
 
     @classmethod
     def main(cls):
@@ -470,17 +472,20 @@ class FastApp(Citable):
     def learner_kwargs(
         self,
         output_dir: Path = Param("./outputs", help="The location of the output directory."),
+        weight_decay: float = Param(
+            None, help="The amount of weight decay. If None then it uses the default amount of weight decay in fastai."
+        ),
+        # l2_regularization: bool = Param(False, help="Whether to add decay to the gradients (L2 regularization) instead of to the weights directly (weight decay)."),
         **kwargs,
     ):
         output_dir = Path(output_dir)
         output_dir.mkdir(exist_ok=True, parents=True)
-        # callbacks = call_func(self.callbacks, **kwargs)
 
         return dict(
             loss_func=call_func(self.loss_func, **kwargs),
             metrics=call_func(self.metrics, **kwargs),
             path=output_dir,
-            # cbs=callbacks,
+            wd=weight_decay,
         )
 
     def loss_func(self, **kwargs):
@@ -529,6 +534,7 @@ class FastApp(Citable):
         self,
         project_name: str = Param(default=None, help="The name for this project for logging purposes."),
         run_name: str = Param(default=None, help="The name for this particular run for logging purposes."),
+        run_id: str = Param(default=None, help="A unique ID for this particular run for logging purposes."),
         notes: str = Param(None, help="A longer description of the run for logging purposes."),
         tag: List[str] = Param(
             None, help="A tag for logging purposes. Multiple tags can be added each introduced with --tag."
@@ -562,6 +568,7 @@ class FastApp(Citable):
             callback = FastAppWandbCallback(
                 app=self,
                 project_name=project_name,
+                id=run_id,
                 name=run_name,
                 mode=wandb_mode,
                 dir=wandb_dir,
