@@ -36,6 +36,9 @@ output:
                                       [default: ./outputs]
       --pretrained / --no-pretrained  Whether or not to use the pretrained weights.
                                       [default: pretrained]
+      --weight-decay FLOAT            The amount of weight decay. If None then it
+                                      uses the default amount of weight decay in
+                                      fastai.
       --csv PATH                      A CSV with image paths and categories.
       --image-column TEXT             The name of the column with the image paths.
                                       [default: image]
@@ -76,6 +79,8 @@ output:
                                       purposes.
       --run-name TEXT                 The name for this particular run for logging
                                       purposes.
+      --run-id TEXT                   A unique ID for this particular run for
+                                      logging purposes.
       --notes TEXT                    A longer description of the run for logging
                                       purposes.
       --tag TEXT                      A tag for logging purposes. Multiple tags can

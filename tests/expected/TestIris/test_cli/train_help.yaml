@@ -31,6 +31,8 @@ output:
                                       purposes.
       --run-name TEXT                 The name for this particular run for logging
                                       purposes.
+      --run-id TEXT                   A unique ID for this particular run for
+                                      logging purposes.
       --notes TEXT                    A longer description of the run for logging
                                       purposes.
       --tag TEXT                      A tag for logging purposes. Multiple tags can

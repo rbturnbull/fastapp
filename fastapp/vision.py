@@ -69,9 +69,12 @@ class VisionApp(FastApp):
         self,
         output_dir: Path = Param("./outputs", help="The location of the output directory."),
         pretrained: bool = Param(default=True, help="Whether or not to use the pretrained weights."),
+        weight_decay: float = Param(
+            None, help="The amount of weight decay. If None then it uses the default amount of weight decay in fastai."
+        ),
         **kwargs,
     ):
-        kwargs = super().learner_kwargs(output_dir=output_dir, **kwargs)
+        kwargs = super().learner_kwargs(output_dir=output_dir, weight_decay=weight_decay, **kwargs)
         kwargs['pretrained'] = pretrained
         self.fine_tune = pretrained
         return kwargs

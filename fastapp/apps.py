@@ -180,6 +180,7 @@ class FastApp(Citable):
             raise FileNotFoundError(f"Please pass in a pretrained model.")
 
         # Check if needs to be downloaded
+        location = str(location)
         if location.startswith("http"):
             # TODO get user cache dir
             cached_download(location, user_cache_dir, reload)
